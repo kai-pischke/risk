@@ -1,0 +1,49 @@
+name:                risk
+version:             0.1.0.0
+github:              "kai-pischke/risk"
+license:             BSD3
+author:              "Alex Pay, River Newbury and Kai Pischke"
+maintainer:          "kai.pischke@some.ox.ac.uk"
+copyright:           "2020 Alex Pay, River Newbury and Kai Pischke"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+- interface.md
+
+# Metadata used when publishing your package
+# synopsis:            Risk Board Game in Haskell.
+# category:            Web
+
+description:         Please see the README on GitHub at <https://github.com/kai-pischke/risk#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+
+library:
+  source-dirs: src
+
+executables:
+  risk-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - risk
+
+tests:
+  risk-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - risk
+    - hspec
+    - hspec-discover
+    - QuickCheck

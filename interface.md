@@ -1,13 +1,17 @@
 
 ## Graph
+### Types
+```hs
+Eq n => Graph n
+```
 
 ### Functions
 ```hs
-neighbors :: Graph n -> n -> [n]
+neighbors :: Eq n => Graph n -> n -> [n]
 ```  
 Given a graph and a node, returns a list of the directly adjacent nodes.
 ```hs
-isNeighbor :: Graph n -> n -> n -> Bool
+isNeighbor :: Eq n => Graph n -> n -> n -> Bool
 ```  
 Given a graph and two nodes, returns `True` if there is an edge connecting them and `False` otherwise.
 ```hs
