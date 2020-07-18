@@ -1,19 +1,13 @@
 
 name: Continuous Integration
 
-# On a typical workflow, changes are made through pull requests against the main branch. 
-# This section makes sure that jobs only executed when either a pull request is opened against
-# `master` or, when a change is pushed to an existing pull request.
 on:
-  pull_request: { "branches": [ "master" ] }
+  push: { "branches": [ "master" ] }
 
 jobs:
   build:
     strategy:
       matrix:
-        # Here may be defined more targets, like `macOS-latest` or `windows-2016` for compiling and
-        # running tests on different environment. In later steps, we can / should refer to the os as 
-        # `${{ matrix.os }}`.
         os: [ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
