@@ -1,0 +1,33 @@
+
+name: Continuous Integration
+
+# On a typical workflow, changes are made through pull requests against the main branch. 
+# This section makes sure that jobs only executed when either a pull request is opened against
+# `master` or, when a change is pushed to an existing pull request.
+on:
+  pull_request: { "branches": [ "master" ] }
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        # Here may be defined more targets, like `macOS-latest` or `windows-2016` for compiling and
+        # running tests on different environment. In later steps, we can / should refer to the os as 
+        # `${{ matrix.os }}`.
+        os: [ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v1
+
+    - name: 🧰 Setup Stack
+      uses: mstksg/setup-stack@v1
+
+    - name: 🔨 Build & Test
+      run: |
+        # Stack does all sort of exotic manipulations in the terminal with the build output. This
+        # can be the source of unexpected issues in emulated terminals, hence `--no-terminal`.
+        stack --no-terminal test 
