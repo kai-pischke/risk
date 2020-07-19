@@ -2,7 +2,8 @@
 name: Continuous Integration
 
 on:
-  push: { "branches": [ "master" ] }
+  # uncomment to turn on automatic testing
+  #push: { "branches": [ "master" ] } 
 
 jobs:
   build:
