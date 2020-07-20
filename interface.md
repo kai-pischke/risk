@@ -24,7 +24,7 @@ Given a valid adjacency list for an undirected graph, returns the corresponding 
 
 ### Types
 ```hs
-Country -- (Enum, Eq, Showable)
+Country -- (Enum, Eq, Show, Ord)
 ```
 The `Country` type should be inhabited by 42 nullary constructors with the names corresponding to the country names (including capitalisations) given in note 1 (missing spaces where necessary). `Country` should be an intsance of enum using the numbering convention given in note 1. Show should add in the spaces again so `show GreatBritain = "Great Britain"`.
 
@@ -37,6 +37,43 @@ Given a country, returns the list of all neighbouring countries.
 isNeighbor :: Country -> Country -> Bool
 ```
 Given two countries, returns `True` if there is an edge connecting them and `False` otherwise.
+
+## State 
+### Functions
+```hs
+newGame :: [Players] -> GameState
+```
+Creates a blank game with no troops in any country. Players should be given in turn order starting with the current player.
+
+```hs
+troops :: GameState -> Country -> Int
+```
+Gives the number of troops in a given country.
+
+```hs
+turnOrder :: GameState -> [Player]
+```
+Returns a list of players (in the order of play) starting with the current player.
+
+```hs
+owner :: GameState -> Country -> Player
+```
+Gives the player who owns a certain country.
+
+```hs
+changeTroops :: Country -> Int -> GameState -> GameState
+```
+Modifies (adds or subtracts) the given number of troops (to or from a country).
+
+```hs
+changeOwner :: Country -> Player -> GameState -> GameState
+```
+Changes the owner of a country.
+
+```hs
+nextTurn :: GameState -> GameState
+```
+Advances to the next turn.
 
 # Notes 
 
