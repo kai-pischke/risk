@@ -39,9 +39,22 @@ isNeighbor :: Country -> Country -> Bool
 Given two countries, returns `True` if there is an edge connecting them and `False` otherwise.
 
 ## State 
+### Types
+```hs
+GameState -- (Eq)
+```
+
+```hs
+MiniPhase (WonBattle Country Country Attackers | Normal) -- (Eq, Show)
+```
+
+```hs 
+Phase (Reinforce | Attack MiniPhase | Fortify)
+```
+
 ### Functions
 ```hs
-newGame :: [Players] -> GameState
+newGame :: [Players] -> StdGen -> GameState
 ```
 Creates a blank game with no troops in any country. Players should be given in turn order starting with the current player.
 
@@ -73,7 +86,66 @@ Changes the owner of a country.
 ```hs
 nextTurn :: GameState -> GameState
 ```
-Advances to the next turn.
+Advances to the next turn (and updates the phase).
+
+```hs
+currentStdGen :: GameState -> StdGen
+```
+Gets the current StdGen.
+
+```hs
+updateStdGen :: StdGen -> GameState -> GameState
+```
+Replaces the current StdGen.
+
+```hs
+phase :: GameState -> Phase
+```
+Gets the current phase.
+
+```hs
+nextPhase :: GameState -> GameState
+```
+Updates the current phase.
+
+## Battles
+### Types
+```hs
+Defenders (OneDef | TwoDef) -- (Eq, Show, Enum, Ord)
+```
+
+```hs
+Attackers (OneAtt | TwoAtt | ThreeAtt) -- (Eq, Show, Enum, Ord)
+```
+
+```hs
+doBattle :: Attackers -> Defenders -> StdGen -> (Int, Int, StdGen)
+```
+## Moves
+
+```hs
+reinforce :: [(Country, Int)] -> GameState -> Maybe GameState
+```
+
+```hs
+fortify :: Country -> Country -> Int -> GameState -> Maybe GameState
+```
+
+```hs
+attack :: Attackers -> Defenders -> Country -> Country -> GameState -> Maybe GameState
+```
+
+```hs
+invade :: Int -> GameState -> Maybe GameState
+```
+
+```hs
+skipFortify :: GameState -> Maybe GameState
+```
+
+```hs
+endAttack :: GameState -> Maybe GameState
+```
 
 # Notes 
 
