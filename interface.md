@@ -118,18 +118,24 @@ Defenders (OneDef | TwoDef) -- (Eq, Show, Enum, Ord)
 Attackers (OneAtt | TwoAtt | ThreeAtt) -- (Eq, Show, Enum, Ord)
 ```
 
+### Functions
 ```hs
 doBattle :: Attackers -> Defenders -> StdGen -> (Int, Int, StdGen)
 ```
+Takes the number of Attackers and the number of defenders and returns the outcome of the battle (attackers lost, defenders lost).
+
 ## Moves
 
 ```hs
 reinforce :: [(Country, Int)] -> GameState -> Maybe GameState
 ```
+Add reinforcements (specified as a list of pairs of country and non-negative integer number of troops to add). Must be during the correct phase.
 
 ```hs
 fortify :: Country -> Country -> Int -> GameState -> Maybe GameState
 ```
+Moves troops from one country to another. Countries must be neighbors and owned by the current player. Must be during the correct phase.
+
 
 ```hs
 attack :: Attackers -> Defenders -> Country -> Country -> GameState -> Maybe GameState
