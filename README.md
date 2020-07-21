@@ -4,6 +4,10 @@ This will be an implementation of the RISK Board game in Haskell. It is being wr
 # Game
 We will start with a simplified version of the game. There will be no risk cards in this version. There will be only two phases per turn (place reinforcements and attack). All attacks will use the maximum number of dice. Everyone will receive exactly 5 new troops each turn. The board layout will remain unchanged. This should be easier to implement than jumping straight in to the full version. 
 
+# Rules
+
+https://www.hasbro.com/common/instruct/risk.pdf
+
 ## Structure 
 
 ### app/
