@@ -51,49 +51,53 @@ data Country = Alaska
              deriving (Enum, Eq, Show, Ord)
 
 
+--Riskboard made from adjacency list
+riskboard = Graph.makeGraph [(Alaska , [Alberta, NorthwestTerritory,Kamchatka]),
+                            (Alberta , [Alaska, NorthwestTerritory, Ontario, WesternUnitedStates]),
+                            (CentralAmerica , [EasternUnitedStates, WesternUnitedStates, Venezuela]),
+                            (EasternUnitedStates , [CentralAmerica, Ontario, Quebec, WesternUnitedStates]),
+                            (Greenland , [Ontario, NorthwestTerritory, Quebec, Iceland]),
+                            (NorthwestTerritory , [Alaska, Alberta, Ontario, Greenland]),
+                            (Ontario , [NorthwestTerritory, Alberta, WesternUnitedStates, EasternUnitedStates, Quebec, Greenland]),
+                            (Quebec , [Ontario, EasternUnitedStates, Greenland]),
+                            (WesternUnitedStates , [Alberta, Ontario, EasternUnitedStates, CentralAmerica]),
+                            (Argentina , [Peru, Brazil]),
+                            (Brazil , [Venezuela, Peru, Argentina, NorthAfrica]),
+                            (Peru , [Venezuela, Brazil, Argentina]),
+                            (Venezuela , [CentralAmerica, Brazil, Peru]),
+                            (GreatBritain , [Iceland, Scandinavia, NorthernEurope, WesternEurope]),
+                            (Iceland , [Greenland, Scandinavia, GreatBritain]),
+                            (NorthernEurope , [GreatBritain, Scandinavia, Ukraine, SouthernEurope, WesternEurope]),
+                            (Scandinavia , [Iceland, Ukraine, NorthernEurope, GreatBritain]),
+                            (SouthernEurope , [WesternEurope, NorthernEurope, Ukraine, MiddleEast, Egypt, NorthAfrica]),
+                            (Ukraine , [Scandinavia, Ural, Afghanistan, MiddleEast, SouthernEurope, NorthernEurope]),
+                            (WesternEurope , [GreatBritain, NorthernEurope, SouthernEurope, NorthAfrica]),
+                            (Congo , [NorthAfrica, EastAfrica, SouthAfrica]),
+                            (EastAfrica , [Egypt, NorthAfrica, Congo, SouthAfrica, MiddleEast, Madagascar]),
+                            (Egypt , [SouthernEurope, MiddleEast, EastAfrica, NorthAfrica]),
+                            (Madagascar , [EastAfrica, SouthAfrica]),
+                            (NorthAfrica , [Brazil, WesternEurope, SouthernEurope, Egypt, EastAfrica, Congo]),
+                            (SouthAfrica , [Congo, EastAfrica, Madagascar]),
+                            (Afghanistan , [Ukraine, Ural, China, India, MiddleEast]),
+                            (China , [Ural, Siberia, Mongolia, Siam, India, Afghanistan]),
+                            (India , [MiddleEast, Afghanistan, China, Siam]),
+                            (MiddleEast , [Ukraine, Afghanistan, India, EastAfrica, Egypt, SouthernEurope]),
+                            (Irkutsk , [Siberia, Yakutsk, Kamchatka, Mongolia]),
+                            (Japan , [Mongolia, Kamchatka]),
+                            (Kamchatka , [Mongolia, Irkutsk, Yakutsk, Alaska, Japan]),
+                            (Mongolia , [Siberia, Irkutsk, Kamchatka, Japan, China]),
+                            (Siam , [India, China, Indonesia]),
+                            (Siberia , [Ural, Yakutsk, Irkutsk, Mongolia, China]),
+                            (Ural , [Ukraine, Siberia, China, Afghanistan]),
+                            (Yakutsk , [Siberia, Kamchatka, Irkutsk]),
+                            (EasternAustralia , [NewGuinea, WesternAustralia]),
+                            (Indonesia , [Siam, NewGuinea, WesternAustralia]),
+                            (NewGuinea ,  [Indonesia, WesternAustralia, EasternAustralia]),
+                            (WesternAustralia , [Indonesia, NewGuinea, EasternAustralia])]
+
+-- Simple Renamings
 neighbours :: Country -> [Country]
-neighbours Alaska = [Alberta, NorthwestTerritory,Kamchatka]
-neighbours Alberta = [Alaska, NorthwestTerritory, Ontario, WesternUnitedStates]
-neighbours CentralAmerica = [EasternUnitedStates, WesternUnitedStates, Venezuela]
-neighbours EasternUnitedStates = [CentralAmerica, Ontario, Quebec, WesternUnitedStates]
-neighbours Greenland = [Ontario, NorthwestTerritory, Quebec, Iceland]
-neighbours NorthwestTerritory = [Alaska, Alberta, Ontario, Greenland]
-neighbours Ontario = [NorthwestTerritory, Alberta, WesternUnitedStates, EasternUnitedStates, Quebec, Greenland]
-neighbours Quebec = [Ontario, EasternUnitedStates, Greenland]
-neighbours WesternUnitedStates = [Alberta, Ontario, EasternUnitedStates, CentralAmerica]
-neighbours Argentina = [Peru, Brazil]
-neighbours Brazil = [Venezuela, Peru, Argentina, NorthAfrica]
-neighbours Peru = [Venezuela, Brazil, Argentina]
-neighbours Venezuela = [CentralAmerica, Brazil, Peru]
-neighbours GreatBritain = [Iceland, Scandinavia, NorthernEurope, WesternEurope]
-neighbours Iceland = [Greenland, Scandinavia, GreatBritain]
-neighbours NorthernEurope = [GreatBritain, Scandinavia, Ukraine, SouthernEurope, WesternEurope]
-neighbours Scandinavia = [Iceland, Ukraine, NorthernEurope, GreatBritain]
-neighbours SouthernEurope = [WesternEurope, NorthernEurope, Ukraine, MiddleEast, Egypt, NorthAfrica]
-neighbours Ukraine = [Scandinavia, Ural, Afghanistan, MiddleEast, SouthernEurope, NorthernEurope]
-neighbours WesternEurope = [GreatBritain, NorthernEurope, SouthernEurope, NorthAfrica]
-neighbours Congo = [NorthAfrica, EastAfrica, SouthAfrica]
-neighbours EastAfrica = [Egypt, NorthAfrica, Congo, SouthAfrica, MiddleEast, Madagascar]
-neighbours Egypt = [SouthernEurope, MiddleEast, EastAfrica, NorthAfrica]
-neighbours Madagascar = [EastAfrica, SouthAfrica]
-neighbours NorthAfrica = [Brazil, WesternEurope, SouthernEurope, Egypt, EastAfrica, Congo]
-neighbours SouthAfrica = [Congo, EastAfrica, Madagascar]
-neighbours Afghanistan = [Ukraine, Ural, China, India, MiddleEast]
-neighbours China = [Ural, Siberia, Mongolia, Siam, India, Afghanistan]
-neighbours India = [MiddleEast, Afghanistan, China, Siam]
-neighbours MiddleEast = [Ukraine, Afghanistan, India, EastAfrica, Egypt, SouthernEurope]
-neighbours Irkutsk = [Siberia, Yakutsk, Kamchatka, Mongolia]
-neighbours Japan = [Mongolia, Kamchatka]
-neighbours Kamchatka = [Mongolia, Irkutsk, Yakutsk, Alaska, Japan]
-neighbours Mongolia = [Siberia, Irkutsk, Kamchatka, Japan, China]
-neighbours Siam = [India, China, Indonesia]
-neighbours Siberia = [Ural, Yakutsk, Irkutsk, Mongolia, China]
-neighbours Ural = [Ukraine, Siberia, China, Afghanistan]
-neighbours Yakutsk = [Siberia, Kamchatka, Irkutsk]
-neighbours EasternAustralia = [NewGuinea, WesternAustralia]
-neighbours Indonesia = [Siam, NewGuinea, WesternAustralia]
-neighbours NewGuinea =  [Indonesia, WesternAustralia, EasternAustralia]
-neighbours WesternAustralia = [Indonesia, NewGuinea, EasternAustralia]
+neighbours = Graph.neighbours riskBoard
 
 isNeighbour :: Country -> Country -> Bool
-isNeighbour c d = any (==d) (neighbours c)
+isNeighbour c d = Graph.isNeighbour riskBoard
