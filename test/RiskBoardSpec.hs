@@ -24,7 +24,7 @@ spec = do
         (Iceland == Iceland) `shouldBe` True
       it "== works as expected for different countries" $ do
         (NorthwestTerritory == Kamchatka) `shouldBe` False
-      it "== works as expected for neighbors" $ do
+      it "== works as expected for neighbours" $ do
         (Mongolia == Irkutsk) `shouldBe` False
     context "Ord" $ do 
       it "< works as expected (true case)" $ do
@@ -41,55 +41,55 @@ spec = do
       it "works for Western United States" $ do
         show WesternUnitedStates `shouldBe` "Western United States"
 
-  describe "isNeighbor" $ do
+  describe "isNeighbour" $ do
     context "Africa" $ do 
-      it "correctly identifies Madagascar and South Africa as neighbors" $ do
-        isNeighbor Madagascar SouthAfrica `shouldBe` True
-      it "correctly identifies Egypt and Congo as non-neighbors" $ do
-        isNeighbor Egypt Congo `shouldBe` False
-      it "correctly identifies Egypt and East Africa as neighbors" $ do
-        isNeighbor Egypt EastAfrica `shouldBe` True
+      it "correctly identifies Madagascar and South Africa as neighbours" $ do
+        isNeighbour Madagascar SouthAfrica `shouldBe` True
+      it "correctly identifies Egypt and Congo as non-neighbours" $ do
+        isNeighbour Egypt Congo `shouldBe` False
+      it "correctly identifies Egypt and East Africa as neighbours" $ do
+        isNeighbour Egypt EastAfrica `shouldBe` True
     context "Europe" $ do 
-      it "correctly identifies Northern Europe and Scandinavia as neighbors" $ do
-        isNeighbor NorthernEurope Scandinavia `shouldBe` True
-      it "correctly identifies Iceland and Ukraine as non-neighbors" $ do
-        isNeighbor Iceland Ukraine `shouldBe` False
-      it "correctly identifies Great Britain and Western Europe as neighbors" $ do
-        isNeighbor GreatBritain WesternEurope `shouldBe` True
+      it "correctly identifies Northern Europe and Scandinavia as neighbours" $ do
+        isNeighbour NorthernEurope Scandinavia `shouldBe` True
+      it "correctly identifies Iceland and Ukraine as non-neighbours" $ do
+        isNeighbour Iceland Ukraine `shouldBe` False
+      it "correctly identifies Great Britain and Western Europe as neighbours" $ do
+        isNeighbour GreatBritain WesternEurope `shouldBe` True
     context "Asia" $ do 
-      it "correctly identifies India and Siam as neighbors" $ do
-        isNeighbor India Siam `shouldBe` True
-      it "correctly identifies Middle East and Japan as non-neighbors" $ do
-        isNeighbor MiddleEast Japan `shouldBe` False
-      it "correctly identifies Ural and Siberia as neighbors" $ do
-        isNeighbor Ural Siberia `shouldBe` True
+      it "correctly identifies India and Siam as neighbours" $ do
+        isNeighbour India Siam `shouldBe` True
+      it "correctly identifies Middle East and Japan as non-neighbours" $ do
+        isNeighbour MiddleEast Japan `shouldBe` False
+      it "correctly identifies Ural and Siberia as neighbours" $ do
+        isNeighbour Ural Siberia `shouldBe` True
     context "North America" $ do
-      it "correctly identifies Eastern United States and Western United States as neighbors" $ do
-        isNeighbor EasternUnitedStates WesternUnitedStates `shouldBe` True
-      it "correctly identifies Quebec and Alaska as non-neighbors" $ do
-        isNeighbor Quebec Alaska `shouldBe` False
-      it "correctly identifies Ontario and Greenland as neighbors" $ do
-        isNeighbor Ontario Greenland `shouldBe` True
+      it "correctly identifies Eastern United States and Western United States as neighbours" $ do
+        isNeighbour EasternUnitedStates WesternUnitedStates `shouldBe` True
+      it "correctly identifies Quebec and Alaska as non-neighbours" $ do
+        isNeighbour Quebec Alaska `shouldBe` False
+      it "correctly identifies Ontario and Greenland as neighbours" $ do
+        isNeighbour Ontario Greenland `shouldBe` True
     context "South America" $ do
-      it "correctly identifies Brazil and Venezuela as neighbors" $ do
-        isNeighbor Brazil Venezuela `shouldBe` True
-      it "correctly identifies Argentina and Venezuela as non-neighbors" $ do
-        isNeighbor Argentina Venezuela `shouldBe` False
-      it "correctly identifies Peru and Argentina as neighbors" $ do
-        isNeighbor Peru Argentina `shouldBe` True
+      it "correctly identifies Brazil and Venezuela as neighbours" $ do
+        isNeighbour Brazil Venezuela `shouldBe` True
+      it "correctly identifies Argentina and Venezuela as non-neighbours" $ do
+        isNeighbour Argentina Venezuela `shouldBe` False
+      it "correctly identifies Peru and Argentina as neighbours" $ do
+        isNeighbour Peru Argentina `shouldBe` True
     context "Australia" $ do
-      it "correctly identifies Eastern Australia and Western Australia as neighbors" $ do
-        isNeighbor EasternAustralia WesternAustralia `shouldBe` True
-      it "correctly identifies Indonesia and Eastern Australia as non-neighbors" $ do
-        isNeighbor Indonesia EasternAustralia `shouldBe` False
-      it "correctly identifies New Guinea and Western Australia as neighbors" $ do
-        isNeighbor NewGuinea WesternAustralia `shouldBe` True
+      it "correctly identifies Eastern Australia and Western Australia as neighbours" $ do
+        isNeighbour EasternAustralia WesternAustralia `shouldBe` True
+      it "correctly identifies Indonesia and Eastern Australia as non-neighbours" $ do
+        isNeighbour Indonesia EasternAustralia `shouldBe` False
+      it "correctly identifies New Guinea and Western Australia as neighbours" $ do
+        isNeighbour NewGuinea WesternAustralia `shouldBe` True
     context "Between Continents" $ do
-      it "correctly identifies Alaska and Kamchatka as neighbors" $ do
-        isNeighbor Alaska Kamchatka `shouldBe` True
-      it "correctly identifies Brazil and New Guinea as non-neighbors" $ do
-        isNeighbor Brazil NewGuinea `shouldBe` False
-      it "correctly identifies Afghanistan and Ukraine as neighbors" $ do
-        isNeighbor Afghanistan Ukraine `shouldBe` True
+      it "correctly identifies Alaska and Kamchatka as neighbours" $ do
+        isNeighbour Alaska Kamchatka `shouldBe` True
+      it "correctly identifies Brazil and New Guinea as non-neighbours" $ do
+        isNeighbour Brazil NewGuinea `shouldBe` False
+      it "correctly identifies Afghanistan and Ukraine as neighbours" $ do
+        isNeighbour Afghanistan Ukraine `shouldBe` True
 
 

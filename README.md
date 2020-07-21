@@ -1,6 +1,9 @@
 # Risk
 This will be an implementation of the RISK Board game in Haskell. It is being written by the first year Computer Science students at Somerville College Oxford as a summer project over the summer of 2020.
 
+# Game
+We will start with a simplified version of the game. There will be no risk cards in this version. There will be only two phases per turn (place reinforcements and attack). All attacks will use the maximum number of dice. Everyone will receive exactly 5 new troops each turn. The board layout will remain unchanged. This should be easier to implement than jumping straight in to the full version. 
+
 ## Structure 
 
 ### app/
