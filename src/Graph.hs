@@ -12,7 +12,7 @@ neighbours :: Eq n => Graph n -> n -> [n]
 neighbours (Graph _ f) = f
 
 isNeighbour :: Eq n => Graph n -> n -> n -> Bool
-isNeighbour (Graph _ f) c d = any (==d) (f c)
+isNeighbour g c d = any (==d) (neighbours g c)
 
 
 --Constructs a graph from an adjacency list; must be undirected Graph
@@ -35,6 +35,3 @@ makef (n:ns) x
 testReflexivity:: Eq n => [n] -> (n -> [n]) -> Bool
 testReflexivity [] f = True
 testReflexivity (n:ns) f = all (\x -> any (==n) (f x))  (f n) && testReflexivity ns f 
-
-main:: IO()
-main = return()
