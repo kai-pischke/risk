@@ -18,6 +18,7 @@ module State
 
 import System.Random
 import Data.Map (Map)
+import Data.Maybe
 import qualified Data.Map as Map
 import RiskBoard
 import Battle
@@ -25,7 +26,8 @@ import Battle
 -- this is stupid, I will find a way to get rid of this.
 instance Eq StdGen where 
    a == b = show a == show b
-   
+
+-- internal representation of game state
 data GameState = InternalGameState
    { troopMap :: Map Country Int,
      stateStdGen :: StdGen,
@@ -48,10 +50,10 @@ newGame listOfPlayers startingStdGen = InternalGameState
    listOfPlayers
 
 troops :: GameState -> Country -> Int
-troops = undefined
+troops g c = fromMaybe (error "you gave me an unexpected country") (Map.lookup c (troopMap g))
 
 turnOrder :: GameState -> [Player]
-turnOrder = undefined
+turnOrder = statePayers
 
 owner :: GameState -> Country -> Player
 owner = undefined
@@ -66,13 +68,13 @@ nextTurn :: GameState -> GameState
 nextTurn = undefined
 
 currentStdGen :: GameState -> StdGen
-currentStdGen = undefined
+currentStdGen = stateStdGen
 
 updateStdGen :: StdGen -> GameState -> GameState
 updateStdGen = undefined
 
 phase :: GameState -> Phase
-phase = undefined
+phase = statePhase
 
 nextPhase :: GameState -> GameState
 nextPhase = undefined
