@@ -22,8 +22,17 @@ import qualified Data.Map as Map
 import RiskBoard
 import Battle
 
-data GameState = Undefined 
-               deriving (Eq)
+-- this is stupid, I will find a way to get rid of this.
+instance Eq StdGen where 
+   a == b = show a == show b
+   
+data GameState = InternalGameState
+   { troopMap :: Map Country Int,
+     stateStdGen :: StdGen,
+     statePhase :: Phase,
+     statePayers :: [Player]
+   } deriving (Eq)
+   
 data Player = Black | Blue | Green | Red | Yellow 
                deriving (Eq, Show)
 data MiniPhase = WonBattle Country Country Attackers | Normal 
@@ -32,7 +41,11 @@ data Phase = Reinforce | Attack MiniPhase | Fortify
                deriving (Eq, Show)
 
 newGame :: [Player] -> StdGen -> GameState
-newGame = undefined
+newGame listOfPlayers startingStdGen = InternalGameState 
+   (Map.fromList $ zip [(minBound :: Country)..] [0..])
+   startingStdGen
+   Reinforce
+   listOfPlayers
 
 troops :: GameState -> Country -> Int
 troops = undefined
