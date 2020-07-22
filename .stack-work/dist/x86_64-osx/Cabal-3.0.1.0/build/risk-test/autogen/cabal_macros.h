@@ -55,6 +55,17 @@
   (major1) == 2 && (major2) == 7 && (minor) <= 1)
 #endif /* MIN_VERSION_hspec_discover */
 
+/* package random-1.1 */
+#ifndef VERSION_random
+#define VERSION_random "1.1"
+#endif /* VERSION_random */
+#ifndef MIN_VERSION_random
+#define MIN_VERSION_random(major1,major2,minor) (\
+  (major1) <  1 || \
+  (major1) == 1 && (major2) <  1 || \
+  (major1) == 1 && (major2) == 1 && (minor) <= 0)
+#endif /* MIN_VERSION_random */
+
 /* package risk-0.1.0.0 */
 #ifndef VERSION_risk
 #define VERSION_risk "0.1.0.0"
@@ -155,7 +166,7 @@
 #endif /* MIN_TOOL_VERSION_runghc */
 
 #ifndef CURRENT_COMPONENT_ID
-#define CURRENT_COMPONENT_ID "risk-0.1.0.0-1mgAp97tY0O9VZHzuq2U43-risk-test"
+#define CURRENT_COMPONENT_ID "risk-0.1.0.0-29l2PXE7NxU4gOe2q1p7Cj-risk-test"
 #endif /* CURRENT_COMPONENT_ID */
 #ifndef CURRENT_PACKAGE_VERSION
 #define CURRENT_PACKAGE_VERSION "0.1.0.0"

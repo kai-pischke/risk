@@ -8,11 +8,11 @@ Eq n => Graph n
 
 ### Functions
 ```hs
-neighbors :: Eq n => Graph n -> n -> [n]
+neighbours :: Eq n => Graph n -> n -> [n]
 ```  
 Given a graph and a node, returns a list of the directly adjacent nodes.
 ```hs
-isNeighbor :: Eq n => Graph n -> n -> n -> Bool
+isNeighbour :: Eq n => Graph n -> n -> n -> Bool
 ```  
 Given a graph and two nodes, returns `True` if there is an edge connecting them and `False` otherwise.
 ```hs
@@ -30,11 +30,11 @@ The `Country` type should be inhabited by 42 nullary constructors with the names
 
 ### Functions
 ```hs
-neighbors :: Country -> [Country]
+neighbours :: Country -> [Country]
 ``` 
 Given a country, returns the list of all neighbouring countries.
 ```hs
-isNeighbor :: Country -> Country -> Bool
+isNeighbour :: Country -> Country -> Bool
 ```
 Given two countries, returns `True` if there is an edge connecting them and `False` otherwise.
 
@@ -45,16 +45,20 @@ GameState -- (Eq)
 ```
 
 ```hs
+Player (Black | Blue | Green | Red | Yellow) -- (Eq, Show) 
+```
+
+```hs
 MiniPhase (WonBattle Country Country Attackers | Normal) -- (Eq, Show)
 ```
 
 ```hs 
-Phase (Reinforce | Attack MiniPhase | Fortify)
+Phase (Reinforce | Attack MiniPhase | Fortify) -- (Eq, Show)
 ```
 
 ### Functions
 ```hs
-newGame :: [Players] -> StdGen -> GameState
+newGame :: [Player] -> StdGen -> GameState
 ```
 Creates a blank game with no troops in any country. Players should be given in turn order starting with the current player.
 
@@ -111,12 +115,14 @@ Updates the current phase.
 ## Battles
 ### Types
 ```hs
-Defenders (OneDef | TwoDef) -- (Eq, Show, Enum, Ord)
+Defenders (OneDef | TwoDef) -- (Eq, Show, Ord, Enum)
 ```
+Note that for `Enum`, enumeration starts at 1 not 0.
 
 ```hs
-Attackers (OneAtt | TwoAtt | ThreeAtt) -- (Eq, Show, Enum, Ord)
+Attackers (OneAtt | TwoAtt | ThreeAtt) -- (Eq, Show, Ord, Enum)
 ```
+Note that for `Enum`, enumeration starts at 1 not 0.
 
 ### Functions
 ```hs
@@ -134,7 +140,7 @@ Add reinforcements (specified as a list of pairs of country and non-negative int
 ```hs
 fortify :: Country -> Country -> Int -> GameState -> Maybe GameState
 ```
-Moves troops from one country to another. Countries must be neighbors and owned by the current player. Must be during the correct phase.
+Moves troops from one country to another. Countries must be neighbours and owned by the current player. Must be during the correct phase.
 
 
 ```hs

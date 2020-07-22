@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: cbc9b58745225ce4137cbaca7328bd5e72e398f5e1abeb581b92bc88e221ef62
+-- hash: 3850f4dafd727354b25351b5965c8338edf2887927c6faf0672a37070e215e0b
 
 name:           risk
 version:        0.1.0.0
@@ -28,14 +28,17 @@ source-repository head
 
 library
   exposed-modules:
+      Battle
       Graph
       RiskBoard
+      State
   other-modules:
       Paths_risk
   hs-source-dirs:
       src
   build-depends:
       base >=4.7 && <5
+    , random
   default-language: Haskell2010
 
 executable risk-exe
@@ -47,6 +50,7 @@ executable risk-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , random
     , risk
   default-language: Haskell2010
 
@@ -65,5 +69,6 @@ test-suite risk-test
     , base >=4.7 && <5
     , hspec
     , hspec-discover
+    , random
     , risk
   default-language: Haskell2010
