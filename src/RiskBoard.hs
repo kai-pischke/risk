@@ -48,7 +48,7 @@ data Country = Alaska
              | Indonesia
              | NewGuinea
              | WesternAustralia
-             deriving (Enum, Eq, Show, Ord)
+             deriving (Enum, Eq, Show, Ord, Bounded)
 
 
 --Riskboard made from adjacency list

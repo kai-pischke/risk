@@ -17,6 +17,8 @@ module State
     ) where
 
 import System.Random
+import Data.Map (Map)
+import qualified Data.Map as Map
 import RiskBoard
 import Battle
 

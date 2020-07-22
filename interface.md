@@ -24,7 +24,7 @@ Given a valid adjacency list for an undirected graph, returns the corresponding 
 
 ### Types
 ```hs
-Country -- (Enum, Eq, Show, Ord)
+Country -- (Enum, Eq, Show, Ord, Bounded)
 ```
 The `Country` type should be inhabited by 42 nullary constructors with the names corresponding to the country names (including capitalisations) given in note 1 (missing spaces where necessary). `Country` should be an intsance of enum using the numbering convention given in note 1. Show should add in the spaces again so `show GreatBritain = "Great Britain"`.
 
