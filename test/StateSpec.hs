@@ -5,6 +5,7 @@ import Test.QuickCheck
 import State
 import RiskBoard
 import Battle
+import System.Random
 
 spec :: Spec
 spec = do
@@ -41,9 +42,16 @@ spec = do
         (Attack(WonBattle GreatBritain Scandinavia TwoAtt) == Attack (WonBattle GreatBritain WesternAustralia TwoAtt)) `shouldBe` False
         (Attack(WonBattle Scandinavia WesternAustralia TwoAtt) == Attack(WonBattle GreatBritain WesternAustralia TwoAtt)) `shouldBe` False
   describe "newgame" $ do
+
     context "Newly initialised game with players [Blue, Red, Green]" $ do
-      it "correctly has no troops in Scandinavia" $ do
-      it "correctly has no troops in Kamchatka" $ do
-      it "correctly has no troops in North Africa" $ do
-      it "correctly has Blue as first player" $ do
-      it "correctly has Reinforce as starting phase" $ do
+        it "correctly has no troops in Scandinavia" $ do
+          (troops game Scandinavia == 0) `shouldBe` True
+        it "correctly has no troops in Kamchatka" $ do
+          (troops game Kamchatka == 0) `shouldBe` True
+        it "correctly has no troops in North Africa" $ do
+          (troops game NorthAfrica == 0) `shouldBe` True
+        it "correctly has players in order Blue, Red, Green" $ do
+          (turnOrder game == [Blue, Red, Green]) `shouldBe` True
+        it "correctly has Reinforce as starting phase" $ do
+          (phase game == Reinforce) `shouldBe` True
+      where game = newGame [Blue, Red, Green] (mkStdGen 0)
