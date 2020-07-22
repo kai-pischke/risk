@@ -1,7 +1,7 @@
 module Graph
     ( Graph,
-      neighbors,
-      isNeighbor,
+      neighbours,
+      isNeighbour,
       makeGraph
     ) where
 

@@ -52,7 +52,7 @@ data Country = Alaska
 
 
 --Riskboard made from adjacency list
-riskboard = Graph.makeGraph [(Alaska , [Alberta, NorthwestTerritory,Kamchatka]),
+riskBoard = Graph.makeGraph [(Alaska , [Alberta, NorthwestTerritory,Kamchatka]),
                             (Alberta , [Alaska, NorthwestTerritory, Ontario, WesternUnitedStates]),
                             (CentralAmerica , [EasternUnitedStates, WesternUnitedStates, Venezuela]),
                             (EasternUnitedStates , [CentralAmerica, Ontario, Quebec, WesternUnitedStates]),
@@ -100,4 +100,4 @@ neighbours :: Country -> [Country]
 neighbours = Graph.neighbours riskBoard
 
 isNeighbour :: Country -> Country -> Bool
-isNeighbour c d = Graph.isNeighbour riskBoard
+isNeighbour = Graph.isNeighbour riskBoard
