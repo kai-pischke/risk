@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3850f4dafd727354b25351b5965c8338edf2887927c6faf0672a37070e215e0b
+-- hash: 48664353f895132e8bf6bacdf17a2112bf82cb1a179fdc868f1475ddf8b23135
 
 name:           risk
 version:        0.1.0.0
@@ -58,6 +58,7 @@ test-suite risk-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      BattleSpec
       GraphSpec
       RiskBoardSpec
       Paths_risk
