@@ -63,6 +63,7 @@ test-suite risk-test
   other-modules:
       BattleSpec
       GraphSpec
+      StateSpec
       RiskBoardSpec
       Paths_risk
   hs-source-dirs:

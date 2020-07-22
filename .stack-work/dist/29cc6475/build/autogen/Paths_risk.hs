@@ -30,7 +30,7 @@ version = Version [0,1,0,0] []
 bindir, libdir, dynlibdir, datadir, libexecdir, sysconfdir :: FilePath
 
 bindir     = "C:\\Users\\alexd\\Desktop\\risk-master\\risk\\.stack-work\\install\\392054cf\\bin"
-libdir     = "C:\\Users\\alexd\\Desktop\\risk-master\\risk\\.stack-work\\install\\392054cf\\lib\\x86_64-windows-ghc-8.8.3\\risk-0.1.0.0-Fl5GrM9oLx6JA7T140UOlS"
+libdir     = "C:\\Users\\alexd\\Desktop\\risk-master\\risk\\.stack-work\\install\\392054cf\\lib\\x86_64-windows-ghc-8.8.3\\risk-0.1.0.0-FFvC89jblST8xI8g6deZnc"
 dynlibdir  = "C:\\Users\\alexd\\Desktop\\risk-master\\risk\\.stack-work\\install\\392054cf\\lib\\x86_64-windows-ghc-8.8.3"
 datadir    = "C:\\Users\\alexd\\Desktop\\risk-master\\risk\\.stack-work\\install\\392054cf\\share\\x86_64-windows-ghc-8.8.3\\risk-0.1.0.0"
 libexecdir = "C:\\Users\\alexd\\Desktop\\risk-master\\risk\\.stack-work\\install\\392054cf\\libexec\\x86_64-windows-ghc-8.8.3\\risk-0.1.0.0"
