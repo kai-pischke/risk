@@ -73,7 +73,7 @@ turnOrder :: GameState -> [Player]
 Returns a list of players (in the order of play) starting with the current player.
 
 ```hs
-owner :: GameState -> Country -> Player
+owner :: GameState -> Country -> Maybe Player
 ```
 Gives the player who owns a certain country.
 
@@ -83,7 +83,7 @@ changeTroops :: Country -> Int -> GameState -> GameState
 Modifies (adds or subtracts) the given number of troops (to or from a country).
 
 ```hs
-changeOwner :: Country -> Player -> GameState -> GameState
+changeOwner :: Country -> Maybe Player -> GameState -> GameState
 ```
 Changes the owner of a country.
 
