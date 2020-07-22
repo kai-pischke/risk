@@ -9,7 +9,8 @@ module Moves (
 
   import Battle
   import State
-  
+  import RiskBoard
+
   reinforce :: [(Country, Int)] -> GameState -> Maybe GameState
   reinforce = undefined
 
