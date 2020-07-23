@@ -140,7 +140,7 @@ Add reinforcements (specified as a list of pairs of country and non-negative int
 ```hs
 fortify :: Country -> Country -> Int -> GameState -> Maybe GameState
 ```
-Moves troops from one country to another. Countries must be neighbours and owned by the current player. Must be during the correct phase.
+Moves troops from one country to another. Countries must be neighbours and owned by the current player. Must be during the correct phase. Troops are sent from the first country to the second one.
 
 
 ```hs
