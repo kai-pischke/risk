@@ -55,13 +55,13 @@ spec = do
                 (toEnum 3) `shouldBe` ThreeAtt
     describe "doBattle" $ do
         it "ensures total losses are correct" $ property $
-               \a d g -> let (x,y,_) = doBattle a d g 
+               \a d g -> let (x,y,_) = doBattle a d g
                          in x+y == min (fromEnum a) (fromEnum d)
         it "ensures 0 ≤ attackers lost ≤ attackers" $ property $
-               \a d g -> let (x,_,_) = doBattle a d g 
+               \a d g -> let (x,_,_) = doBattle a d g
                          in 0 <= x && x <= (fromEnum a)
         it "ensures 0 ≤ defenders lost ≤ defenders" $ property $
-               \a d g -> let (_,y,_) = doBattle a d g 
+               \a d g -> let (_,y,_) = doBattle a d g
                          in 0 <= y && y <= (fromEnum d)
 
 
