@@ -24,10 +24,6 @@ import Control.Monad
 import RiskBoard
 import Battle
 
--- this is stupid, I will find a way to get rid of this.
-instance Eq StdGen where 
-   a == b = show a == show b
-
 -- internal representation of game state
 data GameState = InternalGameState
    { troopMap :: Map Country Int,

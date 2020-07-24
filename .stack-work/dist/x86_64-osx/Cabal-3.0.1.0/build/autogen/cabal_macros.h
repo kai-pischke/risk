@@ -33,15 +33,15 @@
   (major1) == 0 && (major2) == 6 && (minor) <= 2)
 #endif /* MIN_VERSION_containers */
 
-/* package random-1.1 */
+/* package random-1.2.0 */
 #ifndef VERSION_random
-#define VERSION_random "1.1"
+#define VERSION_random "1.2.0"
 #endif /* VERSION_random */
 #ifndef MIN_VERSION_random
 #define MIN_VERSION_random(major1,major2,minor) (\
   (major1) <  1 || \
-  (major1) == 1 && (major2) <  1 || \
-  (major1) == 1 && (major2) == 1 && (minor) <= 0)
+  (major1) == 1 && (major2) <  2 || \
+  (major1) == 1 && (major2) == 2 && (minor) <= 0)
 #endif /* MIN_VERSION_random */
 
 /* tool gcc-4.2.1 */
@@ -133,10 +133,10 @@
 #endif /* MIN_TOOL_VERSION_runghc */
 
 #ifndef CURRENT_PACKAGE_KEY
-#define CURRENT_PACKAGE_KEY "risk-0.1.0.0-LtmN7Mf1fhuJrsPcNZ0HPP"
+#define CURRENT_PACKAGE_KEY "risk-0.1.0.0-8eB6vZ1G5dG2LWH3EhEKIc"
 #endif /* CURRENT_PACKAGE_KEY */
 #ifndef CURRENT_COMPONENT_ID
-#define CURRENT_COMPONENT_ID "risk-0.1.0.0-LtmN7Mf1fhuJrsPcNZ0HPP"
+#define CURRENT_COMPONENT_ID "risk-0.1.0.0-8eB6vZ1G5dG2LWH3EhEKIc"
 #endif /* CURRENT_COMPONENT_ID */
 #ifndef CURRENT_PACKAGE_VERSION
 #define CURRENT_PACKAGE_VERSION "0.1.0.0"
