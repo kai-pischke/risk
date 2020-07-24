@@ -73,7 +73,7 @@ turnOrder :: GameState -> [Player]
 Returns a list of players (in the order of play) starting with the current player.
 
 ```hs
-owner :: GameState -> Country -> Player
+owner :: GameState -> Country -> Maybe Player
 ```
 Gives the player who owns a certain country.
 
@@ -83,7 +83,7 @@ changeTroops :: Country -> Int -> GameState -> GameState
 Modifies (adds or subtracts) the given number of troops (to or from a country).
 
 ```hs
-changeOwner :: Country -> Player -> GameState -> GameState
+changeOwner :: Country -> Maybe Player -> GameState -> GameState
 ```
 Changes the owner of a country.
 
@@ -112,7 +112,7 @@ nextPhase :: GameState -> GameState
 ```
 Updates the current phase.
 
-## Battles
+## Battle
 ### Types
 ```hs
 Defenders (OneDef | TwoDef) -- (Eq, Show, Ord, Enum)
@@ -140,7 +140,7 @@ Add reinforcements (specified as a list of pairs of country and non-negative int
 ```hs
 fortify :: Country -> Country -> Int -> GameState -> Maybe GameState
 ```
-Moves troops from one country to another. Countries must be neighbours and owned by the current player. Must be during the correct phase.
+Moves troops from one country to another. Countries must be neighbours and owned by the current player. Must be during the correct phase. Troops are sent from the first country to the second one.
 
 
 ```hs

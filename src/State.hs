@@ -17,9 +17,10 @@ module State
     ) where
 
 import System.Random
-import Data.Map (Map)
 import Data.Maybe
+import Data.Map (Map)
 import qualified Data.Map as Map
+import Control.Monad
 import RiskBoard
 import Battle
 
@@ -30,11 +31,14 @@ instance Eq StdGen where
 -- internal representation of game state
 data GameState = InternalGameState
    { troopMap :: Map Country Int,
+     playerMap :: Map Country (Maybe Player),
      stateStdGen :: StdGen,
      statePhase :: Phase,
      statePayers :: [Player]
    } deriving (Eq)
-   
+
+
+
 data Player = Black | Blue | Green | Red | Yellow 
                deriving (Eq, Show)
 data MiniPhase = WonBattle Country Country Attackers | Normal 
@@ -42,12 +46,35 @@ data MiniPhase = WonBattle Country Country Attackers | Normal
 data Phase = Reinforce | Attack MiniPhase | Fortify
                deriving (Eq, Show)
 
+advancePhase :: Phase -> Phase 
+advancePhase Reinforce = Attack Normal
+advancePhase (Attack _) = Fortify
+advancePhase Fortify = Reinforce
+
+-- map functions for Internal State
+changeTroopMap :: (Map Country Int -> Map Country Int) -> GameState -> GameState
+changeTroopMap f (InternalGameState t p g h l) = InternalGameState (f t) p g h l
+
+changePlayerMap :: (Map Country (Maybe Player) -> Map Country (Maybe Player)) -> GameState -> GameState
+changePlayerMap f (InternalGameState t p g h l) = InternalGameState t (f p) g h l
+   
+changeGen :: (StdGen -> StdGen) -> GameState -> GameState
+changeGen f (InternalGameState t p g h l) = InternalGameState t p (f g) h l
+   
+changePhase :: (Phase -> Phase) -> GameState -> GameState
+changePhase f (InternalGameState t p g h l) = InternalGameState t p g (f h) l
+
+changePlayer :: ([Player] -> [Player]) -> GameState -> GameState
+changePlayer f (InternalGameState t p g h l) = InternalGameState t p g h (f l)
+--
+
 newGame :: [Player] -> StdGen -> GameState
-newGame listOfPlayers startingStdGen = InternalGameState 
-   (Map.fromList $ zip [(minBound :: Country)..] [0..])
+newGame listOfPlayer startingStdGen = InternalGameState 
+   (Map.fromList $ zip [(minBound :: Country)..] $ repeat 0)
+   (Map.fromList $ zip [(minBound :: Country)..] $ repeat Nothing)
    startingStdGen
    Reinforce
-   listOfPlayers
+   listOfPlayer
 
 troops :: GameState -> Country -> Int
 troops g c = fromMaybe (error "you gave me an unexpected country") (Map.lookup c (troopMap g))
@@ -55,26 +82,30 @@ troops g c = fromMaybe (error "you gave me an unexpected country") (Map.lookup c
 turnOrder :: GameState -> [Player]
 turnOrder = statePayers
 
-owner :: GameState -> Country -> Player
-owner = undefined
+owner :: GameState -> Country -> Maybe Player
+owner g c = join $ Map.lookup c (playerMap g)
 
 changeTroops :: Country -> Int -> GameState -> GameState
-changeTroops = undefined
+changeTroops c i = changeTroopMap (Map.insertWith (+) c i)
 
-changeOwner :: Country -> Player -> GameState -> GameState
-changeOwner = undefined
+changeOwner :: Country -> Maybe Player -> GameState -> GameState
+changeOwner c p = changePlayerMap (Map.insert c p)
 
 nextTurn :: GameState -> GameState
-nextTurn = undefined
+nextTurn = changePlayer rotate . changePhase (const Reinforce)
+   where 
+      rotate :: [a] -> [a]
+      rotate [] = []
+      rotate (x:xs) = xs ++ [x]
 
 currentStdGen :: GameState -> StdGen
 currentStdGen = stateStdGen
 
 updateStdGen :: StdGen -> GameState -> GameState
-updateStdGen = undefined
+updateStdGen = changeGen . const
 
 phase :: GameState -> Phase
 phase = statePhase
 
 nextPhase :: GameState -> GameState
-nextPhase = undefined
+nextPhase = changePhase advancePhase
