@@ -112,7 +112,7 @@ nextPhase :: GameState -> GameState
 ```
 Updates the current phase.
 
-## Battles
+## Battle
 ### Types
 ```hs
 Defenders (OneDef | TwoDef) -- (Eq, Show, Ord, Enum)
