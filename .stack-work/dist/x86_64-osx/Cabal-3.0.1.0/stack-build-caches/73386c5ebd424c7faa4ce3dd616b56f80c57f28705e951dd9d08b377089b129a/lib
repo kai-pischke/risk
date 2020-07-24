@@ -1,11 +1,11 @@
 /Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/interface.md:
-  hash: 6d0ea1ad7c327fb7878b45f1cb08716f9b9ee2beb5eb0263105d5fe023774c9f
-  size: 5598
-  modtime: 1595504035
+  hash: b2b8912d151e6c075132a269a51aaa1ba5b678b2c26f38f470da850ec3be0ac3
+  size: 5615
+  modtime: 1595595254
 /Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/src/Battle.hs:
-  hash: 8101e8d41e9ab09bc8b1bf5509d8dde4803f0bcecb7cc8ba0130d5b00515eb81
-  size: 410
-  modtime: 1595427680
+  hash: a6780c7d08f46758c66eec48687ae361495dcb564815caa3271e62356a095a54
+  size: 834
+  modtime: 1595519785
 /Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/risk.cabal:
   hash: 5a148293144e545d015366c98a44657678f87f35e88dd0258ab7930c9f4c3af6
   size: 1789
@@ -27,9 +27,9 @@
   size: 663
   modtime: 1595424375
 /Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/src/State.hs:
-  hash: 8837321c7003d6bfc8c2344316ab17f1d1a4ccd33e922178fc5006bb1f174753
-  size: 3283
-  modtime: 1595444216
+  hash: 396a1bcb922e8b7247f3b5e9473dc9522486e91a718c2d97bd352f0a652d3365
+  size: 3366
+  modtime: 1595595682
 /Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/README.md:
   hash: 8d2df62b83cd25a6fcdbf6ac627735491777473148cbb31ca2869d02bc7144db
   size: 2214
