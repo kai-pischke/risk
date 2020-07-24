@@ -41,17 +41,86 @@ spec = do
         (Attack(WonBattle GreatBritain WesternAustralia TwoAtt) == Attack (WonBattle GreatBritain WesternAustralia OneAtt)) `shouldBe` False
         (Attack(WonBattle GreatBritain Scandinavia TwoAtt) == Attack (WonBattle GreatBritain WesternAustralia TwoAtt)) `shouldBe` False
         (Attack(WonBattle Scandinavia WesternAustralia TwoAtt) == Attack(WonBattle GreatBritain WesternAustralia TwoAtt)) `shouldBe` False
-  describe "newgame" $ do
-
-    context "Newly initialised game with players [Blue, Red, Green]" $ do
-        it "correctly has no troops in Scandinavia" $ do
-          (troops game Scandinavia == 0) `shouldBe` True
-        it "correctly has no troops in Kamchatka" $ do
-          (troops game Kamchatka == 0) `shouldBe` True
-        it "correctly has no troops in North Africa" $ do
-          (troops game NorthAfrica == 0) `shouldBe` True
-        it "correctly has players in order Blue, Red, Green" $ do
-          (turnOrder game == [Blue, Red, Green]) `shouldBe` True
-        it "correctly has Reinforce as starting phase" $ do
-          (phase game == Reinforce) `shouldBe` True
-      where game = newGame [Blue, Red, Green] (mkStdGen 0)
+  describe "changeTroops" $ do
+    let game = newGame [Blue, Red, Green] (mkStdGen 0)
+    let game' = changeTroops Brazil 3 game
+    let game'' = changeTroops Brazil (-2) game'
+    context  "Adding 3 troops to Brazil" $ do
+      it "correctly increases the number of troops in Brazil" $ do
+        (troops game' Brazil == troops game Brazil + 3) `shouldBe` True
+      it "correctly doesn't increase the number of troops in Peru" $ do
+        (troops game' Peru == troops game Peru) `shouldBe` True
+      it "correctly doesn't increase the number of troops in Argentina" $ do
+        (troops game' Argentina == troops game Argentina) `shouldBe` True
+      it "correctly doesn't change the owner of Brazil" $ do
+        (owner game' Brazil == owner game Brazil) `shouldBe` True
+    context "Taking away 2 troops from Brazil " $ do
+      it "correctly decreases the number of troops in Brazil" $ do
+        (troops game'' Brazil == (troops game Brazil) + 1) `shouldBe` True
+      it "correctly doesn't change the number of troops in Peru" $ do
+        (troops game' Peru == troops game Peru) `shouldBe` True
+      it "correctly doesn't change the number of troops in Argentina" $ do
+        (troops game' Argentina == troops game Argentina) `shouldBe` True
+      it "correctly doesn't change the owner of Brazil" $ do
+        (owner game' Brazil == owner game Brazil) `shouldBe` True
+  describe "changeOwner" $ do
+    context "Changing owner of Madagascar" $ do
+      let game = newGame [Blue, Red, Green] (mkStdGen 0)
+      let game' = changeOwner Madagascar Blue game
+      let game'' = changeOwner Madagascar Green game'
+      it "correctly changes owner to Blue" $ do
+        (owner game' Madagascar == Blue) `shouldBe` True
+      it "doesn't change owner of Egypt" $ do
+        (owner game' Egypt == owner game Egypt) `shouldBe` True
+      it "doesn't change owner of North Africa" $ do
+        (owner game' NorthAfrica == owner game NorthAfrica) `shouldBe` True
+      it "correctly changes owner again to Green" $ do
+        (owner game'' Madagascar == Green) `shouldBe` True
+  describe "nextTurn" $ do
+    context "game with players [Blue, Red, Green]" $ do
+      let game = newGame [Blue, Red, Green] (mkStdGen 0)
+      let game' = nextTurn game
+      let game'' = nextTurn game'
+      let game''' = nextTurn game''
+      it "correctly updates first player to Red" $ do
+        (turnOrder game' == [Red, Green, Blue]) `shouldBe` True
+      it "correctly updates first player to Green" $ do
+        (turnOrder game'' == [Green, Blue, Red]) `shouldBe` True
+      it "correctly loops back round to Blue" $ do
+        (turnOrder game''' == [Blue, Red, Green]) `shouldBe` True
+      it "correctly resets phase to Reinforce from Attack" $ do
+        let attGame = nextPhase game'
+        (phase (nextTurn attGame) == Reinforce) `shouldBe` True
+      it "correctly resets phase to Reinforce from Fortify" $ do
+        let fortGame = nextPhase (nextPhase game')
+        (phase (nextTurn fortGame) == Reinforce) `shouldBe` True
+    context "game with players [Black]" $ do
+      let game = newGame [Black] (mkStdGen 0)
+      let game' = nextTurn game
+      let game'' = nextTurn game'
+      it "correctly updates to Black once" $ do
+        (turnOrder game' == [Black]) `shouldBe` True
+      it "correctly updates to Black twice" $ do
+        (turnOrder game'' == [Black]) `shouldBe` True
+  describe "updateStdGen" $ do
+    context "new game" $ do
+      let game = newGame [Blue, Black, Yellow] (mkStdGen 137)
+      let game' = updateStdGen (mkStdGen 30) game
+      it "correctly StdGen in game /= StdGen in game'" $ do
+        (show (currentStdGen game) == show (currentStdGen game')) `shouldBe` False
+  describe "nextPhase" $ do
+    context "New Game" $ do
+      let game = newGame [Blue, Black, Yellow] (mkStdGen 137)
+      let game' = nextPhase game
+      let game'' = nextPhase game'
+      let game''' = nextPhase game''
+      it ("correctly starts on Reinforce") $ do
+        (phase game == Reinforce) `shouldBe` True
+      it ("correctly updates to Attack") $ do
+        (phase game' == Attack Normal) `shouldBe` True
+      it ("correctly updates to Fortify") $ do
+        (phase game'' == Fortify) `shouldBe` True
+      it ("correctly loops back to Reinforce") $ do
+        (phase game''' == Reinforce) `shouldBe` True
+      it ("correctly doesn't change turn order") $ do
+        (turnOrder game'' == turnOrder game) `shouldBe` True

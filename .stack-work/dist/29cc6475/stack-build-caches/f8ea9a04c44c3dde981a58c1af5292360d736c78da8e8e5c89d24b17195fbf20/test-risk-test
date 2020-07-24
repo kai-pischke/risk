@@ -15,9 +15,9 @@ C:\Users\alexd\Desktop\risk-master\risk\ChangeLog.md:
   size: 47
   modtime: 1595416736
 C:\Users\alexd\Desktop\risk-master\risk\risk.cabal:
-  hash: 030f2ecbf204fb3d020b5c00c09db725dda9c9092852297515ec6023ead5e127
+  hash: e0e80e2a3d489303a79a9a2c82f8c261b79e7ab131bae2b7fb6bb55399d53ed3
   size: 1869
-  modtime: 1595428192
+  modtime: 1595437767
 C:\Users\alexd\Desktop\risk-master\risk\test\RiskBoardSpec.hs:
   hash: 717fa6293b40850714291218621df71bd64ac41f9735d0a5212f1baf0632480e
   size: 4820
@@ -35,6 +35,6 @@ C:\Users\alexd\Desktop\risk-master\risk\README.md:
   size: 2244
   modtime: 1595416736
 C:\Users\alexd\Desktop\risk-master\risk\test\StateSpec.hs:
-  hash: f8c59906f52281dea570241ad4d58d3231d07dec4d1c6f3764659345287ce5d1
-  size: 3056
-  modtime: 1595429338
+  hash: 27b1247a7e3ac01a9d8f53aa0f5f31155305300d4cf2f4b01785c6209bf54189
+  size: 6821
+  modtime: 1595594400

@@ -19,17 +19,17 @@ C:\Users\alexd\Desktop\risk-master\risk\ChangeLog.md:
   size: 47
   modtime: 1595416736
 C:\Users\alexd\Desktop\risk-master\risk\risk.cabal:
-  hash: 030f2ecbf204fb3d020b5c00c09db725dda9c9092852297515ec6023ead5e127
+  hash: e0e80e2a3d489303a79a9a2c82f8c261b79e7ab131bae2b7fb6bb55399d53ed3
   size: 1869
-  modtime: 1595428192
+  modtime: 1595437767
 C:\Users\alexd\Desktop\risk-master\risk\src\Moves.hs:
   hash: 0f4d742e3a0039a5e922cde89e05093c59aa660f0c22f65e55209d747a01bfaa
   size: 693
   modtime: 1595420984
 C:\Users\alexd\Desktop\risk-master\risk\src\State.hs:
-  hash: 41617fa94d98db47663ced62a0ce09e65ebcdec5e8046c62beb00dedb1ec76c3
-  size: 1490
-  modtime: 1595428031
+  hash: cf70392fd1e99710dfde3f3bb7c336da2613c30da45492df49f1d317ca927f10
+  size: 2018
+  modtime: 1595437767
 C:\Users\alexd\Desktop\risk-master\risk\package.yaml:
   hash: 93c4c9bdd45acdaaf3ae7670a19f1ade1d02b2b80b11ca389911dd35792ba830
   size: 1150
