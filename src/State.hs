@@ -24,14 +24,10 @@ import Control.Monad
 import RiskBoard
 import Battle
 
--- this is stupid, I will find a way to get rid of this.
-instance Eq StdGen where 
-   a == b = show a == show b
-
 -- internal representation of game state
 data GameState = InternalGameState
    { troopMap :: Map Country Int,
-     playerMap :: Map Country (Maybe Player),
+     playerMap :: Map Country Player,
      stateStdGen :: StdGen,
      statePhase :: Phase,
      statePayers :: [Player]
@@ -55,7 +51,7 @@ advancePhase Fortify = Reinforce
 changeTroopMap :: (Map Country Int -> Map Country Int) -> GameState -> GameState
 changeTroopMap f (InternalGameState t p g h l) = InternalGameState (f t) p g h l
 
-changePlayerMap :: (Map Country (Maybe Player) -> Map Country (Maybe Player)) -> GameState -> GameState
+changePlayerMap :: (Map Country Player -> Map Country Player) -> GameState -> GameState
 changePlayerMap f (InternalGameState t p g h l) = InternalGameState t (f p) g h l
    
 changeGen :: (StdGen -> StdGen) -> GameState -> GameState
@@ -68,27 +64,28 @@ changePlayer :: ([Player] -> [Player]) -> GameState -> GameState
 changePlayer f (InternalGameState t p g h l) = InternalGameState t p g h (f l)
 --
 
-newGame :: [Player] -> StdGen -> GameState
-newGame listOfPlayer startingStdGen = InternalGameState 
-   (Map.fromList $ zip [(minBound :: Country)..] $ repeat 0)
-   (Map.fromList $ zip [(minBound :: Country)..] $ repeat Nothing)
+newGame :: [Player] -> (Country -> (Player, Int))-> StdGen -> GameState
+newGame listOfPlayer countryFunc startingStdGen = InternalGameState 
+   (Map.fromList $ zip countries $ map (snd . countryFunc) countries)
+   (Map.fromList $ zip countries $ map (fst . countryFunc) countries)
    startingStdGen
    Reinforce
    listOfPlayer
+   where countries = [(minBound :: Country)..]
 
 troops :: GameState -> Country -> Int
-troops g c = fromMaybe (error "you gave me an unexpected country") (Map.lookup c (troopMap g))
+troops g c = fromMaybe (error "unexpected country") (Map.lookup c (troopMap g))
 
 turnOrder :: GameState -> [Player]
 turnOrder = statePayers
 
-owner :: GameState -> Country -> Maybe Player
-owner g c = join $ Map.lookup c (playerMap g)
+owner :: GameState -> Country -> Player
+owner g c = fromMaybe (error "unexpected country") (Map.lookup c (playerMap g))
 
 changeTroops :: Country -> Int -> GameState -> GameState
 changeTroops c i = changeTroopMap (Map.insertWith (+) c i)
 
-changeOwner :: Country -> Maybe Player -> GameState -> GameState
+changeOwner :: Country -> Player -> GameState -> GameState
 changeOwner c p = changePlayerMap (Map.insert c p)
 
 nextTurn :: GameState -> GameState

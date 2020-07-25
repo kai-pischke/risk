@@ -29,12 +29,12 @@ version :: Version
 version = Version [0,1,0,0] []
 bindir, libdir, dynlibdir, datadir, libexecdir, sysconfdir :: FilePath
 
-bindir     = "C:\\Users\\alexd\\Desktop\\risk-master\\risk\\.stack-work\\install\\392054cf\\bin"
-libdir     = "C:\\Users\\alexd\\Desktop\\risk-master\\risk\\.stack-work\\install\\392054cf\\lib\\x86_64-windows-ghc-8.8.3\\risk-0.1.0.0-BL6GpEdaevnA0NJOKLmDSQ-risk-test"
-dynlibdir  = "C:\\Users\\alexd\\Desktop\\risk-master\\risk\\.stack-work\\install\\392054cf\\lib\\x86_64-windows-ghc-8.8.3"
-datadir    = "C:\\Users\\alexd\\Desktop\\risk-master\\risk\\.stack-work\\install\\392054cf\\share\\x86_64-windows-ghc-8.8.3\\risk-0.1.0.0"
-libexecdir = "C:\\Users\\alexd\\Desktop\\risk-master\\risk\\.stack-work\\install\\392054cf\\libexec\\x86_64-windows-ghc-8.8.3\\risk-0.1.0.0"
-sysconfdir = "C:\\Users\\alexd\\Desktop\\risk-master\\risk\\.stack-work\\install\\392054cf\\etc"
+bindir     = "C:\\Users\\alexd\\Desktop\\risk-master\\risk\\.stack-work\\install\\b29d45f4\\bin"
+libdir     = "C:\\Users\\alexd\\Desktop\\risk-master\\risk\\.stack-work\\install\\b29d45f4\\lib\\x86_64-windows-ghc-8.8.3\\risk-0.1.0.0-4RuIBvUBuVa2pytQBIYWTT-risk-test"
+dynlibdir  = "C:\\Users\\alexd\\Desktop\\risk-master\\risk\\.stack-work\\install\\b29d45f4\\lib\\x86_64-windows-ghc-8.8.3"
+datadir    = "C:\\Users\\alexd\\Desktop\\risk-master\\risk\\.stack-work\\install\\b29d45f4\\share\\x86_64-windows-ghc-8.8.3\\risk-0.1.0.0"
+libexecdir = "C:\\Users\\alexd\\Desktop\\risk-master\\risk\\.stack-work\\install\\b29d45f4\\libexec\\x86_64-windows-ghc-8.8.3\\risk-0.1.0.0"
+sysconfdir = "C:\\Users\\alexd\\Desktop\\risk-master\\risk\\.stack-work\\install\\b29d45f4\\etc"
 
 getBinDir, getLibDir, getDynLibDir, getDataDir, getLibexecDir, getSysconfDir :: IO FilePath
 getBinDir = catchIO (getEnv "risk_bindir") (\_ -> return bindir)

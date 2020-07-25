@@ -11,15 +11,15 @@
   (major1) == 0 && (major2) == 1 && (minor) <= 0)
 #endif /* MIN_VERSION_risk */
 
-/* package QuickCheck-2.13.2 */
+/* package QuickCheck-2.14.1 */
 #ifndef VERSION_QuickCheck
-#define VERSION_QuickCheck "2.13.2"
+#define VERSION_QuickCheck "2.14.1"
 #endif /* VERSION_QuickCheck */
 #ifndef MIN_VERSION_QuickCheck
 #define MIN_VERSION_QuickCheck(major1,major2,minor) (\
   (major1) <  2 || \
-  (major1) == 2 && (major2) <  13 || \
-  (major1) == 2 && (major2) == 13 && (minor) <= 2)
+  (major1) == 2 && (major2) <  14 || \
+  (major1) == 2 && (major2) == 14 && (minor) <= 1)
 #endif /* MIN_VERSION_QuickCheck */
 
 /* package base-4.13.0.0 */
@@ -66,15 +66,15 @@
   (major1) == 2 && (major2) == 7 && (minor) <= 1)
 #endif /* MIN_VERSION_hspec_discover */
 
-/* package random-1.1 */
+/* package random-1.2.0 */
 #ifndef VERSION_random
-#define VERSION_random "1.1"
+#define VERSION_random "1.2.0"
 #endif /* VERSION_random */
 #ifndef MIN_VERSION_random
 #define MIN_VERSION_random(major1,major2,minor) (\
   (major1) <  1 || \
-  (major1) == 1 && (major2) <  1 || \
-  (major1) == 1 && (major2) == 1 && (minor) <= 0)
+  (major1) == 1 && (major2) <  2 || \
+  (major1) == 1 && (major2) == 2 && (minor) <= 0)
 #endif /* MIN_VERSION_random */
 
 /* package risk-0.1.0.0 */
@@ -210,7 +210,7 @@
 #endif /* MIN_TOOL_VERSION_strip */
 
 #ifndef CURRENT_COMPONENT_ID
-#define CURRENT_COMPONENT_ID "risk-0.1.0.0-BL6GpEdaevnA0NJOKLmDSQ-risk-test"
+#define CURRENT_COMPONENT_ID "risk-0.1.0.0-4RuIBvUBuVa2pytQBIYWTT-risk-test"
 #endif /* CURRENT_COMPONENT_ID */
 #ifndef CURRENT_PACKAGE_VERSION
 #define CURRENT_PACKAGE_VERSION "0.1.0.0"

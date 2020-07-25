@@ -7,6 +7,9 @@ import RiskBoard
 import Battle
 import System.Random
 
+allRed :: GameState
+allRed = newGame [Blue, Red, Green] (\x -> (Red, 0)) (mkStdGen 137)
+
 spec :: Spec
 spec = do
   describe "Player" $ do
@@ -42,7 +45,7 @@ spec = do
         (Attack(WonBattle GreatBritain Scandinavia TwoAtt) == Attack (WonBattle GreatBritain WesternAustralia TwoAtt)) `shouldBe` False
         (Attack(WonBattle Scandinavia WesternAustralia TwoAtt) == Attack(WonBattle GreatBritain WesternAustralia TwoAtt)) `shouldBe` False
   describe "changeTroops" $ do
-    let game = newGame [Blue, Red, Green] (mkStdGen 0)
+    let game = allRed
     let game' = changeTroops Brazil 3 game
     let game'' = changeTroops Brazil (-2) game'
     context  "Adding 3 troops to Brazil" $ do
@@ -65,7 +68,7 @@ spec = do
         (owner game' Brazil == owner game Brazil) `shouldBe` True
   describe "changeOwner" $ do
     context "Changing owner of Madagascar" $ do
-      let game = newGame [Blue, Red, Green] (mkStdGen 0)
+      let game = allRed
       let game' = changeOwner Madagascar Blue game
       let game'' = changeOwner Madagascar Green game'
       it "correctly changes owner to Blue" $ do
@@ -78,7 +81,7 @@ spec = do
         (owner game'' Madagascar == Green) `shouldBe` True
   describe "nextTurn" $ do
     context "game with players [Blue, Red, Green]" $ do
-      let game = newGame [Blue, Red, Green] (mkStdGen 0)
+      let game = allRed
       let game' = nextTurn game
       let game'' = nextTurn game'
       let game''' = nextTurn game''
@@ -95,7 +98,7 @@ spec = do
         let fortGame = nextPhase (nextPhase game')
         (phase (nextTurn fortGame) == Reinforce) `shouldBe` True
     context "game with players [Black]" $ do
-      let game = newGame [Black] (mkStdGen 0)
+      let game = newGame [Black] (\x -> (Blue, 0))(mkStdGen 0)
       let game' = nextTurn game
       let game'' = nextTurn game'
       it "correctly updates to Black once" $ do
@@ -104,13 +107,13 @@ spec = do
         (turnOrder game'' == [Black]) `shouldBe` True
   describe "updateStdGen" $ do
     context "new game" $ do
-      let game = newGame [Blue, Black, Yellow] (mkStdGen 137)
+      let game = allRed
       let game' = updateStdGen (mkStdGen 30) game
       it "correctly StdGen in game /= StdGen in game'" $ do
         (show (currentStdGen game) == show (currentStdGen game')) `shouldBe` False
   describe "nextPhase" $ do
     context "New Game" $ do
-      let game = newGame [Blue, Black, Yellow] (mkStdGen 137)
+      let game = allRed
       let game' = nextPhase game
       let game'' = nextPhase game'
       let game''' = nextPhase game''

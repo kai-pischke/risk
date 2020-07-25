@@ -58,7 +58,7 @@ Phase (Reinforce | Attack MiniPhase | Fortify) -- (Eq, Show)
 
 ### Functions
 ```hs
-newGame :: [Player] -> StdGen -> GameState
+newGame :: [Player] -> (Country -> (Player, Int)) -> StdGen -> GameState
 ```
 Creates a blank game with no troops in any country. Players should be given in turn order starting with the current player.
 
@@ -73,7 +73,7 @@ turnOrder :: GameState -> [Player]
 Returns a list of players (in the order of play) starting with the current player.
 
 ```hs
-owner :: GameState -> Country -> Maybe Player
+owner :: GameState -> Country -> Player
 ```
 Gives the player who owns a certain country.
 
@@ -83,7 +83,7 @@ changeTroops :: Country -> Int -> GameState -> GameState
 Modifies (adds or subtracts) the given number of troops (to or from a country).
 
 ```hs
-changeOwner :: Country -> Maybe Player -> GameState -> GameState
+changeOwner :: Country -> Player -> GameState -> GameState
 ```
 Changes the owner of a country.
 

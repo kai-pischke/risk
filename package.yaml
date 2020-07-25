@@ -18,8 +18,8 @@ extra-source-files:
 description:         Please see the README on GitHub at <https://github.com/kai-pischke/risk#readme>
 
 dependencies:
-- base >= 4.7 && < 5
-- random
+- base >= 4.8 && < 5
+- random >= 1.2
 - containers
 
 library:
@@ -48,4 +48,4 @@ tests:
     - risk
     - hspec
     - hspec-discover
-    - QuickCheck
+    - QuickCheck >= 2.14.1
