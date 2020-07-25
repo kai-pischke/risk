@@ -65,6 +65,7 @@ changePlayer f (InternalGameState t p g h l) = InternalGameState t p g h (f l)
 --
 
 newGame :: [Player] -> (Country -> (Player, Int))-> StdGen -> GameState
+newGame [] _ _ = error "empty list (can't create game with no players)"
 newGame listOfPlayer countryFunc startingStdGen = InternalGameState 
    (Map.fromList $ zip countries $ map (snd . countryFunc) countries)
    (Map.fromList $ zip countries $ map (fst . countryFunc) countries)
