@@ -2,6 +2,7 @@ module StateSpec where
 
 import Test.Hspec
 import Test.QuickCheck
+import Control.Exception (evaluate)
 import State
 import RiskBoard
 import Battle
@@ -44,10 +45,43 @@ spec = do
         (Attack(WonBattle GreatBritain WesternAustralia TwoAtt) == Attack (WonBattle GreatBritain WesternAustralia OneAtt)) `shouldBe` False
         (Attack(WonBattle GreatBritain Scandinavia TwoAtt) == Attack (WonBattle GreatBritain WesternAustralia TwoAtt)) `shouldBe` False
         (Attack(WonBattle Scandinavia WesternAustralia TwoAtt) == Attack(WonBattle GreatBritain WesternAustralia TwoAtt)) `shouldBe` False
+  describe "newGame" $ do
+    context "All countries owned by Red, players are [Blue, Red, Green]" $ do
+      it "correctly reinforce is first phase" $ do
+        (phase allRed) `shouldBe` Reinforce
+      it "correctly has turnorder [Blue, Red, Green]" $ do
+        (turnOrder allRed) `shouldBe` [Blue, Red, Green]
+      it "correctly has owner of Madagascar as Red" $ do
+        (owner allRed Madagascar) `shouldBe` Red
+      it "correctly has owner of Ukraine as Red" $ do
+        (owner allRed Ukraine) `shouldBe` Red
+      it "correctly no troops in Madagacar" $ do
+        (troops allRed Madagascar) `shouldBe` 0
+    context "Initialised with countries owned by a player not in the player list, different numbers of troops" $ do
+      let game = newGame [Yellow, Black, Blue] (\x -> (Green, fromEnum x)) (mkStdGen 45)
+      it "correctly has Madagascar owned by Green" $ do
+        (owner game Madagascar) `shouldBe` Green
+      it "correctly owner of North Africa is Green" $ do
+        (owner game NorthAfrica) `shouldBe` Green
+      it "has correct number of troops in Madagascar" $ do
+        (troops game Madagascar) `shouldBe` (fromEnum Madagascar)
+      it "has correct number of troops in North Africa" $ do
+        (troops game NorthAfrica) `shouldBe` (fromEnum NorthAfrica)
+      it "correctly doesn't alter turnOrder to include Green" $ do
+        (turnOrder game) `shouldBe` [Yellow, Black, Blue]
+    context "Repeat countries in player list" $ do
+      let game = newGame [Yellow, Black, Yellow, Blue] (\x -> (Green, fromEnum x)) (mkStdGen 45)
+      it "correctly allows for repeats in turnOrder" $ do
+        (turnOrder game) `shouldBe` [Yellow, Black, Yellow, Blue]
+    context "Empty player list" $ do
+      it "correctly throws an error when given empty player list" $ do
+        evaluate (newGame [] (\x -> (Green, 0)) (mkStdGen 45)) `shouldThrow` anyErrorCall
+
   describe "changeTroops" $ do
     let game = allRed
     let game' = changeTroops Brazil 3 game
     let game'' = changeTroops Brazil (-2) game'
+    let game''' = changeTroops Brazil (-2) game''
     context  "Adding 3 troops to Brazil" $ do
       it "correctly increases the number of troops in Brazil" $ do
         (troops game' Brazil == troops game Brazil + 3) `shouldBe` True
@@ -61,24 +95,36 @@ spec = do
       it "correctly decreases the number of troops in Brazil" $ do
         (troops game'' Brazil == (troops game Brazil) + 1) `shouldBe` True
       it "correctly doesn't change the number of troops in Peru" $ do
-        (troops game' Peru == troops game Peru) `shouldBe` True
+        (troops game'' Peru == troops game Peru) `shouldBe` True
       it "correctly doesn't change the number of troops in Argentina" $ do
-        (troops game' Argentina == troops game Argentina) `shouldBe` True
+        (troops game'' Argentina == troops game Argentina) `shouldBe` True
       it "correctly doesn't change the owner of Brazil" $ do
-        (owner game' Brazil == owner game Brazil) `shouldBe` True
+        (owner game'' Brazil == owner game Brazil) `shouldBe` True
+    context "Taking another 2 away from Brazil" $ do
+      it "correctly allows the number of troops in Brazil to be negative" $ do
+        (troops game''' Brazil) `shouldBe` (-1)
   describe "changeOwner" $ do
     context "Changing owner of Madagascar" $ do
-      let game = allRed
+      let game = newGame [Red, Green, Blue] (\x -> (Red, fromEnum x)) (mkStdGen 13)
       let game' = changeOwner Madagascar Blue game
       let game'' = changeOwner Madagascar Green game'
+      let game''' = changeOwner Madagascar Black game''
       it "correctly changes owner to Blue" $ do
         (owner game' Madagascar == Blue) `shouldBe` True
+      it "correctly doesn't change number of troops" $ do
+        (troops game Madagascar == troops game' Madagascar) `shouldBe` True
       it "doesn't change owner of Egypt" $ do
         (owner game' Egypt == owner game Egypt) `shouldBe` True
       it "doesn't change owner of North Africa" $ do
         (owner game' NorthAfrica == owner game NorthAfrica) `shouldBe` True
       it "correctly changes owner again to Green" $ do
         (owner game'' Madagascar == Green) `shouldBe` True
+      it "correctly doesn't change number of troops in Madagascar" $  do
+        (troops game Madagascar == troops game' Madagascar) `shouldBe` True
+      it "correctly allows owner to  be changes to a player not in turnOrder" $ do
+        (owner game''' Madagascar) `shouldBe` Black
+      it "correctly doesn't alter turnOrder" $ do
+        (turnOrder game''') `shouldBe` [Red, Green, Blue]
   describe "nextTurn" $ do
     context "game with players [Blue, Red, Green]" $ do
       let game = allRed
@@ -105,6 +151,20 @@ spec = do
         (turnOrder game' == [Black]) `shouldBe` True
       it "correctly updates to Black twice" $ do
         (turnOrder game'' == [Black]) `shouldBe` True
+    context "game with repeats in turnOrder, [Black, Yellow, Black, Blue]" $ do
+      let game = newGame [Black, Yellow, Black, Blue] (\x -> (Black, fromEnum x)) (mkStdGen 546)
+      let game' = nextTurn game
+      let game'' = nextTurn game'
+      let game''' = nextTurn game''
+      let game'''' = nextTurn game'''
+      it "correctly updates to Yellow" $ do
+        (turnOrder game') `shouldBe` [Yellow, Black, Blue, Black]
+      it "correctly updates to Black again" $ do
+        (turnOrder game'') `shouldBe` [Black, Blue, Black, Yellow]
+      it "correctly updates to Blue" $ do
+        (turnOrder game''') `shouldBe` [Blue, Black, Yellow, Black ]
+      it "correctly loops back to Black" $ do
+        (turnOrder game'''') `shouldBe` [Black, Yellow, Black, Blue]
   describe "updateStdGen" $ do
     context "new game" $ do
       let game = allRed
