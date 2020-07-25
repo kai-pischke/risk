@@ -64,7 +64,7 @@ instance Show Country where
     show Brazil = "Brazil"
     show Peru = "Peru"
     show Venezuela = "Venezuela"
-    show GreatBritain "Great Britain"
+    show GreatBritain = "Great Britain"
     show Iceland = "Iceland"
     show NorthernEurope = "Northern Europe"
     show Scandinavia = "Scandinavia"
@@ -92,7 +92,7 @@ instance Show Country where
     show EasternAustralia = "Eastern Australia"
     show Indonesia = "Indonesia"
     show NewGuinea = "New Guinea"
-    show WesternAustralia = "Western Australia
+    show WesternAustralia = "Western Australia"
 
 --Riskboard made from adjacency list
 riskBoard = Graph.makeGraph [(Alaska , [Alberta, NorthwestTerritory,Kamchatka]),

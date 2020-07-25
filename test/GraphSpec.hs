@@ -74,7 +74,7 @@ spec = do
       it "correctly identifies non-neighbor for singleton" $ do 
         isNeighbour moreComplexGraph 10 10 `shouldBe` False   
     context "for random small graphs" $ do 
-      it "is symmertic (so isNeighbour g a b ⇒ isNeighbour g b a)" $ property $
+      it "is symmertic (so isNeighbour g a b ==> isNeighbour g b a)" $ property $
           forAll (elements [2..10])
           $ \n -> forAll (smallGraphs n) 
           $ \g -> forAll (elements [1..n])
