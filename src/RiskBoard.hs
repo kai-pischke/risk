@@ -48,8 +48,51 @@ data Country = Alaska
              | Indonesia
              | NewGuinea
              | WesternAustralia
-             deriving (Enum, Eq, Show, Ord, Bounded)
+             deriving (Enum, Eq, Ord, Bounded)
 
+instance Show Country where
+    show Alaska = "Alaska"
+    show Alberta = "Alberta"
+    show CentralAmerica = "Central America"
+    show EasternUnitedStates = "Eastern United States"
+    show Greenland = "Greenland"
+    show NorthwestTerritory = "Northwest Territory"
+    show Ontario = "Ontario"
+    show Quebec = "Quebec"
+    show WesternUnitedStates = "Western United States"
+    show Argentina = "Argentina"
+    show Brazil = "Brazil"
+    show Peru = "Peru"
+    show Venezuela = "Venezuela"
+    show GreatBritain "Great Britain"
+    show Iceland = "Iceland"
+    show NorthernEurope = "Northern Europe"
+    show Scandinavia = "Scandinavia"
+    show SouthernEurope = "Southern Europe"
+    show Ukraine = "Ukraine"
+    show WesternEurope = "Western Europe"
+    show Congo = "Congo"
+    show EastAfrica = "East Africa"
+    show Egypt = "Egypt"
+    show Madagascar = "Madagascar"
+    show NorthAfrica = "North Africa"
+    show SouthAfrica = "South Africa"
+    show Afghanistan = "Afghanistan"
+    show China = "China"
+    show India = "India"
+    show Irkutsk = "Irkutsk"
+    show Japan = "Japan"
+    show Kamchatka = "Kamchatka"
+    show MiddleEast = "Middle East"
+    show Mongolia = "Mongolia"
+    show Siam = "Siam"
+    show Siberia = "Siberia"
+    show Ural = "Ural"
+    show Yakutsk = "Yakutsk"
+    show EasternAustralia = "Eastern Australia"
+    show Indonesia = "Indonesia"
+    show NewGuinea = "New Guinea"
+    show WesternAustralia = "Western Australia
 
 --Riskboard made from adjacency list
 riskBoard = Graph.makeGraph [(Alaska , [Alberta, NorthwestTerritory,Kamchatka]),
