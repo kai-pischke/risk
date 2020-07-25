@@ -113,7 +113,7 @@ spec = do
         (show (currentStdGen game) == show (currentStdGen game')) `shouldBe` False
   describe "nextPhase" $ do
     context "New Game" $ do
-      let game = allRed
+      let game = allRedgggggg
       let game' = nextPhase game
       let game'' = nextPhase game'
       let game''' = nextPhase game''
