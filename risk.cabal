@@ -64,7 +64,6 @@ test-suite risk-test
       BattleSpec
       GraphSpec
       RiskBoardSpec
-      StateSpec
       Paths_risk
   hs-source-dirs:
       test
