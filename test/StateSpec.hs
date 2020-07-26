@@ -187,3 +187,34 @@ spec = do
         (phase game''' == Reinforce) `shouldBe` True
       it ("correctly doesn't change turn order") $ do
         (turnOrder game'' == turnOrder game) `shouldBe` True
+  describe "changeMiniPhase" $ do
+    let game = allRed
+    let reinforceChange = changeMiniPhase (WonBattle Peru Argentina TwoAtt) game
+    let game' = nextPhase game
+    let changeToWonBattle = changeMiniPhase (WonBattle Peru Argentina TwoAtt) game'
+    let changeToWonBattle2 = changeMiniPhase (WonBattle India Brazil TwoAtt) game'
+    let changeToNormal = changeMiniPhase Normal changeToWonBattle
+    let nextFromNormal = nextPhase changeToNormal
+    let nextFromWonBattle = nextPhase changeToWonBattle
+    let fortified = changeMiniPhase (WonBattle India Brazil OneAtt) nextFromNormal
+    context "New GAme" $ do
+      it "correctly does nothing when in Reinforce phase" $ do
+        reinforceChange `shouldBe` game
+    context "In normal attack phase" $ do
+      it "correctly changes to WonBattle for adjacent countries"  $ do
+        (phase changeToWonBattle) `shouldBe` (Attack (WonBattle Peru Argentina TwoAtt))
+      it "correctly changes to WonBattle for non-adjacent countries" $ do
+        (phase changeToWonBattle2) `shouldBe` (Attack (WonBattle India Brazil TwoAtt))
+    context "In WonBattle attack phase" $ do
+      it "correctly changes to Normal phase" $ do
+        changeToNormal `shouldBe` game'
+    context "calling nextPhase" $ do
+      it "correctly goes to Fortify when in normal attack phase" $ do
+        (phase nextFromNormal) `shouldBe` Fortify
+      it "correctly goes to Fortify when in WonBattle phase" $ do
+        (phase nextFromWonBattle) `shouldBe` Fortify
+      it "correctly no difference in state whether phase changes from Normal or WonBattle MiniPhase" $ do
+        nextFromWonBattle `shouldBe` nextFromNormal
+    context "In Fortify phase" $ do
+      it "correctly no change when changeMiniPhase called" $ do
+        fortified `shouldBe` nextFromNormal

@@ -3,21 +3,21 @@ C:\Users\alexd\Desktop\risk-master\risk\test\BattleSpec.hs:
   size: 2726
   modtime: 1595677884
 C:\Users\alexd\Desktop\risk-master\risk\test\GraphSpec.hs:
-  hash: 8adffc9400a9f57082c526af14d2f87859df9120949e9e086db197f7fdbb5a24
-  size: 5722
-  modtime: 1595681001
+  hash: fc8fd415327ce68891cd819ecd7208287bd4f7857597fb88129ffb42f2758978
+  size: 5704
+  modtime: 1595767630
 C:\Users\alexd\Desktop\risk-master\risk\interface.md:
-  hash: 18a662c405033cd0180a35f52e967feb1de68941109c950fe49afe8dab31e729
-  size: 5826
-  modtime: 1595610332
+  hash: c10bca281a3177f0710574655c62d40c013efd63c5c8a45b9d0c45fe2e34c476
+  size: 6943
+  modtime: 1595765659
 C:\Users\alexd\Desktop\risk-master\risk\ChangeLog.md:
   hash: c76da3aaa7251698c3a2a8a44115533068b770eaacd20a5806fecf3c361cbb2e
   size: 47
   modtime: 1595416736
 C:\Users\alexd\Desktop\risk-master\risk\risk.cabal:
-  hash: 56fa218fb8b0dfcfcf9be85a148d102408dc3047d2d18cf211e79b89ecabb936
-  size: 1896
-  modtime: 1595678613
+  hash: 3b00360a5af7876daf1fc3d9ae0e7e8c361ffa0c8b420ad4ee55270c64751690
+  size: 1852
+  modtime: 1595767329
 C:\Users\alexd\Desktop\risk-master\risk\test\RiskBoardSpec.hs:
   hash: 717fa6293b40850714291218621df71bd64ac41f9735d0a5212f1baf0632480e
   size: 4820
@@ -35,6 +35,6 @@ C:\Users\alexd\Desktop\risk-master\risk\README.md:
   size: 2244
   modtime: 1595416736
 C:\Users\alexd\Desktop\risk-master\risk\test\StateSpec.hs:
-  hash: 0c94fe9666a666f14f93c61b04483ef7c2f3640e4b3214bc4acadd94bddf21e8
-  size: 10380
-  modtime: 1595684597
+  hash: b16dd97a1883186525c8a0c60d07a16ab4b8d56d58ad4c3056f044f675336ccb
+  size: 12214
+  modtime: 1595767522
