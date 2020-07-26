@@ -5,20 +5,20 @@
 ```hs
 Eq n => Graph n
 ```
-
+This type models an undirected (not necessarily connected) graph. We consider the vertecies of the graph to be *nodes* (which are members of the type `n`). We require that each node is in a distinct equivelence class of the equivalence relation `Eq n`. It is importnat to note that we consider all graphs (of type `Graph n`) to contain every inhabitant of the type `n`. In general, we assume that all nodes are disconnected unless otherwise specified when creating the graph. So for example a `Graph Integer` contains an infinite number of nodes. We say that two nodes are neighbours if (and only if) there is an edge between those two vertecies of the graph.
 ### Functions
 ```hs
 neighbours :: Eq n => Graph n -> n -> [n]
 ```  
-Given a graph and a node, returns a list of the directly adjacent nodes.
+Given a graph and a node (vertex of the graph), returns a list of the directly adjacent nodes. Note that a consequence of the fact that we consider all members of a type to be nodes is that the function `neighbors` is a total function, so defined for all possible n (returning the empty list for nodes with no neighbours). 
 ```hs
 isNeighbour :: Eq n => Graph n -> n -> n -> Bool
 ```  
-Given a graph and two nodes, returns `True` if there is an edge connecting them and `False` otherwise.
+Given a graph and two nodes, returns `True` if there is an edge connecting them and `False` otherwise. Neighbours is also a total function.
 ```hs
 makeGraph :: Eq n => [(n, [n])] -> Graph n
 ```
-Given a valid adjacency list for an undirected graph, returns the corresponding representation as a `Graph n`.
+Given a valid adjacency list for an undirected graph, returns the corresponding representation as a `Graph n`. The adjacency list takes the form of a list of pairs. Each pair contains a member of the type `n` followed by a (possibly empty) list of neighbours. The (isNeighbour) relation must be symmetric (so if `a :: n` has `b :: n` in its list, then `b :: n` must have `a :: n` in its list). Any pairs containing the empty list as a second element are ignored - these nodes (as well as any others not included) are treated as having no neighbours. This well-formedness condition, together with the condition that no duplicate entries exist, ae precoditions to the function (which should throw an error if they are violated). 
 
 ## RiskMap
 
@@ -32,7 +32,7 @@ The `Country` type should be inhabited by 42 nullary constructors with the names
 ```hs
 neighbours :: Country -> [Country]
 ``` 
-Given a country, returns the list of all neighbouring countries.
+Given a country, returns the list of all neighbouring countries (in no specific order).
 ```hs
 isNeighbour :: Country -> Country -> Bool
 ```
@@ -41,7 +41,7 @@ Given two countries, returns `True` if there is an edge connecting them and `Fal
 ## State 
 ### Types
 ```hs
-GameState -- (Eq)
+GameState -- (Eq, Show)
 ```
 
 ```hs
