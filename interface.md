@@ -52,6 +52,9 @@ Player (Black | Blue | Green | Red | Yellow) -- (Eq, Show)
 MiniPhase (WonBattle Country Country Attackers | Normal) -- (Eq, Show)
 ```
 
+WonBattle take it's arguements as such: WonBattle (Attacking Country) (Defending Country) (Attackers Left After Attack)
+
+
 ```hs 
 Phase (Reinforce | Attack MiniPhase | Fortify) -- (Eq, Show)
 ```
@@ -112,6 +115,12 @@ nextPhase :: GameState -> GameState
 ```
 Updates the current phase.
 
+```hs
+updateMiniPhase :: MiniPhase -> GameState -> GameState
+```
+Does nothing if not in attack phase. If is sets phase to Attack MiniPhase
+
+
 ## Battle
 ### Types
 ```hs
@@ -135,29 +144,35 @@ Takes the number of Attackers and the number of defenders and returns the outcom
 ```hs
 reinforce :: [(Country, Int)] -> GameState -> Maybe GameState
 ```
-Add reinforcements (specified as a list of pairs of country and non-negative integer number of troops to add). Must be during the correct phase.
+Add reinforcements (specified as a list of pairs of country and non-negative integer number of troops to add). Must be during the correct phase.  Should update phase to Attack Normal.
 
 ```hs
 fortify :: Country -> Country -> Int -> GameState -> Maybe GameState
 ```
-Moves troops from one country to another. Countries must be neighbours and owned by the current player. Must be during the correct phase. Troops are sent from the first country to the second one.
+Moves troops from one country to another. Countries must be neighbours and owned by the current player. Must be during the correct phase. Troops are sent from the first country to the second one. Should update phase to Reincorce and call nextTurn.
 
 
 ```hs
 attack :: Attackers -> Defenders -> Country -> Country -> GameState -> Maybe GameState
 ```
+Attacks the 2nd Country from the first with the number of attackers and defenders specified. Must Be neighbouring countries owned by different players. Must be during the correct phase. If 2nd Country ends up with 0 troops must start a WonBattle MiniPhase, with the number of troops left after casualties from the attack.
 
 ```hs
 invade :: Int -> GameState -> Maybe GameState
 ```
+Invades a country from another with Int number of troops. Should be only able to be called in WonBattle MiniPhase. Invades defending country from attacking. Can't invade  with less than the number of attackers left. Should move back to a Normal Attack MiniPhase
 
 ```hs
 skipFortify :: GameState -> Maybe GameState
 ```
+Must be during the correct phase. Should update phase to Reincorce and call nextTurn.
+
 
 ```hs
 endAttack :: GameState -> Maybe GameState
 ```
+Must be during the Attack Normal MiniPhase. Should update phase to Fortify.
+
 
 # Notes 
 
