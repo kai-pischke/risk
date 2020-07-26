@@ -13,9 +13,11 @@ module State
       currentStdGen,
       updateStdGen,
       phase,
-      nextPhase
+      nextPhase,
+      changeMiniPhase
     ) where
 
+-- imports --
 import System.Random
 import Data.Maybe
 import Data.Map (Map)
@@ -24,17 +26,17 @@ import Control.Monad
 import RiskBoard
 import Battle
 
--- internal representation of game state
+--- internal representation of game state ---
 data GameState = InternalGameState
    { troopMap :: Map Country Int,
      playerMap :: Map Country Player,
      stateStdGen :: StdGen,
      statePhase :: Phase,
      statePayers :: [Player]
-   } deriving (Eq)
+   } deriving (Eq, Show)
+----------------------------------------------
 
-
-
+-- types --
 data Player = Black | Blue | Green | Red | Yellow 
                deriving (Eq, Show)
 data MiniPhase = WonBattle Country Country Attackers | Normal 
@@ -42,12 +44,22 @@ data MiniPhase = WonBattle Country Country Attackers | Normal
 data Phase = Reinforce | Attack MiniPhase | Fortify
                deriving (Eq, Show)
 
+-- helper functions for phases --
 advancePhase :: Phase -> Phase 
 advancePhase Reinforce = Attack Normal
 advancePhase (Attack _) = Fortify
 advancePhase Fortify = Reinforce
 
--- map functions for Internal State
+updateMiniPhase :: MiniPhase -> Phase -> Phase
+updateMiniPhase m (Attack x) = Attack m
+updateMiniPhase _ y = y
+
+-- general helper functions --
+rotate :: [a] -> [a]
+rotate [] = []
+rotate (x:xs) = xs ++ [x]
+
+-- map functions for Internal State --
 changeTroopMap :: (Map Country Int -> Map Country Int) -> GameState -> GameState
 changeTroopMap f (InternalGameState t p g h l) = InternalGameState (f t) p g h l
 
@@ -62,8 +74,8 @@ changePhase f (InternalGameState t p g h l) = InternalGameState t p g (f h) l
 
 changePlayer :: ([Player] -> [Player]) -> GameState -> GameState
 changePlayer f (InternalGameState t p g h l) = InternalGameState t p g h (f l)
---
 
+-- publicly exposed functions --
 newGame :: [Player] -> (Country -> (Player, Int))-> StdGen -> GameState
 newGame [] _ _ = error "empty list (can't create game with no players)"
 newGame listOfPlayer countryFunc startingStdGen = InternalGameState 
@@ -91,10 +103,6 @@ changeOwner c p = changePlayerMap (Map.insert c p)
 
 nextTurn :: GameState -> GameState
 nextTurn = changePlayer rotate . changePhase (const Reinforce)
-   where 
-      rotate :: [a] -> [a]
-      rotate [] = []
-      rotate (x:xs) = xs ++ [x]
 
 currentStdGen :: GameState -> StdGen
 currentStdGen = stateStdGen
@@ -107,3 +115,7 @@ phase = statePhase
 
 nextPhase :: GameState -> GameState
 nextPhase = changePhase advancePhase
+
+changeMiniPhase :: MiniPhase -> GameState -> GameState
+changeMiniPhase = changePhase . updateMiniPhase
+   
