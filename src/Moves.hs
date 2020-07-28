@@ -1,4 +1,5 @@
 module Moves (
+    Country(..),
     reinforce,
     attack,
     invade,
