@@ -118,8 +118,32 @@ Updates the current phase.
 ```hs
 updateMiniPhase :: MiniPhase -> GameState -> GameState
 ```
-Does nothing if not in attack phase. If is sets phase to Attack MiniPhase
+Does nothing if not in attack phase, otherwise sets phase to Attack MiniPhase (inserting the provided MiniPhase).
 
+## SetupBoard
+### Types
+```hs
+SetupBoardState -- (Eq, Show)
+```
+Keeps track of how many troops on each country, who owns each country as well as player order and number of troops remaining to be placed for each player. 
+```hs 
+SetupState (Incomplete SetupBoardState | Complete SetupBoardState) -- (Eq, Show)
+```
+Contains a SetupBoardState and information about 
+### Functions
+```hs
+emptyBoard :: [Players] -> SetupState
+```
+Creates a blank board with no troops and where no countries are owned yet.
+
+```hs
+placeTroop :: Country -> SetupState -> SetupState
+```
+Partial function, only defined for incomplete `SetupState` and only when the current player owns the given country. 
+```hs
+completeBoardOwner :: SetupBoardState -> Country -> (Player, Int)
+```
+Partial function, only defined for complete `SetupState`, gives the owner and number of troops in each country.
 
 ## Battle
 ### Types
