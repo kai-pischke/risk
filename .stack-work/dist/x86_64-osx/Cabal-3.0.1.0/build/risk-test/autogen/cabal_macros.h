@@ -66,6 +66,17 @@
   (major1) == 2 && (major2) == 7 && (minor) <= 1)
 #endif /* MIN_VERSION_hspec_discover */
 
+/* package multiset-0.3.4.3 */
+#ifndef VERSION_multiset
+#define VERSION_multiset "0.3.4.3"
+#endif /* VERSION_multiset */
+#ifndef MIN_VERSION_multiset
+#define MIN_VERSION_multiset(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  3 || \
+  (major1) == 0 && (major2) == 3 && (minor) <= 4)
+#endif /* MIN_VERSION_multiset */
+
 /* package random-1.2.0 */
 #ifndef VERSION_random
 #define VERSION_random "1.2.0"
@@ -177,7 +188,7 @@
 #endif /* MIN_TOOL_VERSION_runghc */
 
 #ifndef CURRENT_COMPONENT_ID
-#define CURRENT_COMPONENT_ID "risk-0.1.0.0-LaiSJm7tHGl2qrOCa370Fv-risk-test"
+#define CURRENT_COMPONENT_ID "risk-0.1.0.0-8xN3mO8BxjEL1zIXkoOIcG-risk-test"
 #endif /* CURRENT_COMPONENT_ID */
 #ifndef CURRENT_PACKAGE_VERSION
 #define CURRENT_PACKAGE_VERSION "0.1.0.0"

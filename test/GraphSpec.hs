@@ -115,3 +115,4 @@ spec = do
           $ \a -> (not $ null (neighbours (getBlind g) a))
           ==> forAll (elements (neighbours (getBlind g) a))
           $ \b -> a `elem` neighbours (getBlind g) b
+      

@@ -1,19 +1,19 @@
 /Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/interface.md:
-  hash: a534c78760ffbb71880a27039514628207e5f3e63e7d65318c666b05af09cde8
-  size: 6717
-  modtime: 1595767848
+  hash: eb30ee7a13cce141016451da5b5caa4d43cc464a4e619ec9b1ea5b70f6f54613
+  size: 9215
+  modtime: 1595926794
 /Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/risk.cabal:
-  hash: f2dc1a5c5167beddffd7f5189f7c95077d74967bf481593d7cf510b3be2c11c5
-  size: 1849
-  modtime: 1595767848
+  hash: e78b7e3b10eaf9ec2679608aea5030d0ddb7218e7c7f0ed58834fa3257de337c
+  size: 1880
+  modtime: 1595933313
 /Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/test/RiskBoardSpec.hs:
-  hash: 8bfe192437a95634366fcbee425e1f44864610bd556f75463b3040d8c4ef7b24
-  size: 4725
-  modtime: 1595668816
+  hash: 3efa8b99445c6e0a89d2968abf10086b505c6306ec975186bb4ed9eaa4b61b3a
+  size: 6011
+  modtime: 1595930132
 /Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/package.yaml:
-  hash: 6fce9b72978bac9f94fbcda824f093acec61ba51022ee889b2e3cb3b41a515a9
-  size: 1116
-  modtime: 1595603260
+  hash: c2b286a1c17238206a445f4cc6e18e99672147828c777e3d39659e6e3d9d95c0
+  size: 1131
+  modtime: 1595930042
 /Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/test/StateSpec.hs:
   hash: 7f51de9633bd5924aea312e650bfbad52b8f724dbe4ee2fb1e1177b111a5b52a
   size: 11987
@@ -35,10 +35,14 @@
   size: 2214
   modtime: 1595400951
 /Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/test/GraphSpec.hs:
-  hash: b36c339aee58f4609f2796701c02446da682859d4b5a00df5f8ea1150a819870
-  size: 5587
-  modtime: 1595767848
+  hash: b473284e7f5d5f6ae5707a18f737963a5c55315f498e449db852a2797417fd6d
+  size: 5593
+  modtime: 1595930312
 /Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/ChangeLog.md:
   hash: 34373dce0dd5fdd1e2385f7a6eda940a9edb79c751cde0b98d2ef8fb63b54180
   size: 44
   modtime: 1595078347
+/Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/test/MovesSpec.hs:
+  hash: 90043ea2e6f31daa27f4975679de81982bb9908fa0c285eabd41c44aea029ba4
+  size: 8562
+  modtime: 1595929884

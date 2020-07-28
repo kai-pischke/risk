@@ -49,3 +49,4 @@ tests:
     - hspec
     - hspec-discover
     - QuickCheck >= 2.14.1
+    - multiset

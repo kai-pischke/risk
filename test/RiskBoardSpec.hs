@@ -4,6 +4,7 @@ import Test.Hspec
 import Test.QuickCheck
 import Data.List
 import RiskBoard
+import qualified Data.MultiSet as M
 
 spec :: Spec
 spec = do
@@ -91,5 +92,28 @@ spec = do
         isNeighbour Brazil NewGuinea `shouldBe` False
       it "correctly identifies Afghanistan and Ukraine as neighbours" $ do
         isNeighbour Afghanistan Ukraine `shouldBe` True
-
-
+        
+  describe "neighbours" $ do
+    context "Africa" $ do 
+      it "correctly identifies neighbours of Congo" $ do
+        M.fromList (neighbours Congo) `shouldBe` M.fromList [EastAfrica, SouthAfrica, NorthAfrica]
+    context "Europe" $ do 
+      it "correctly identifies neighbours of Great Britain" $ do
+        M.fromList (neighbours GreatBritain) 
+          `shouldBe` M.fromList [Iceland, Scandinavia, NorthernEurope, WesternEurope]
+    context "Asia" $ do 
+      it "correctly identifies neighbours of India" $ do
+        M.fromList (neighbours India) 
+          `shouldBe` M.fromList [MiddleEast, Siam, Afghanistan, China]
+    context "North America" $ do
+      it "correctly identifies neighbours of Alberta" $ do
+        M.fromList (neighbours Alberta) 
+          `shouldBe` M.fromList [NorthwestTerritory, Ontario, Alaska, WesternUnitedStates]
+    context "South America" $ do
+      it "correctly identifies neighbours of Peru" $ do
+        M.fromList (neighbours Peru) 
+          `shouldBe` M.fromList [Venezuela, Brazil, Argentina]
+    context "Australia" $ do
+      it "correctly identifies neighbours of Indonisia" $ do
+        M.fromList (neighbours Indonesia) 
+          `shouldBe` M.fromList [WesternAustralia, NewGuinea, Siam]

@@ -6,7 +6,7 @@ import Test.QuickCheck
 import State
 import Moves
 import Battle
-import Sysetm.Random
+import System.Random
 
 
 

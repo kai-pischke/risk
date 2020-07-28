@@ -144,7 +144,7 @@
 #endif /* MIN_TOOL_VERSION_runghc */
 
 #ifndef CURRENT_COMPONENT_ID
-#define CURRENT_COMPONENT_ID "risk-0.1.0.0-6zihfsYtTdX9exaenl6psu-risk-exe"
+#define CURRENT_COMPONENT_ID "risk-0.1.0.0-E7k1gKXu95QEZvYF3kep3Q-risk-exe"
 #endif /* CURRENT_COMPONENT_ID */
 #ifndef CURRENT_PACKAGE_VERSION
 #define CURRENT_PACKAGE_VERSION "0.1.0.0"

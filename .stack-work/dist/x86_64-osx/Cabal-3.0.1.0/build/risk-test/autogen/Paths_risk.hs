@@ -30,7 +30,7 @@ version = Version [0,1,0,0] []
 bindir, libdir, dynlibdir, datadir, libexecdir, sysconfdir :: FilePath
 
 bindir     = "/Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/.stack-work/install/x86_64-osx/9208cb742cffeea00fe990c2670721f722122139a3462482a07aa0fea11e3345/8.8.3/bin"
-libdir     = "/Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/.stack-work/install/x86_64-osx/9208cb742cffeea00fe990c2670721f722122139a3462482a07aa0fea11e3345/8.8.3/lib/x86_64-osx-ghc-8.8.3/risk-0.1.0.0-LaiSJm7tHGl2qrOCa370Fv-risk-test"
+libdir     = "/Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/.stack-work/install/x86_64-osx/9208cb742cffeea00fe990c2670721f722122139a3462482a07aa0fea11e3345/8.8.3/lib/x86_64-osx-ghc-8.8.3/risk-0.1.0.0-8xN3mO8BxjEL1zIXkoOIcG-risk-test"
 dynlibdir  = "/Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/.stack-work/install/x86_64-osx/9208cb742cffeea00fe990c2670721f722122139a3462482a07aa0fea11e3345/8.8.3/lib/x86_64-osx-ghc-8.8.3"
 datadir    = "/Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/.stack-work/install/x86_64-osx/9208cb742cffeea00fe990c2670721f722122139a3462482a07aa0fea11e3345/8.8.3/share/x86_64-osx-ghc-8.8.3/risk-0.1.0.0"
 libexecdir = "/Users/kaipischke/Documents/Fun/haskell/stack_test/project/risk/.stack-work/install/x86_64-osx/9208cb742cffeea00fe990c2670721f722122139a3462482a07aa0fea11e3345/8.8.3/libexec/x86_64-osx-ghc-8.8.3/risk-0.1.0.0"
