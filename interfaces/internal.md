@@ -10,7 +10,7 @@ This type models an undirected (not necessarily connected) graph. We consider th
 ```hs
 neighbours :: Eq n => Graph n -> n -> [n]
 ```  
-Given a graph and a node (vertex of the graph), returns a list of the directly adjacent nodes. Note that a consequence of the fact that we consider all members of a type to be nodes is that the function `neighbors` is a total function, so defined for all possible n (returning the empty list for nodes with no neighbours). 
+Given a graph and a node (vertex of the graph), returns a list of the directly adjacent nodes. Note that a consequence of the fact that we consider all members of a type to be nodes is that the function `neighbors` is a total function, so defined for all possible n (returning the empty list for nodes with no neighbours).
 ```hs
 isNeighbour :: Eq n => Graph n -> n -> n -> Bool
 ```  
@@ -18,7 +18,7 @@ Given a graph and two nodes, returns `True` if there is an edge connecting them 
 ```hs
 makeGraph :: Eq n => [(n, [n])] -> Graph n
 ```
-Given a valid adjacency list for an undirected graph, returns the corresponding representation as a `Graph n`. The adjacency list takes the form of a list of pairs. Each pair contains a member of the type `n` followed by a (possibly empty) list of neighbours. The (isNeighbour) relation must be symmetric (so if `a :: n` has `b :: n` in its list, then `b :: n` must have `a :: n` in its list). Any pairs containing the empty list as a second element are ignored - these nodes (as well as any others not included) are treated as having no neighbours. This well-formedness condition, together with the condition that no duplicate entries exist, ae precoditions to the function (which should throw an error if they are violated). 
+Given a valid adjacency list for an undirected graph, returns the corresponding representation as a `Graph n`. The adjacency list takes the form of a list of pairs. Each pair contains a member of the type `n` followed by a (possibly empty) list of neighbours. The (isNeighbour) relation must be symmetric (so if `a :: n` has `b :: n` in its list, then `b :: n` must have `a :: n` in its list). Any pairs containing the empty list as a second element are ignored - these nodes (as well as any others not included) are treated as having no neighbours. This well-formedness condition, together with the condition that no duplicate entries exist, ae precoditions to the function (which should throw an error if they are violated).
 
 ## RiskMap
 
@@ -31,21 +31,21 @@ The `Country` type should be inhabited by 42 nullary constructors with the names
 ### Functions
 ```hs
 neighbours :: Country -> [Country]
-``` 
+```
 Given a country, returns the list of all neighbouring countries (in no specific order).
 ```hs
 isNeighbour :: Country -> Country -> Bool
 ```
 Given two countries, returns `True` if there is an edge connecting them and `False` otherwise.
 
-## State 
+## State
 ### Types
 ```hs
 GameState -- (Eq, Show)
 ```
 
 ```hs
-Player (Black | Blue | Green | Red | Yellow) -- (Eq, Show) 
+Player (Black | Blue | Green | Red | Yellow) -- (Eq, Show)
 ```
 
 ```hs
@@ -55,7 +55,7 @@ MiniPhase (WonBattle Country Country Attackers | Normal) -- (Eq, Show)
 WonBattle take it's arguements as such: WonBattle (Attacking Country) (Defending Country) (Attackers Left After Attack)
 
 
-```hs 
+```hs
 Phase (Reinforce | Attack MiniPhase | Fortify) -- (Eq, Show)
 ```
 
@@ -125,11 +125,11 @@ Does nothing if not in attack phase, otherwise sets phase to Attack MiniPhase (i
 ```hs
 SetupBoardState -- (Eq, Show)
 ```
-Keeps track of how many troops on each country, who owns each country as well as player order and number of troops remaining to be placed for each player. 
-```hs 
+Keeps track of how many troops on each country, who owns each country as well as player order and number of troops remaining to be placed for each player.
+```hs
 SetupState (Incomplete SetupBoardState | Complete SetupBoardState) -- (Eq, Show)
 ```
-Contains a SetupBoardState and information about 
+Contains a SetupBoardState and information about
 ### Functions
 ```hs
 emptyBoard :: [Players] -> SetupState
@@ -139,7 +139,7 @@ Creates a blank board with no troops and where no countries are owned yet.
 ```hs
 placeTroop :: Country -> SetupState -> SetupState
 ```
-Partial function, only defined for incomplete `SetupState` and only when the current player owns the given country. 
+Partial function, only defined for incomplete `SetupState` and only when the current player owns the given country.
 ```hs
 completeBoardOwner :: SetupBoardState -> Country -> (Player, Int)
 ```
@@ -177,7 +177,7 @@ Moves troops from one country to another. Countries must be neighbours and owned
 
 
 ```hs
-attack :: Attackers -> Defenders -> Country -> Country -> GameState -> Maybe GameState
+attack :: Country -> Country -> Attackers -> Defenders -> GameState -> Maybe GameState
 ```
 Attacks the 2nd Country from the first with the number of attackers and defenders specified. Must Be neighbouring countries owned by different players. Must be during the correct phase. If 2nd Country ends up with 0 troops must start a WonBattle MiniPhase, with the number of troops left after casualties from the attack.
 
@@ -198,7 +198,7 @@ endAttack :: GameState -> Maybe GameState
 Must be during the Attack Normal MiniPhase. Should update phase to Fortify.
 
 
-# Notes 
+# Notes
 
 ## Note 1
 
@@ -231,7 +231,7 @@ The country names vary between different editions of Risk. These are the names w
 | Egypt                    | 22 |
 | Madagascar               | 23 |
 | North Africa             | 24 |
-| South Africa             | 25 | 
+| South Africa             | 25 |
 | Afghanistan              | 26 |
 | China                    | 27 |
 | India                    | 28 |
