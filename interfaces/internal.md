@@ -127,24 +127,32 @@ SetupBoardState -- (Eq, Show)
 ```
 Keeps track of how many troops on each country, who owns each country as well as player order and number of troops remaining to be placed for each player.
 ```hs
-SetupState (Incomplete SetupBoardState | Complete SetupBoardState) -- (Eq, Show)
+SetupState (Incomplete SetupBoardState | PartiallyComplete SetupBoardState | Complete SetupBoardState) -- (Eq, Show)
 ```
-Contains a SetupBoardState and information about
+Contains a SetupBoardState and information about how complete the board is :
+ - Incomplete is when not all countries have a owner 
+ - PartiallyComplete is when all countries have an owner but not all troops have been placed
+ - Complete is when all troops have been placed
+
+
 ### Functions
 ```hs
 emptyBoard :: [Players] -> SetupState
 ```
-Creates a blank board with no troops and where no countries are owned yet.
+Creates a blank board with no troops and where no countries are owned yet. Creates an Incomplete SetupBoardState.
 
 ```hs
-placeTroop :: Country -> SetupState -> SetupState
+placeTroop :: Country -> SetupState -> Maybe SetupState
 ```
-Partial function, only defined for incomplete `SetupState` and only when the current player owns the given country.
+Partial function, only defined for incomplete and partially complete `SetupState` and only when the current player owns the given country.
+ - Should error if called on a Complete SetupBoardState
+ - Should return Nothing if called on a Country not owned by currecnt player
+
 ```hs
 completeBoardOwner :: SetupBoardState -> Country -> (Player, Int)
 ```
 Partial function, only defined for complete `SetupState`, gives the owner and number of troops in each country.
-
+ - Should error if called on a incomplete or partially incomplete `SetupState`
 ## Battle
 ### Types
 ```hs
