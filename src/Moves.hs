@@ -22,10 +22,10 @@ module Moves (
   nReinforcements _ _ = 5
 
   reinforce :: [(Country, Int)] -> GameState -> Maybe GameState
-  reinforce movs gs | phase gs == Reinforce && validMovList movs = Just $ nextPhase $ foldr ((.).miniChange) id movs gs
+  reinforce movs gs | phase gs == Reinforce && validMovList movs =
+    Just $ nextPhase $ foldr ((.).(uncurry changeTroops)) id movs gs
                     | otherwise = Nothing
-    where miniChange (c, nTroops) = changeTroops c nTroops
-          validMovList = valid (nReinforcements gs (currPlayer gs))
+    where validMovList = valid (nReinforcements gs (currPlayer gs))
           valid 0 []  = True
           valid _ []  = False
           valid n ((c,t) : ms) = (owner gs c == currPlayer gs)
@@ -56,7 +56,8 @@ module Moves (
   invade nTroops gs = f (phase gs)
     where
       f (Attack (WonBattle cAtt cDef attLeft))
-        | (nTroops >= fromEnum attLeft) && (nTroops < troops gs cAtt) = Just $ changeTroops cDef nTroops gs
+        | (nTroops >= fromEnum attLeft) && (nTroops < troops gs cAtt) =
+          Just $ ((changeMiniPhase Normal) . (changeTroops cAtt (-nTroops)) . (changeTroops cDef nTroops)) gs
         | otherwise = Nothing
       f _ = Nothing
 
@@ -67,7 +68,7 @@ module Moves (
 
   fortify :: Country -> Country -> Int -> GameState -> Maybe GameState
   fortify cFrom cTo nTroops gs
-    | valid = (Just . nextPhase . (changeTroops cFrom (-nTroops)) . (changeTroops cTo nTroops)) gs
+    | valid = (Just . nextTurn . (changeTroops cFrom (-nTroops)) . (changeTroops cTo nTroops)) gs
     | otherwise = Nothing
     where valid = (phase gs == Fortify) &&
                   (nTroops < troops gs cFrom) &&
