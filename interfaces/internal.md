@@ -153,6 +153,7 @@ completeBoardOwner :: SetupBoardState -> Country -> (Player, Int)
 ```
 Partial function, only defined for complete `SetupState`, gives the owner and number of troops in each country.
  - Should error if called on a incomplete or partially incomplete `SetupState`
+
 ## Battle
 ### Types
 ```hs

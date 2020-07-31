@@ -2,15 +2,19 @@
 
 ## What it sends you
 
-A json file to represent the current state of board:
+Here is the basic idea (will update soon):
+```js
 {
-    "Board" : {dict from Country to (Player, NumTroops)}
-    "Phase" : ({"Phase" :"Fortify" | "Reinforce" | "Attack Normal"}
-            | {"Phase" : "WonInvade", "AttackingCountry" : ... ,"DefendingCountry" : ..., "NumAttackers" : ...}
-    "Players" : List of players in play order with head being current player
-
+   "board": {
+        "Alaska": [1, "Blue"],
+        "Western Europe": [3, "Red"],
+        ...
+        "Western Australia": [7, "Green"]
+    },
+   "phase": {"type": "Reinforce"},
+   "players": ["Blue", "Green", "Red"]
 }
-
+```
 A special request to get number of defenders when being attacked:
 
 
