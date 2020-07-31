@@ -116,7 +116,7 @@ nextPhase :: GameState -> GameState
 Updates the current phase.
 
 ```hs
-updateMiniPhase :: MiniPhase -> GameState -> GameState
+changeMiniPhase :: MiniPhase -> GameState -> GameState
 ```
 Does nothing if not in attack phase, otherwise sets phase to Attack MiniPhase (inserting the provided MiniPhase).
 
@@ -130,7 +130,7 @@ Keeps track of how many troops on each country, who owns each country as well as
 SetupState (Incomplete SetupBoardState | PartiallyComplete SetupBoardState | Complete SetupBoardState) -- (Eq, Show)
 ```
 Contains a SetupBoardState and information about how complete the board is :
- - Incomplete is when not all countries have a owner 
+ - Incomplete is when not all countries have a owner
  - PartiallyComplete is when all countries have an owner but not all troops have been placed
  - Complete is when all troops have been placed
 
@@ -181,7 +181,7 @@ Add reinforcements (specified as a list of pairs of country and non-negative int
 ```hs
 fortify :: Country -> Country -> Int -> GameState -> Maybe GameState
 ```
-Moves troops from one country to another. Countries must be neighbours and owned by the current player. Must be during the correct phase. Troops are sent from the first country to the second one. Should update phase to Reincorce and call nextTurn.
+Moves troops from one country to another. Countries must be neighbours and owned by the current player. Must be during the correct phase. Troops are sent from the first country to the second one. Should update phase to Reincorce and call nextTurn. Has to fortify 5 troops
 
 
 ```hs
