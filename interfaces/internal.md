@@ -37,15 +37,16 @@ Given a country, returns the list of all neighbouring countries (in no specific 
 isNeighbour :: Country -> Country -> Bool
 ```
 Given two countries, returns `True` if there is an edge connecting them and `False` otherwise.
-
+## GameElements
+### Types
+```hs
+Player (Black | Blue | Green | Red | Yellow) -- (Eq, Show)
+```
+Each player is represented by the colour they play as.
 ## State
 ### Types
 ```hs
 GameState -- (Eq, Show)
-```
-
-```hs
-Player (Black | Blue | Green | Red | Yellow) -- (Eq, Show)
 ```
 
 ```hs
@@ -137,7 +138,7 @@ Contains a SetupBoardState and information about how complete the board is :
 
 ### Functions
 ```hs
-emptyBoard :: [Players] -> SetupState
+emptyBoard :: [Player] -> SetupState
 ```
 Creates a blank board with no troops and where no countries are owned yet. Creates an Incomplete SetupBoardState.
 
