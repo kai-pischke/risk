@@ -193,7 +193,7 @@ Attacks the 2nd Country from the first with the number of attackers and defender
 ```hs
 invade :: Int -> GameState -> Maybe GameState
 ```
-Invades a country from another with Int number of troops. Should be only able to be called in WonBattle MiniPhase. Invades defending country from attacking. Can't invade  with less than the number of attackers left. Should move back to a Normal Attack MiniPhase
+Invades a country from another with Int number of troops, meaning owner is changed and Int troops are tranferred from the attacking country to the defending country. Should be only able to be called in WonBattle MiniPhase. Can't invade  with less than the number of attackers left. Should move back to a Normal Attack MiniPhase. Gives an error if called with a MiniPhase which shouldn't be possible.
 
 ```hs
 skipFortify :: GameState -> Maybe GameState
