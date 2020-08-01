@@ -9,17 +9,23 @@ module Moves (
 ) where
 
 
-  --imports
+  ---- Imports --------------------------------
   import Battle
   import State
   import RiskBoard
+  ---------------------------------------------
 
+  ---- Helper Functions ------------------------
   currPlayer :: GameState -> Player
   currPlayer = head.turnOrder
 
   --change later to  calculate continent bonuses
-  nReinforcements :: GameState ->Player -> Int
+  nReinforcements :: GameState -> Player -> Int
   nReinforcements _ _ = 5
+
+  -----------------------------------------------
+
+  ----Public Functions ---------------------
 
   reinforce :: [(Country, Int)] -> GameState -> Maybe GameState
   reinforce movs gs | phase gs == Reinforce && validMovList movs =
@@ -44,20 +50,20 @@ module Moves (
               (phase gs == Attack Normal)
       makeChange (attLosses, defLosses, stdGen) =
         if (defLosses == troops gs cDef) --attacker has won a country
-          then (changeOwner cDef (currPlayer gs)) .
-            (changeMiniPhase (WonBattle cAtt cDef (toEnum (nInvaders)))) .
-            regularChanges
+          then
+           (changeMiniPhase (WonBattle cAtt cDef (toEnum nInvaders))) . regularChanges
           else regularChanges
         where regularChanges = (changeTroops cAtt (-attLosses)) . (changeTroops cDef (-defLosses)) . (updateStdGen stdGen)
               nInvaders = fromEnum att - attLosses
 
-  -- Must invade with at least the number of attackers left
+  -- Must invade with at least the number of attackers left, must leave at least 1 in the previous country
   invade :: Int -> GameState -> Maybe GameState
   invade nTroops gs = f (phase gs)
     where
       f (Attack (WonBattle cAtt cDef attLeft))
-        | (nTroops >= fromEnum attLeft) && (nTroops < troops gs cAtt) =
-          Just $ ((changeMiniPhase Normal) . (changeTroops cAtt (-nTroops)) . (changeTroops cDef nTroops)) gs
+        | not (cAtt `isNeighbour` cDef) || (owner gs cAtt == owner gs cDef) = error "Impossible MiniPhase"
+        | (nTroops >= fromEnum attLeft) && (nTroops < troops gs cAtt) && (owner gs cAtt == currPlayer gs) =
+          Just $ ((changeMiniPhase Normal) . (changeOwner cDef (currPlayer gs)). (changeTroops cAtt (-nTroops)) . (changeTroops cDef nTroops)) gs
         | otherwise = Nothing
       f _ = Nothing
 
@@ -80,3 +86,5 @@ module Moves (
   skipFortify :: GameState -> Maybe GameState
   skipFortify gs | phase gs == Fortify = Just (nextTurn gs)
                  | otherwise = Nothing
+
+-------------------------------------------------------------------------------------------------------
