@@ -146,7 +146,7 @@ placeTroop :: Country -> SetupState -> Maybe SetupState
 ```
 Partial function, only defined for incomplete and partially complete `SetupState` and only when the current player owns the given country.
  - Should error if called on a Complete SetupBoardState
- - Should return Nothing if called on a Country not owned by currecnt player
+ - Should return Nothing if called on a Country not owned by current player or noone
 
 ```hs
 completeBoardOwner :: SetupBoardState -> Country -> (Player, Int)

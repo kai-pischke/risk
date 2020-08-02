@@ -9,7 +9,7 @@ import qualified Data.MultiSet as M
 spec :: Spec
 spec = do
   describe "Country" $ do
-    context "Enum" $ do 
+    context "Enum" $ do
       it "correctly associates East Africa with the id 21" $ do
         fromEnum EastAfrica `shouldBe` 21
       it "correctly associates Greenland with the id 4" $ do
@@ -20,19 +20,19 @@ spec = do
         fromEnum NewGuinea `shouldBe` 40
       it "correctly associates Venezuela with the id 12" $ do
         fromEnum Venezuela `shouldBe` 12
-    context "Eq" $ do 
+    context "Eq" $ do
       it "== works as expected for Iceland" $ do
         (Iceland == Iceland) `shouldBe` True
       it "== works as expected for different countries" $ do
         (NorthwestTerritory == Kamchatka) `shouldBe` False
       it "== works as expected for neighbours" $ do
         (Mongolia == Irkutsk) `shouldBe` False
-    context "Ord" $ do 
+    context "Ord" $ do
       it "< works as expected (true case)" $ do
         (China < Ural) `shouldBe` True
       it "< works as expected (false case)" $ do
         (Irkutsk < NorthAfrica) `shouldBe` False
-    context "Show" $ do 
+    context "Show" $ do
       it "works for Scandinavia" $ do
         show Scandinavia `shouldBe` "Scandinavia"
       it "works for Western Europe" $ do
@@ -43,21 +43,21 @@ spec = do
         show WesternUnitedStates `shouldBe` "Western United States"
 
   describe "isNeighbour" $ do
-    context "Africa" $ do 
+    context "Africa" $ do
       it "correctly identifies Madagascar and South Africa as neighbours" $ do
         isNeighbour Madagascar SouthAfrica `shouldBe` True
       it "correctly identifies Egypt and Congo as non-neighbours" $ do
         isNeighbour Egypt Congo `shouldBe` False
       it "correctly identifies Egypt and East Africa as neighbours" $ do
         isNeighbour Egypt EastAfrica `shouldBe` True
-    context "Europe" $ do 
+    context "Europe" $ do
       it "correctly identifies Northern Europe and Scandinavia as neighbours" $ do
         isNeighbour NorthernEurope Scandinavia `shouldBe` True
       it "correctly identifies Iceland and Ukraine as non-neighbours" $ do
         isNeighbour Iceland Ukraine `shouldBe` False
       it "correctly identifies Great Britain and Western Europe as neighbours" $ do
         isNeighbour GreatBritain WesternEurope `shouldBe` True
-    context "Asia" $ do 
+    context "Asia" $ do
       it "correctly identifies India and Siam as neighbours" $ do
         isNeighbour India Siam `shouldBe` True
       it "correctly identifies Middle East and Japan as non-neighbours" $ do
@@ -92,28 +92,28 @@ spec = do
         isNeighbour Brazil NewGuinea `shouldBe` False
       it "correctly identifies Afghanistan and Ukraine as neighbours" $ do
         isNeighbour Afghanistan Ukraine `shouldBe` True
-        
+
   describe "neighbours" $ do
-    context "Africa" $ do 
+    context "Africa" $ do
       it "correctly identifies neighbours of Congo" $ do
         M.fromList (neighbours Congo) `shouldBe` M.fromList [EastAfrica, SouthAfrica, NorthAfrica]
-    context "Europe" $ do 
+    context "Europe" $ do
       it "correctly identifies neighbours of Great Britain" $ do
-        M.fromList (neighbours GreatBritain) 
+        M.fromList (neighbours GreatBritain)
           `shouldBe` M.fromList [Iceland, Scandinavia, NorthernEurope, WesternEurope]
-    context "Asia" $ do 
+    context "Asia" $ do
       it "correctly identifies neighbours of India" $ do
-        M.fromList (neighbours India) 
+        M.fromList (neighbours India)
           `shouldBe` M.fromList [MiddleEast, Siam, Afghanistan, China]
     context "North America" $ do
       it "correctly identifies neighbours of Alberta" $ do
-        M.fromList (neighbours Alberta) 
+        M.fromList (neighbours Alberta)
           `shouldBe` M.fromList [NorthwestTerritory, Ontario, Alaska, WesternUnitedStates]
     context "South America" $ do
       it "correctly identifies neighbours of Peru" $ do
-        M.fromList (neighbours Peru) 
+        M.fromList (neighbours Peru)
           `shouldBe` M.fromList [Venezuela, Brazil, Argentina]
     context "Australia" $ do
       it "correctly identifies neighbours of Indonisia" $ do
-        M.fromList (neighbours Indonesia) 
+        M.fromList (neighbours Indonesia)
           `shouldBe` M.fromList [WesternAustralia, NewGuinea, Siam]
