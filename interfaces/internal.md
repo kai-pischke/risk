@@ -37,15 +37,16 @@ Given a country, returns the list of all neighbouring countries (in no specific 
 isNeighbour :: Country -> Country -> Bool
 ```
 Given two countries, returns `True` if there is an edge connecting them and `False` otherwise.
-
+## GameElements
+### Types
+```hs
+Player (Black | Blue | Green | Red | Yellow) -- (Eq, Show)
+```
+Each player is represented by the colour they play as.
 ## State
 ### Types
 ```hs
 GameState -- (Eq, Show)
-```
-
-```hs
-Player (Black | Blue | Green | Red | Yellow) -- (Eq, Show)
 ```
 
 ```hs
@@ -137,7 +138,7 @@ Contains a SetupBoardState and information about how complete the board is :
 
 ### Functions
 ```hs
-emptyBoard :: [Players] -> SetupState
+emptyBoard :: [Player] -> SetupState
 ```
 Creates a blank board with no troops and where no countries are owned yet. Creates an Incomplete SetupBoardState.
 
@@ -193,7 +194,7 @@ Attacks the 2nd Country from the first with the number of attackers and defender
 ```hs
 invade :: Int -> GameState -> Maybe GameState
 ```
-Invades a country from another with Int number of troops. Should be only able to be called in WonBattle MiniPhase. Invades defending country from attacking. Can't invade  with less than the number of attackers left. Should move back to a Normal Attack MiniPhase
+Invades a country from another with Int number of troops, meaning owner is changed and Int troops are tranferred from the attacking country to the defending country. Should be only able to be called in WonBattle MiniPhase. Can't invade  with less than the number of attackers left. Should move back to a Normal Attack MiniPhase. Gives an error if called with a MiniPhase which shouldn't be possible.
 
 ```hs
 skipFortify :: GameState -> Maybe GameState
