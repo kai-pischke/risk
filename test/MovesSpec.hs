@@ -154,15 +154,16 @@ spec = do
 
             it "Check it doesn't let you invade with more or less troops than possible" $ do
                 let testGame = (changeMiniPhase (WonBattle WesternAustralia EasternAustralia TwoAtt)) game
-                ((invade 0 testGame == Nothing) `shouldBe` True)
-                ((invade 1 testGame == Nothing) `shouldBe` True)
-                ((invade 4 testGame == Nothing) `shouldBe` True)
+                (invade 0 testGame == Nothing) `shouldBe` True
+                (invade 1 testGame == Nothing) `shouldBe` True
+                (invade 4 testGame == Nothing) `shouldBe` True
 
-            it "Check it doesn't let invade any invalid combination of countries" $ do
-                (((invade 2.changeMiniPhase (WonBattle WesternAustralia Peru OneAtt)) testGame == Nothing) `shouldBe` True)
-                (((invade 2.changeMiniPhase (WonBattle Siam Indonesia OneAtt)) testGame == Nothing) `shouldBe` True)
-                (((invade 2.changeMiniPhase (WonBattle EasternAustralia WesternAustralia OneAtt)) testGame == Nothing) `shouldBe` True)
-                (((invade 2.changeMiniPhase (WonBattle Peru Brazil OneAtt)) testGame == Nothing) `shouldBe` True)
+            it "Check it erros with any invalid combination of countries" $ do
+                ((print.invade 2.changeMiniPhase (WonBattle Siam Indonesia OneAtt)) testGame) `shouldThrow` anyException
+                ((print.invade 2.changeMiniPhase (WonBattle EasternAustralia WesternAustralia OneAtt)) testGame) `shouldThrow` anyException
+                ((print.invade 2.changeMiniPhase (WonBattle Peru Brazil OneAtt)) testGame) `shouldThrow` anyException
+                ((print.invade 2.changeMiniPhase (WonBattle WesternAustralia Peru OneAtt)) testGame) `shouldThrow` anyException
+
 
 
     describe "skipFortify" $ do

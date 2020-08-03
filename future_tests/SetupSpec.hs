@@ -28,12 +28,12 @@ spec = do
                 ((placeTroop Alaska .justPlaceTroop Siam .justPlaceTroop Alaska) setupGame == Nothing) `shouldBe` True
 
             it "Errors if try to add to a complete board" $ do
-                ((placeTroop Alaska .completeBoard) setupGame) `shouldThrow` anyException
+                ((print.placeTroop Alaska .completeBoard) setupGame) `shouldThrow` anyException
 
     describe "completeBoardOwner" $ do
         context "Invalid Inputs" $ do
             it "Errors if try to apply to a incomplete or partially complete board" $ do
-                ((completeBoardOwner) setupGame) `shouldThrow` anyException
-                ((completeBoardOwner. addOneAllCountry) setupGame) `shouldThrow` anyException
+                ((print.completeBoardOwner) setupGame) `shouldThrow` anyException
+                ((print.completeBoardOwner.addOneAllCountry) setupGame) `shouldThrow` anyException
 
     describe "Creating a full board" $ do

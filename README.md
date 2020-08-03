@@ -2,17 +2,13 @@
 This will be an implementation of the RISK Board game in Haskell. It is being written by the first year Computer Science students at Somerville College Oxford as a summer project over the summer of 2020.
 
 # Game
-We will start with a simplified version of the game. There will be no risk cards in this version. There will be only two phases per turn (place reinforcements and attack). All attacks will use the maximum number of dice. Everyone will receive exactly 5 new troops each turn. The board layout will remain unchanged. This should be easier to implement than jumping straight in to the full version. 
+We will start with a simplified version of the game. There will be no risk cards in this version. There will be only two phases per turn (place reinforcements and attack). All attacks will use the maximum number of dice. Everyone will receive exactly 5 new troops each turn. The board layout will remain unchanged. This should be easier to implement than jumping straight in to the full version.
 
-# Rules
-
-https://www.hasbro.com/common/instruct/risk.pdf
-
-## Structure 
+## Structure
 
 ### app/
 
-Contains the `Main.hs` file. Not very useful right now since we haven't done much yet. In the end the `Main.hs` file will import the modules from the `src` folder. 
+Contains the `Main.hs` file. Not very useful right now since we haven't done much yet. In the end the `Main.hs` file will import the modules from the `src` folder.
 
 ### src/
 
@@ -24,7 +20,7 @@ Contains all the test cases. Ideally each module should have a corresponding tes
 
 ### interface.md
 
-This is meant to show the interface that each module should expose. Ideally any functionality should first be specified in `interface.md` then you should write a test file (and put it in the `test/` folder) and only then should you write the module. 
+This is meant to show the interface that each module should expose. Ideally any functionality should first be specified in `interface.md` then you should write a test file (and put it in the `test/` folder) and only then should you write the module.
 
 ### stack.yaml, package.yaml and risk.cabal
 Don't edit `risk.cabal`. Anything you can do in that file you can also do in `package.yaml` which is just a fancy version of it that is used to automatically generate the `risk.cabal` file. If you delete `risk.cabal` then stack will make a new one on the next build. If you accidently edit `risk.cabal` the best thing to do is just to delete it. In general everything you need will be in `package.yaml`, but you may also need to specify the version of external dependencies in `stack.yaml`.
