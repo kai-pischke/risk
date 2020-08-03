@@ -61,8 +61,8 @@ module Moves (
   invade nTroops gs = f (phase gs)
     where
       f (Attack (WonBattle cAtt cDef attLeft))
-        | not (cAtt `isNeighbour` cDef) || (owner gs cAtt == owner gs cDef) = error "Impossible MiniPhase"
-        | (nTroops >= fromEnum attLeft) && (nTroops < troops gs cAtt) && (owner gs cAtt == currPlayer gs) =
+        | not (cAtt `isNeighbour` cDef) || (owner gs cAtt == owner gs cDef) || (owner gs cAtt /= currPlayer gs) = error "Impossible MiniPhase"
+        | (nTroops >= fromEnum attLeft) && (nTroops < troops gs cAtt) =
           Just $ ((changeMiniPhase Normal) . (changeOwner cDef (currPlayer gs)). (changeTroops cAtt (-nTroops)) . (changeTroops cDef nTroops)) gs
         | otherwise = Nothing
       f _ = Nothing
