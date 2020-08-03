@@ -3,6 +3,8 @@ module SetupSpec where
 import Test.Hspec
 import SetupBoard
 import RiskBoard
+import State
+import System.Random
 
 setupGame = emptyBoard [Red, Black]
 
@@ -13,8 +15,9 @@ addOneAllCountry s = foldr (\f x -> (fromJust.f) x) s fs
     where
         fs = map placeTroop [toEnum 0 ..]
 
-completeBoard:: SetupState -> SetupState
-completeBoard = undefined
+completeBoard:: Int -> [Country] -> SetupState -> SetupState
+completeBoard 0 s = s
+completeBoard n (c:cs) s = (completeBoard (n-1) (cs++c). placeTroop c) s
 
 spec :: Spec
 spec = do
@@ -28,7 +31,7 @@ spec = do
                 ((placeTroop Alaska .justPlaceTroop Siam .justPlaceTroop Alaska) setupGame == Nothing) `shouldBe` True
 
             it "Errors if try to add to a complete board" $ do
-                ((print.placeTroop Alaska .completeBoard) setupGame) `shouldThrow` anyException
+                ((print.placeTroop Alaska .completeBoard 40) setupGame) `shouldThrow` anyException
 
     describe "completeBoardOwner" $ do
         context "Invalid Inputs" $ do
@@ -37,3 +40,12 @@ spec = do
                 ((print.completeBoardOwner.addOneAllCountry) setupGame) `shouldThrow` anyException
 
     describe "Creating a full board" $ do
+        context "2 Player Board" $ do
+            let completed2pBoard = completeBoard 80 setupGame
+            let b2p = newGame [Red, Black] (completeBoardOwner completedBoard) (mkStdGet 0)
+            it "2 player game has correct owners" $ do
+                (all (\x -> owner b (fromEnum x) == Red) (filter even [0..41])) `shouldBe` True
+                (all (\x -> owner b (fromEnum x) == Black) (filter odd [0..41])) `shouldBe` True
+
+            it "2 player game has correct number troops" $ do
+                (all (\x -> troops b (fromEnum x) == 2) [0..37]) `shouldBe` True
