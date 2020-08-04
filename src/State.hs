@@ -1,6 +1,5 @@
 module State
     ( GameState,
-      Player(..),
       MiniPhase(..),
       Phase(..),
       newGame,
@@ -25,6 +24,7 @@ import qualified Data.Map as Map
 import Control.Monad
 import RiskBoard
 import Battle
+import GameElements
 
 --- internal representation of game state ---
 data GameState = InternalGameState
@@ -37,8 +37,6 @@ data GameState = InternalGameState
 ----------------------------------------------
 
 -- types --
-data Player = Black | Blue | Green | Red | Yellow 
-               deriving (Eq, Show)
 data MiniPhase = WonBattle Country Country Attackers | Normal 
                deriving (Eq, Show)
 data Phase = Reinforce | Attack MiniPhase | Fortify

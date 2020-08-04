@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b5a0420c6a5f48c4c3b6f549204b1f3b7bc4fc1be90235e3c0715a7dcc8a1404
+-- hash: dd721119c2676f89a17db716b17d422e6bf69283a9daf7ba2854930166b0dc53
 
 name:           risk
 version:        0.1.0.0
@@ -30,6 +30,7 @@ source-repository head
 library
   exposed-modules:
       Battle
+      GameElements
       Graph
       Moves
       RiskBoard
@@ -67,7 +68,6 @@ test-suite risk-test
       GraphSpec
       MovesSpec
       RiskBoardSpec
-      SetupSpec
       StateSpec
       Paths_risk
   hs-source-dirs:

@@ -7,6 +7,7 @@ import State
 import RiskBoard
 import Battle
 import System.Random
+import GameElements
 
 allRed :: GameState
 allRed = newGame [Blue, Red, Green] (\x -> (Red, 0)) (mkStdGen 137)

@@ -1,10 +1,11 @@
-module SetupSpec where
+module SetupBoardSpec where
 
 import Test.Hspec
 import SetupBoard
 import RiskBoard
 import State
 import System.Random
+import GameElements
 
 setupGame = emptyBoard [Red, Black]
 

@@ -1,8 +1,8 @@
 module SetupBoard 
         ( SetupState(..),
-            emptyBoard,
-            placeTroop,
-            completeBoardOwner
+          emptyBoard,
+          placeTroop,
+          completeBoardOwner
         ) where
 
 import Data.Map (Map)

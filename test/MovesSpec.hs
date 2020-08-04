@@ -7,7 +7,7 @@ import State
 import Moves
 import Battle
 import System.Random
-
+import GameElements
 
 spec :: Spec
 

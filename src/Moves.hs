@@ -13,6 +13,7 @@ module Moves (
   import Battle
   import State
   import RiskBoard
+  import GameElements
   ---------------------------------------------
 
   ---- Helper Functions ------------------------
