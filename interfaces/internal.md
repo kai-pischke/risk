@@ -150,7 +150,7 @@ Partial function, only defined for incomplete and partially complete `SetupState
  - Should return Nothing if called on a Country not owned by current player or noone
 
 ```hs
-completeBoardOwner :: SetupBoardState -> Country -> (Player, Int)
+completeBoardOwner :: SetupState -> Country -> (Player, Int)
 ```
 Partial function, only defined for complete `SetupState`, gives the owner and number of troops in each country.
  - Should error if called on a incomplete or partially incomplete `SetupState`
