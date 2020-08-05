@@ -11,7 +11,7 @@ https://www.hasbro.com/common/instruct/risk.pdf
  - Continent Bonuses to troops
  - Country Bonuses to troops
  - 2 player special Rules
- 
+
 
 
 ## **Deviations from Rules/ Special rules**
@@ -21,3 +21,4 @@ https://www.hasbro.com/common/instruct/risk.pdf
 
 ## **Assumptions**
  - We get the players already in order of play
+ - Assuming there an the same number of infantry, cavalry and artillery cards

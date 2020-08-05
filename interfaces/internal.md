@@ -208,6 +208,25 @@ endAttack :: GameState -> Maybe GameState
 Must be during the Attack Normal MiniPhase. Should update phase to Fortify.
 
 
+## Protocol
+### Types
+
+
+### Functions
+```hs
+toJson :: GameState ->
+```
+
+```hs
+fromJson :: -> [String]
+```
+
+## Server
+
+
+## Interface
+
+
 # Notes
 
 ## Note 1
