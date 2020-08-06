@@ -1,11 +1,24 @@
 
-## Message.hs 
+## Message.hs
 ```
-Response = General Update | Special Question Player | Invalid Error 
+Response = General Update | Special Question Player | Invalid Error
+```
+```
+Update = WaitingRoom [Player] | Setup SetupState | Play GameState
+```
+```
+Question = NumDefenders
+```
+```
+Error = InvalidMove | NotTurn
 ```
 
 ```
-Request = ...
+Request = Request Player RequestType
+```
+
+```
+RequestType = StartGame ... | PlaceTroop ... |
 ```
 
 ## Interface.hs
@@ -18,7 +31,11 @@ empty :: Game
 receive :: Request -> Game -> (Response, Game)
 ```
 
-export 
+```
+addPlayer :: Game -> (Game, Player)
+```
+
+export
 
 ```
 Response
@@ -103,5 +120,3 @@ so a dictionary from country -> (nTroops, owner)
 Phase :: {"type": "simplePhase", "phase": String}
             | {"type": "miniPhase", "attackingCountry": String, "defendingCountry": String, "attackersRemaining": Int}
 ```
-
-
