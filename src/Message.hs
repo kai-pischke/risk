@@ -17,7 +17,7 @@ module Message (
 
   ---- Types ---------------------
 
-  data Response = General Update | Special Question Player | Invalid Error
+  data Response = General Update | Special Question Player | Invalid Error Player
     deriving (Eq, Show)
 
   data Update = WaitingRoom [Player] | Setup SetupState | Play GameState
@@ -50,5 +50,7 @@ module Message (
     | Fortify Country Country Int
     | Invade Int
     | ChooseDefenders Int
+    | EndAttack
+    | SkipFortify
     deriving (Eq, Show)
   -----------------------------------
