@@ -1,37 +1,44 @@
 
 ## Message.hs
-```
+```hs
 Response = General Update | Special Question Player | Invalid Error
 ```
-```
+```hs
 Update = WaitingRoom [Player] | Setup SetupState | Play GameState
 ```
-```
+```hs
 Question = NumDefenders
 ```
-```
+```hs
 Error = InvalidMove | NotTurn
 ```
 
-```
+```hs
 Request = Request Player RequestType
 ```
 
-```
-RequestType = StartGame ... | PlaceTroop ... |
+```hs
+RequestType =
+    StartGame |
+    PlaceTroop Country |
+    Attack Country Country Attackers |
+    Reinforce [(Country, Int)] |
+    Fortify Country Country Int |
+    Invade Int |
+    ChooseDefenders Int
 ```
 
 ## Interface.hs
 
-```
+```hs
 empty :: Game
 ```
 
-```
+```hs
 receive :: Request -> Game -> (Response, Game)
 ```
 
-```
+```hs
 addPlayer :: Game -> (Game, Player)
 ```
 
