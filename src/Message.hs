@@ -50,5 +50,7 @@ module Message (
     | Fortify Country Country Int
     | Invade Int
     | ChooseDefenders Int
+    | EndAttack
+    | SkipFortify
     deriving (Eq, Show)
   -----------------------------------

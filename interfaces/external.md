@@ -19,13 +19,15 @@ Request = Request Player RequestType
 
 ```hs
 RequestType =
-    StartGame |
-    PlaceTroop Country |
-    Attack Country Country Attackers |
-    Reinforce [(Country, Int)] |
-    Fortify Country Country Int |
-    Invade Int |
-    ChooseDefenders Int
+    StartGame
+    | PlaceTroop Country
+    | Attack Country Country Attackers
+    | Reinforce [(Country, Int)]
+    | Fortify Country Country Int
+    | Invade Int
+    | ChooseDefenders Int
+    | EndAttack
+    | SkipFortify
 ```
 
 ## Interface.hs
@@ -37,10 +39,13 @@ empty :: Game
 ```hs
 receive :: Request -> Game -> (Response, Game)
 ```
-
+total function. For any request, checks whether it is valid and returns an
+appropriate response message along with the new Game with the correct changes made.
 ```hs
 addPlayer :: Game -> (Game, Player)
 ```
+Errors if we aren't in the waiting phase, or if the waiting room is full, or if
+the given waiting room is invalid (i.e. there are repeats)
 
 export
 
@@ -106,6 +111,17 @@ Msg = {..., "numberOfTroops": Int}
 #### `"chooseDefenders"`
 ```
 Msg = {..., "numberOfDefenders": Int}
+
+```
+
+#### endAttack
+```
+Msg = {...}
+```
+
+#### skipFortify
+```
+Msg = {...}
 ```
 
 ### We send
