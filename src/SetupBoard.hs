@@ -21,9 +21,10 @@ data SetupBoardState = InternalGameState
                 } deriving (Eq, Show)
 
 data SetupState = Incomplete SetupBoardState
-                                                                | PartiallyComplete SetupBoardState
-                                                                | Complete SetupBoardState
-                                                                deriving (Eq, Show)
+                | PartiallyComplete SetupBoardState
+                | Complete SetupBoardState
+                deriving (Eq, Show)
+                
 -- map functions --
 type SbStateTransformer = SetupBoardState -> SetupBoardState
 
@@ -45,14 +46,14 @@ currentPlayer = head . statePlayers
 
 toSetupState :: SetupBoardState -> SetupState
 toSetupState s | not $ null $ Map.filter isNothing $ playerMap s    = Incomplete s
-                             | not $ null $ Map.filter (/= 0) $ playerRemaining s = PartiallyComplete s
-                             | otherwise
-                                                                                                         = Complete s
+               | not $ null $ Map.filter (/= 0) $ playerRemaining s = PartiallyComplete s
+               | otherwise                                          = Complete s
+              
 nextTurn :: SetupBoardState -> SetupBoardState
 nextTurn = changePlayers rotate
         where
-                rotate [] = []
-                rotate (x:xs) = xs ++ [x]
+          rotate [] = []
+          rotate (x:xs) = xs ++ [x]
 
 distinct :: Eq a => [a] -> Bool
 distinct [] = True
@@ -77,30 +78,31 @@ placeTroop c (Incomplete s) = case Map.lookup c (playerMap s) of
     where
         p = currentPlayer s
         valid = maybe (error $ "Player '" ++ show p ++ "' not playing.")
-                                    (>0) (Map.lookup p $ playerRemaining s)
+                      (>0) (Map.lookup p $ playerRemaining s)
         ownerAdded = changePlayerMap (Map.insert c (Just p)) s
         decremented = changeRemaining (Map.insertWith (flip (-)) p 1) ownerAdded
-        newBoard = nextTurn $ decremented
+        troopAdded = changeTroopMap (Map.insertWith (+) c 1) decremented
+        newBoard = nextTurn $ troopAdded
 
 
 placeTroop c (PartiallyComplete s) = case Map.lookup c (playerMap s) of
      (Just (Just x)) -> if valid && x == p
-                                            then Just $ toSetupState $ newBoard
-                                            else Nothing
+                        then Just $ toSetupState $ newBoard
+                        else Nothing
      _               -> error "impossible situation: Nothing in PartiallyComplete"
     where
         p = currentPlayer s
         valid = maybe (error $ "Player '" ++ show p ++ "' not playing.")
                                     (>0) (Map.lookup p $ playerRemaining s)
         decremented = changeRemaining (Map.insertWith (flip (-)) p 1) s
-        newBoard = nextTurn $ decremented
+        troopAdded = changeTroopMap (Map.insertWith (+) c 1) decremented
+        newBoard = nextTurn $ troopAdded
 
 placeTroop _ _ = error "invalid call to placeTroop: called on 'Complete' SetupState."
 
 completeBoardOwner :: SetupState -> Country -> (Player, Int)
 completeBoardOwner (Complete s) c = result
-        where
-                Just result = (,) <$> (join $ Map.lookup c $ playerMap s) <*> (Map.lookup c $ troopMap s)
+        where Just result = (,) <$> (join $ Map.lookup c $ playerMap s) <*> (Map.lookup c $ troopMap s)
 completeBoardOwner _ _ = error "completeBoardOwner only defined for Complete SetupBoardState"
 
 -- private --
@@ -111,4 +113,4 @@ initialTroops 4 = 30
 initialTroops 3 = 35
 initialTroops 2 = 40
 initialTroops n = error $ "Game rules only specified for 2-6 players. Not sure what to do for "
-                                                                                                ++ show n ++ " players."
+                        ++ show n ++ " players."

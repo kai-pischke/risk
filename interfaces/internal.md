@@ -53,7 +53,7 @@ GameState -- (Eq, Show)
 MiniPhase (WonBattle Country Country Attackers | Normal) -- (Eq, Show)
 ```
 
-WonBattle take it's arguements as such: WonBattle (Attacking Country) (Defending Country) (Attackers Left After Attack)
+WonBattle take its arguements as such: WonBattle (Attacking Country) (Defending Country) (Attackers Left After Attack)
 
 
 ```hs
