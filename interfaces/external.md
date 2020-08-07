@@ -155,7 +155,6 @@ Phase :: {"type": "simplePhase", "phase": String}
 ##### NumDefenders
 ```
 {"type": "chooseDefenders",
- "playerAttacking": String,
  "attackingCountry": String,
  "defendingCountry": String
 }
