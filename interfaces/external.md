@@ -54,11 +54,11 @@ Request
 
 ## Parse.hs
 ```
-read :: Data.Text -> Maybe Request
+readRequest :: Data.Text -> Maybe Request
 ```
 
 ```
-show ::  Response -> Data.Text
+showResponse ::  Response -> Data.Text
 ```
 
 ## Server.hs
