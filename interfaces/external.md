@@ -109,13 +109,35 @@ Msg = {..., "numberOfDefenders": Int}
 ```
 
 ### We send
+
+
+#### If it's a General Update
+
+##### WaitingRoom :
 ```
-{"board": Board, "turnOrder": [String], "phase": Phase}
+{"type": "waitingRoom", "players": [String]}
+```
+
+##### Setup :
+```
+{"type": "setup",
+ "players": [String],
+ "board": Board
+}
+```
+
+If not owned then owner is "None" and numberTroops is 0
+
+##### Play :
+```
+{"type": "play",
+ "players": [String],
+ "board": Board,
+ "phase": Phase
+}
 ```
 
 where:
-
-
 
 ```
 Board :: {String: {"numberTroops": Int, "owner": String}}
@@ -126,4 +148,20 @@ so a dictionary from country -> (nTroops, owner)
 ```
 Phase :: {"type": "simplePhase", "phase": String}
             | {"type": "miniPhase", "attackingCountry": String, "defendingCountry": String, "attackersRemaining": Int}
+```
+
+#### If it's a Special Question:
+
+##### NumDefenders
+```
+{"type": "chooseDefenders",
+ "playerAttacking": String,
+ "attackingCountry": String,
+ "defendingCountry": String
+}
+```
+
+#### If it's an Invalid Error:
+```
+{"type": (Error converted to a string), "player" : String}
 ```

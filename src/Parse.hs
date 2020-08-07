@@ -3,8 +3,8 @@
 
 
 module Parse (
-    read,
-    show
+    readRequest,
+    showResponse
 ) where
 
 
@@ -17,13 +17,14 @@ readRequest :: String -> Maybe Request
 readRequest = undefined
 showResponse ::  Response -> String
 
+instance ToJSON Response where
+    toJSON (General (WaitingRoom ps)) = object [""]
 
-showResponse (General (WaitingRoom ps)) = undefined
-showResponse (General (Setup setup)) = undefined
-showResponse (General (Play game)) = undefined
+    toJSON (General (Setup setup)) = undefined
+    toJSON (General (Play game)) = undefined
 
 
-showResponse (Special NumDefenders p) = undefined
+    toJSON (Special NumDefenders p) = undefined
 
-showResponse (Invalid InvalidMove) = undefined
-showResponse (Invalid NotTurn) = undefined
+    toJSON (Invalid InvalidMove) = undefined
+    toJSON (Invalid NotTurn) = undefined
