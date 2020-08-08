@@ -143,11 +143,21 @@ emptyBoard :: [Player] -> SetupState
 Creates a blank board with no troops and where no countries are owned yet. Creates an Incomplete SetupBoardState.
 
 ```hs
+setupTurnOrder :: SetupState -> [Player]
+```
+
+Gives the turnOrder for a SetupState, with the player's who's going now first.
+
+```hs
 placeTroop :: Country -> SetupState -> Maybe SetupState
 ```
 Partial function, only defined for incomplete and partially complete `SetupState` and only when the current player owns the given country.
  - Should error if called on a Complete SetupBoardState
  - Should return Nothing if called on a Country not owned by current player or noone
+
+```hs
+incompleteBoardOwner :: SetupState -> Country -> (Maybe Player, Int)
+```
 
 ```hs
 completeBoardOwner :: SetupState -> Country -> (Player, Int)
