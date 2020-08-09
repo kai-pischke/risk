@@ -31,7 +31,7 @@ RequestType = PlaceTroop Country
 ## Interface.hs
 
 ```hs
-empty :: Game
+empty :: StdGen -> Game
 ```
 
 ```hs
