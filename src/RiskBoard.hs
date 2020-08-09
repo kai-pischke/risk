@@ -1,9 +1,9 @@
-module RiskBoard 
+module RiskBoard
     ( Country(..),
       neighbours,
-      isNeighbour 
+      isNeighbour
     ) where
-    
+
 import qualified Graph
 
 data Country = Alaska
@@ -31,7 +31,7 @@ data Country = Alaska
              | Egypt
              | Madagascar
              | NorthAfrica
-             | SouthAfrica 
+             | SouthAfrica
              | Afghanistan
              | China
              | India
@@ -49,6 +49,52 @@ data Country = Alaska
              | NewGuinea
              | WesternAustralia
              deriving (Enum, Eq, Ord, Bounded)
+
+instance Read Country where
+    readsPrec _ "Alaska" = [(Alaska,"")]
+    readsPrec _ "Alberta" = [(Alberta,"")]
+    readsPrec _ "Central America" = [(CentralAmerica,"")]
+    readsPrec _ "Eastern United States" = [(EasternUnitedStates,"")]
+    readsPrec _ "Greenland" = [(Greenland,"")]
+    readsPrec _ "Northwest Territory" = [(NorthwestTerritory,"")]
+    readsPrec _ "Ontario" = [(Ontario,"Ontario")]
+    readsPrec _ "Quebec" = [(Quebec,"Quebec")]
+    readsPrec _ "Western United States" = [(WesternUnitedStates,"")]
+    readsPrec _ "Argentina" = [(Argentina,"")]
+    readsPrec _ "Brazil" = [(Brazil,"")]
+    readsPrec _ "Peru" = [(Peru,"")]
+    readsPrec _ "Venezuela" = [(Venezuela,"")]
+    readsPrec _ "Great Britain" = [(GreatBritain,"")]
+    readsPrec _ "Iceland" = [(Iceland,"")]
+    readsPrec _ "Northern Europe" = [(NorthernEurope,"")]
+    readsPrec _ "Scandinavia" = [(Scandinavia,"")]
+    readsPrec _ "Southern Europe" = [(SouthernEurope,"")]
+    readsPrec _ "Ukraine" = [(Ukraine,"")]
+    readsPrec _ "Western Europe" = [(WesternEurope,"")]
+    readsPrec _ "Congo" = [(Congo,"")]
+    readsPrec _ "East Africa" = [(EastAfrica,"")]
+    readsPrec _ "Egypt" = [(Egypt,"")]
+    readsPrec _ "Madagascar" = [(Madagascar,"")]
+    readsPrec _ "North Africa" = [(NorthAfrica,"")]
+    readsPrec _ "South Africa" = [(SouthAfrica,"")]
+    readsPrec _ "Afghanistan" = [(Afghanistan,"")]
+    readsPrec _ "China" = [(China,"")]
+    readsPrec _ "India" = [(India,"")]
+    readsPrec _ "Irkutsk" = [(Irkutsk,"")]
+    readsPrec _ "Japan" = [(Japan,"")]
+    readsPrec _ "Kamchatka" = [(Kamchatka,"")]
+    readsPrec _ "Middle East" = [(MiddleEast,"")]
+    readsPrec _ "Mongolia" = [(Mongolia,"")]
+    readsPrec _ "Siam" = [(Siam,"")]
+    readsPrec _ "Siberia" = [(Siberia,"")]
+    readsPrec _ "Ural" = [(Ural,"")]
+    readsPrec _ "Yakutsk" = [(Yakutsk,"")]
+    readsPrec _ "Eastern Australia" = [(EasternAustralia,"")]
+    readsPrec _ "Indonesia" = [(Indonesia,"")]
+    readsPrec _ "New Guinea" = [(NewGuinea,"")]
+    readsPrec _ "Western Australia" = [(WesternAustralia,"")]
+    readsPrec _ _ = []
+
 
 instance Show Country where
     show Alaska = "Alaska"
