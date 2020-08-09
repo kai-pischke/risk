@@ -22,3 +22,4 @@ https://www.hasbro.com/common/instruct/risk.pdf
 ## **Assumptions**
  - We get the players already in order of play
  - Assuming there an the same number of infantry, cavalry and artillery cards
+ - Assume that the defender doesn't get to know the number of attacking troops
