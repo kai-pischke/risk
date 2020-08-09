@@ -10,7 +10,7 @@ Update = WaitingRoom [Player] | Setup SetupState | Play GameState
 Question = NumDefenders
 ```
 ```hs
-Error = InvalidMove | NotTurn
+Error = InvalidMove | NotTurn | NotEnoughPlayers | NotInWaitingRoom | SetupComplete | NotInSetup | NotInPlay
 ```
 
 ```hs
