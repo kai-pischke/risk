@@ -10,7 +10,14 @@ Update = WaitingRoom [Player] | Setup SetupState | Play GameState
 Question = NumDefenders
 ```
 ```hs
-Error = InvalidMove | NotTurn | NotEnoughPlayers | NotInWaitingRoom | SetupComplete | NotInSetup | NotInPlay
+Error = InvalidMove
+  | NotTurn
+  | NotEnoughPlayers
+  | NotInWaitingRoom
+  | SetupComplete
+  | NotInSetup
+  | NotInPlay
+  | NotRequestingDefenders
 ```
 
 ```hs
@@ -18,12 +25,13 @@ Request = Request Player RequestType
 ```
 
 ```hs
-RequestType = PlaceTroop Country
+RequestType = StartGame
+            | PlaceTroop Country
             | Attack Country Country Attackers
             | Reinforce [(Country, Int)]
             | Fortify Country Country Int
             | Invade Int
-            | ChooseDefenders Int
+            | ChooseDefenders Defenders
             | EndAttack
             | SkipFortify
 ```
