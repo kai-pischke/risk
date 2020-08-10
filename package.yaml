@@ -22,6 +22,8 @@ dependencies:
 - base >= 4.8 && < 5
 - random >= 1.2
 - containers
+- bytestring
+- aeson
 
 library:
   source-dirs: src

@@ -3,6 +3,8 @@
 
 
 module Parse (
+readRequest,
+showResponse
 ) where
 
 
@@ -12,15 +14,16 @@ import Data.Aeson
 import Control.Applicative
 import Control.Monad
 import Data.Map (Map, fromList)
+import Data.ByteString.Lazy (ByteString)
 
 import qualified State as S (MiniPhase(..), Phase(..), turnOrder, phase, troops, owner)
 import RiskBoard
 import GameElements
 
-readRequest :: String -> Maybe Request
-readRequest = undefined
-showResponse ::  Response -> String
-showResponse = undefined
+readRequest :: ByteString -> Maybe Request
+readRequest = decode
+showResponse ::  Response -> ByteString
+showResponse = encode
 
 
 
