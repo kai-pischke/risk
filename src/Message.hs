@@ -36,7 +36,7 @@ module Message (
   data Question = NumDefenders
     deriving (Eq, Show)
 
-  data Error = InvalidMove | NotTurn | NotEnoughPlayers | NotInWaitingRoom | NotInSetup | NotInPlay
+  data Error = InvalidMove | NotTurn | NotEnoughPlayers | NotInWaitingRoom | SetupComplete | NotInSetup | NotInPlay | NotRequestingDefenders
     deriving (Eq, Show)
 
   data Request = Request Player RequestType
@@ -49,7 +49,7 @@ module Message (
     | Reinforce [(Country, Int)]
     | Fortify Country Country Int
     | Invade Int
-    | ChooseDefenders Int
+    | ChooseDefenders Defenders
     | EndAttack
     | SkipFortify
     deriving (Eq, Show)
