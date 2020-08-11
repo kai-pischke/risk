@@ -55,22 +55,31 @@ the given waiting room is invalid (i.e. there are repeats)
 
 export
 
-```
-Response
+```hs
+Response(..)
 ```
 
-```
-Request
+```hs
+Request(..)
 ```
 
 ## Parse.hs
-```
-readRequest :: ByteString -> Maybe Request
-```
+Note we are using `Data.ByteString.Lazy (ByteString)`.
 
 ```
-showResponse ::  Response -> ByteString
+type parseError = ByteString
 ```
+`parseError` is a `ByteString` holding the JSON-encoded response to a parse error.
+
+```
+decodeRequest :: ByteString -> Either Request ParseError
+```
+Reads in a received `ByteString` and returns a `Left Request` or a `Right ParseError`.
+
+```
+encodeResponse ::  Response -> ByteString
+```
+encodes a `Response` to a `ByteString`.
 
 ## Server.hs
 
