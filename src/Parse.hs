@@ -19,6 +19,7 @@ import Data.ByteString.Lazy (ByteString)
 import qualified State as S (MiniPhase(..), Phase(..), turnOrder, phase, troops, owner)
 import RiskBoard
 import GameElements
+---------------------------------------------
 
 readRequest :: ByteString -> Maybe Request
 readRequest = decode
@@ -61,7 +62,7 @@ instance FromJSON Request where
         else if (requestType == ("ChooseDefenders" :: String))
             then do
                 nd <- v .: "number_of_defenders"
-                return (Request (read sender) (ChooseDefenders nd))
+                return (Request (read sender) (ChooseDefenders $ toEnum nd))
         else if (requestType == ("EndAttack" :: String))
             then return (Request (read sender) EndAttack)
         else if (requestType == ("SkipFortify" :: String))
@@ -88,15 +89,18 @@ instance ToJSON Response where
 ---- General Updates ------------------------
 
     toJSON (General (WaitingRoom ps)) =
-        object ["state" .= show "WaitingRoom",
+        object ["kind" .= show "State",
+                "state" .= show "WaitingRoom",
                 "players" .= map show ps]
 
     toJSON (General (Setup setup)) =
-        object ["state" .= show "setup",
+        object ["kind" .= show "State",
+                "state" .= show "Setup",
                 "players" .= map show [1]] --Flag
 
     toJSON (General (Play g)) =
-        object ["state" .= show "Play",
+        object ["kind" .= show "State",
+                "state" .= show "Play",
                 "players" .= map show (S.turnOrder g),
                 "board" .= ((fromList.zip (map show countries)) $ map getOwnerTroopMap countries),
                 "phase" .= (phaseToJson $ S.phase g)]
@@ -107,14 +111,11 @@ instance ToJSON Response where
 
 ---- Special Questions ----------------------
 
-
---    toJSON (Special (NumDefenders (S.WonBattle ac dc _)) p) =
---        object ["kind" .= show "chooseDefenders",
---                "attackingCountry" .= ac,
---                "defendingCountry" .= dc]
---        where countries = [(minBound :: Country)..]
+    toJSON (Special NumDefenders p) =
+        object ["kind" .= show "Question",
+                "questoiun" .= show "ChooseDefenders"]
 
 ---- Invalid Errors -------------------------
     toJSON (Invalid e p) =
-        object ["error" .= show e,
-                "player" .= show p]
+        object ["kind".= show "Error",
+                "error" .= show e]

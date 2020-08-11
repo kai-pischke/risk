@@ -159,11 +159,13 @@ Partial function, only defined for incomplete and partially complete `SetupState
 incompleteBoardOwner :: SetupState -> Country -> (Maybe Player, Int)
 ```
 
+Partial function, only defined for any `SetupState`, gives the owner and number of troops in each country.
+
 ```hs
 completeBoardOwner :: SetupState -> Country -> (Player, Int)
 ```
-Partial function, only defined for complete `SetupState`, gives the owner and number of troops in each country.
- - Should error if called on a incomplete or partially incomplete `SetupState`
+Partial function, defined for (partially) complete `SetupState`, gives the owner and number of troops in each country.
+ - Should error if called on a incomplete `SetupState`
 
 ## Battle
 ### Types
