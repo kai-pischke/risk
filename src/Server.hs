@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Server where
-import Message (Response(..)) -- Alex should really export this
+import Message (Response(..), Request(..)) -- Alex should really export this
 import Interface
 import GameElements (Player)
 import Parse
@@ -25,6 +25,9 @@ connectNewPlayer conn state = modifyMVar state $ \(State ps g) -> do
 disconnect :: IO()
 disconnect = return ()
 
+respond :: WS.Connection -> MVar State -> Request -> IO ()
+respond conn state req = return ()
+    
 play :: WS.Connection -> Player -> MVar State -> IO ()
 play conn player state = do
     -- send "joining" msg
@@ -33,7 +36,7 @@ play conn player state = do
     -- listen
     bytesReq <- WS.receiveData conn
     case decodeRequest bytesReq of 
-        Left req -> return ()
+        Left req -> respond conn state req 
         Right err -> WS.sendTextData conn err
 
 broadcast :: MVar State -> ByteString -> IO ()
