@@ -24,6 +24,7 @@ dependencies:
 - containers
 - bytestring
 - aeson
+- websockets 
 
 library:
   source-dirs: src

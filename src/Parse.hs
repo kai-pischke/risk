@@ -3,8 +3,9 @@
 
 
 module Parse (
-readRequest,
-showResponse
+decodeRequest,
+encodeResponse,
+ParseError
 ) where
 
 
@@ -21,13 +22,16 @@ import RiskBoard
 import GameElements
 ---------------------------------------------
 
-readRequest :: ByteString -> Maybe Request
-readRequest = decode
-showResponse ::  Response -> ByteString
-showResponse = encode
+decodeRequest :: ByteString -> Either Request ParseError
+decodeRequest = maybe (Right parseError) Left . decode 
 
+encodeResponse :: Response -> ByteString
+encodeResponse = encode
 
+type ParseError = ByteString
 
+parseError :: ParseError
+parseError = "{\"Invalid JSON\"}"
 
 instance FromJSON Request where
     parseJSON (Object v) = do
