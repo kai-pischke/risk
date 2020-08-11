@@ -5,6 +5,7 @@ license:             BSD3
 author:              "Alex Pay, River Newbury and Kai Pischke"
 maintainer:          "kai.pischke@some.ox.ac.uk"
 copyright:           "2020 Alex Pay, River Newbury and Kai Pischke"
+allow-newer: true
 
 extra-source-files:
 - README.md
