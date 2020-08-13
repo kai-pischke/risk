@@ -9,7 +9,9 @@ import qualified Network.WebSockets as WS
 import System.Random (getStdGen)
 import Control.Exception (finally)
 import Control.Concurrent.MVar (MVar, modifyMVar, newMVar, readMVar, modifyMVar_)
-import Control.Monad (forM_)
+import Control.Monad (forM_, forever)
+import Data.ByteString.Lazy.UTF8 as BLU
+import Debug.Trace (trace)
 
 data State = State [(Player, WS.Connection)] Game
 
@@ -19,26 +21,43 @@ updateGame g (State ps _) = State ps g
 
 connectNewPlayer :: WS.Connection -> MVar State -> IO Player
 connectNewPlayer conn state = modifyMVar state $ \(State ps g) -> do
-    let (g, p) = addPlayer g
-    return (State ((p, conn):ps) g, p)
+    let (p, g') = addPlayer g
+    return (State ((p, conn):ps) g', p)
     
 disconnect :: IO()
 disconnect = return ()
 
+send :: MVar State -> Player -> ByteString -> IO ()
+send state player bytes = do
+    State players _ <- readMVar state
+    let (_, conn) = head $ filter ((==) player . fst) players
+    WS.sendTextData conn bytes
+    
 respond :: WS.Connection -> MVar State -> Request -> IO ()
-respond conn state req = return ()
+respond conn state req = do
+    State _ game <- readMVar state
+    let (response, game') = receive req game
+    modifyMVar_ state (return . updateGame game')
+    let bytesResp = encodeResponse response
+    case response of
+        General _ -> broadcast state bytesResp
+        Special _ toPlayer -> send state toPlayer bytesResp
+        Invalid _ toPlayer -> send state toPlayer bytesResp
     
 play :: WS.Connection -> Player -> MVar State -> IO ()
 play conn player state = do
     -- send "joining" msg
-    WS.sendTextData conn $ ("you are in the game!" :: ByteString)
+    WS.sendTextData conn $ BLU.fromString ("{\"" ++ show player ++ "\"}")
     
-    -- listen
-    bytesReq <- WS.receiveData conn
-    case decodeRequest bytesReq of 
-        Left req -> respond conn state req 
-        Right err -> WS.sendTextData conn err
+    putStrLn $ "A new player joined and was assigned " ++ show player ++ "."
+    
+    forever $ do        
+        bytesReq <- WS.receiveData conn
+        case decodeRequest bytesReq of 
+            Left req -> respond conn state req 
+            Right err -> WS.sendTextData conn err
 
+ 
 broadcast :: MVar State -> ByteString -> IO ()
 broadcast state msg = do
     State players _ <- readMVar state
@@ -47,7 +66,7 @@ broadcast state msg = do
 
 application :: MVar State -> WS.ServerApp
 application state pending = do
-
+    
     -- accept a new connection
     conn <- WS.acceptRequest pending
     player <- connectNewPlayer conn state
@@ -59,8 +78,8 @@ application state pending = do
         finally (play conn player state) disconnect
         
     
-run :: IO ()
-run = do
+run :: Int -> IO ()
+run port = do
     -- create the game 
     gen <- getStdGen
     let game = empty gen
@@ -69,4 +88,4 @@ run = do
     state <- newMVar $ State [] game
     
     -- run the main application
-    WS.runServer "0.0.0.0" 9160 $ application state
+    WS.runServer "0.0.0.0" port $ application state

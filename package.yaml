@@ -25,6 +25,7 @@ dependencies:
 - bytestring
 - aeson
 - websockets 
+- utf8-string
 
 library:
   source-dirs: src
