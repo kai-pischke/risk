@@ -48,7 +48,7 @@ receive :: Request -> Game -> (Response, Game)
 total function. For any request, checks whether it is valid and returns an
 appropriate response message along with the new Game with the correct changes made.
 ```hs
-addPlayer :: Game -> (Game, Player)
+addPlayer :: Game -> (Player, Game)
 ```
 Errors if we aren't in the waiting phase, or if the waiting room is full, or if
 the given waiting room is invalid (i.e. there are repeats)
