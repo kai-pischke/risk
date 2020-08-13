@@ -50,7 +50,7 @@ GameState -- (Eq, Show)
 ```
 
 ```hs
-MiniPhase (WonBattle Country Country Attackers | Normal) -- (Eq, Show)
+MiniPhase (MidBattle Country Country Attackers | WonBattle Country Country Attackers | Normal) -- (Eq, Show)
 ```
 
 WonBattle take its arguements as such: WonBattle (Attacking Country) (Defending Country) (Attackers Left After Attack)
@@ -197,9 +197,14 @@ Moves troops from one country to another. Countries must be neighbours and owned
 
 
 ```hs
-attack :: Country -> Country -> Attackers -> Defenders -> GameState -> Maybe GameState
+attack :: Country -> Country -> Attackers -> GameState -> Maybe GameState
 ```
-Attacks the 2nd Country from the first with the number of attackers and defenders specified. Must Be neighbouring countries owned by different players. Must be during the correct phase. If 2nd Country ends up with 0 troops must start a WonBattle MiniPhase, with the number of troops left after casualties from the attack.
+Puts the state into the MidBattle MiniPhase, which records the attacking and defending country, and the number of attackers. Must Be neighbouring countries owned by different players. Must be during the correct phase. Attacker must have < number of attackers in the attacking country. If 2nd Country ends up with 0 troops must start a WonBattle MiniPhase, with the number of troops left after casualties from the attack.
+
+```hs
+chooseDefenders :: Defenders -> GameState -> Maybe GameState
+```
+Only defined for MidBattle MiniPhase. Chooses the number of defenders the defending country uses. The defending country must have >= number of defenders used. Enters WonBattle phase if there are no defenders left.
 
 ```hs
 invade :: Int -> GameState -> Maybe GameState
