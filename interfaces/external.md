@@ -17,7 +17,6 @@ Error = InvalidMove
   | SetupComplete
   | NotInSetup
   | NotInPlay
-  | NotRequestingDefenders
 ```
 
 ```hs

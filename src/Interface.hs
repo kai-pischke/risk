@@ -1,7 +1,7 @@
 module Interface  (
   Game,
-  Response,
-  Request,
+  Response(..),
+  Request(..),
   empty,
   addPlayer,
   receive
@@ -23,7 +23,6 @@ module Interface  (
   data Game = GameWR [Player] StdGen
     | GameSetup SetupState [Player] StdGen
     | GamePlay GameState
-    | MiniState Country Country Attackers GameState
     deriving (Show, Eq)
   --------------------------------------
 
@@ -34,10 +33,10 @@ module Interface  (
 
   --works if the waiting room isn't in order of players,
   --even though this should never happen in practice
-  addPlayer :: Game -> (Game, Player)
+  addPlayer :: Game -> (Player, Game)
   addPlayer (GameWR ps std)
     | repeats ps = error "Invalid waiting room: There are repeats"
-    | length ps < 5 = (GameWR (ps ++ [newPlayer]) std, newPlayer)
+    | length ps < 5 = (newPlayer, GameWR (ps ++ [newPlayer]) std)
     | otherwise = error "Waiting room is full"
     where newPlayer = head $ filter (flip notElem ps) players
   addPlayer _ = error "The game has started, we can't add new players"
@@ -63,19 +62,12 @@ module Interface  (
 
   -- Attack
   receive (Request s (M.Attack cAtt cDef att)) g@(GamePlay gstate)
-    | validMove = let g' = MiniState cAtt cDef att gstate in
-      (Special NumDefenders defender, g')
-    | otherwise = (Invalid InvalidMove s, g)
-    where attacker = owner gstate cAtt
+    | validMove =
+      case attack cAtt cDef att gstate of
+        Nothing -> (Invalid InvalidMove s, g)
+        Just gstate' -> (Special NumDefenders defender, GamePlay gstate')
+    where validMove = (s == currentPlayer gstate)
           defender = owner gstate cDef
-          --Have to add in checks here instead of using the ones in moves otherwise all errors will be sent to person choosing defenders
-          validMove =
-            (s == currentPlayer gstate) &&
-            (troops gstate cAtt > fromEnum att) &&
-            (attacker == s) &&
-            (defender /= s) &&
-            (cDef `isNeighbour` cAtt) &&
-            (phase gstate == State.Attack Normal)
   receive (Request s (M.Attack _ _ _)) g = (Invalid NotInPlay s, g)
 
   -- Reinforce
@@ -108,14 +100,18 @@ module Interface  (
   receive (Request s (Invade _)) g = (Invalid NotInPlay s, g)
 
   -- ChooseDefenders
-  receive (Request s (ChooseDefenders def)) g@(MiniState cAtt cDef att gstate)
-    | s == owner gstate cDef =
-      case attack cAtt cDef att def gstate of
+  receive (Request s (ChooseDefenders def)) g@(GamePlay gstate)
+    | valid =
+      case chooseDefenders def gstate of
         Nothing -> (Invalid InvalidMove s, g)
         Just gstate' -> (General (Play gstate'), GamePlay gstate')
     | otherwise = (Invalid InvalidMove s, g)
+    where valid =
+            case phase gstate of
+              State.Attack (MidBattle cAtt cDef att) -> s == owner gstate cDef
+              _ -> False
 
-  receive (Request s (ChooseDefenders _)) g = (Invalid NotRequestingDefenders s, g)
+  receive (Request s (ChooseDefenders _)) g = (Invalid NotInPlay s, g)
 
   -- EndAttack
   receive (Request s EndAttack) g@(GamePlay gstate)
