@@ -159,11 +159,13 @@ Partial function, only defined for incomplete and partially complete `SetupState
 incompleteBoardOwner :: SetupState -> Country -> (Maybe Player, Int)
 ```
 
+Partial function, only defined for any `SetupState`, gives the owner and number of troops in each country.
+
 ```hs
 completeBoardOwner :: SetupState -> Country -> (Player, Int)
 ```
-Partial function, only defined for complete `SetupState`, gives the owner and number of troops in each country.
- - Should error if called on a incomplete or partially incomplete `SetupState`
+Partial function, defined for (partially) complete `SetupState`, gives the owner and number of troops in each country.
+ - Should error if called on a incomplete `SetupState`
 
 ## Battle
 ### Types
@@ -221,25 +223,6 @@ Must be during the correct phase. Should update phase to Reincorce and call next
 endAttack :: GameState -> Maybe GameState
 ```
 Must be during the Attack Normal MiniPhase. Should update phase to Fortify.
-
-
-## Protocol
-### Types
-
-
-### Functions
-```hs
-toJson :: GameState ->
-```
-
-```hs
-fromJson :: -> [String]
-```
-
-## Server
-
-
-## Interface
 
 
 # Notes
