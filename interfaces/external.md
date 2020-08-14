@@ -47,6 +47,7 @@ receive :: Request -> Game -> (Response, Game)
 ```
 total function. For any request, checks whether it is valid and returns an
 appropriate response message along with the new Game with the correct changes made.
+
 ```hs
 addPlayer :: Game -> (Game, Player)
 ```
