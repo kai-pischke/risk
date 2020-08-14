@@ -3,8 +3,9 @@
 
 
 module Parse (
-readRequest,
-showResponse
+decodeRequest,
+encodeResponse,
+ParseError
 ) where
 
 
@@ -15,6 +16,7 @@ import Control.Applicative
 import Control.Monad
 import Data.Map (Map, fromList)
 import Data.ByteString.Lazy (ByteString)
+import Data.ByteString.Lazy.UTF8 (fromString)
 import Data.Text (Text, pack)
 
 import qualified State as S (MiniPhase(..), Phase(..), turnOrder, phase, troops, owner)
@@ -22,13 +24,16 @@ import RiskBoard
 import GameElements
 ---------------------------------------------
 
-readRequest :: ByteString -> Maybe Request
-readRequest = decode
-showResponse ::  Response -> ByteString
-showResponse = encode
+decodeRequest :: ByteString -> Either Request ParseError
+decodeRequest = maybe (Right parseError) Left . decode
 
+encodeResponse :: Response -> ByteString
+encodeResponse = encode
 
+type ParseError = ByteString
 
+parseError :: ParseError
+parseError = fromString "{\"Invalid JSON\"}"
 
 instance FromJSON Request where
     parseJSON (Object v) = do

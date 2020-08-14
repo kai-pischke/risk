@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 32d40281cb33fb94ab68a79a48fc1450ad5ccec9aeb28e84905fc6ebadcb4fb1
+-- hash: 2a5fe2eb575698fd026f4f3e810d555a02e67a5134f292c8be14bae01787cf34
 
 name:           risk
 version:        0.1.0.0
@@ -37,6 +37,7 @@ library
       Moves
       Parse
       RiskBoard
+      Server
       SetupBoard
       State
   other-modules:
@@ -44,12 +45,14 @@ library
   hs-source-dirs:
       src
   build-depends:
-      base >=4.8 && <5
+      aeson
+    , base >=4.8 && <5
+    , bytestring
     , containers
     , random >=1.2
-    , aeson
-    , bytestring
     , text
+    , utf8-string
+    , websockets
   default-language: Haskell2010
 
 executable risk-exe
@@ -60,10 +63,15 @@ executable risk-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.8 && <5
+      aeson
+    , base >=4.8 && <5
+    , bytestring
     , containers
     , random >=1.2
     , risk
+    , text
+    , utf8-string
+    , websockets
   default-language: Haskell2010
 
 test-suite risk-test
@@ -72,6 +80,7 @@ test-suite risk-test
   other-modules:
       BattleSpec
       GraphSpec
+      InterfaceSpec
       MovesSpec
       RiskBoardSpec
       SetupBoardSpec
@@ -84,10 +93,14 @@ test-suite risk-test
       QuickCheck >=2.14.1
     , aeson
     , base >=4.8 && <5
+    , bytestring
     , containers
     , hspec
     , hspec-discover
     , multiset
     , random >=1.2
     , risk
+    , text
+    , utf8-string
+    , websockets
   default-language: Haskell2010

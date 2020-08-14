@@ -37,13 +37,13 @@ data GameState = InternalGameState
 ----------------------------------------------
 
 -- types --
-data MiniPhase = WonBattle Country Country Attackers | Normal 
+data MiniPhase = MidBattle Country Country Attackers | WonBattle Country Country Attackers | Normal 
                deriving (Eq, Show)
 data Phase = Reinforce | Attack MiniPhase | Fortify
                deriving (Eq, Show)
 
 -- helper functions for phases --
-advancePhase :: Phase -> Phase 
+advancePhase :: Phase -> Phase
 advancePhase Reinforce = Attack Normal
 advancePhase (Attack _) = Fortify
 advancePhase Fortify = Reinforce
@@ -63,10 +63,10 @@ changeTroopMap f (InternalGameState t p g h l) = InternalGameState (f t) p g h l
 
 changePlayerMap :: (Map Country Player -> Map Country Player) -> GameState -> GameState
 changePlayerMap f (InternalGameState t p g h l) = InternalGameState t (f p) g h l
-   
+
 changeGen :: (StdGen -> StdGen) -> GameState -> GameState
 changeGen f (InternalGameState t p g h l) = InternalGameState t p (f g) h l
-   
+
 changePhase :: (Phase -> Phase) -> GameState -> GameState
 changePhase f (InternalGameState t p g h l) = InternalGameState t p g (f h) l
 
@@ -76,7 +76,7 @@ changePlayer f (InternalGameState t p g h l) = InternalGameState t p g h (f l)
 -- publicly exposed functions --
 newGame :: [Player] -> (Country -> (Player, Int))-> StdGen -> GameState
 newGame [] _ _ = error "empty list (can't create game with no players)"
-newGame listOfPlayer countryFunc startingStdGen = InternalGameState 
+newGame listOfPlayer countryFunc startingStdGen = InternalGameState
    (Map.fromList $ zip countries $ map (snd . countryFunc) countries)
    (Map.fromList $ zip countries $ map (fst . countryFunc) countries)
    startingStdGen
@@ -116,4 +116,3 @@ nextPhase = changePhase advancePhase
 
 changeMiniPhase :: MiniPhase -> GameState -> GameState
 changeMiniPhase = changePhase . updateMiniPhase
-   

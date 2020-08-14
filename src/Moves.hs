@@ -2,6 +2,7 @@ module Moves (
     Country(..),
     reinforce,
     attack,
+    chooseDefenders,
     invade,
     endAttack,
     fortify,
@@ -39,23 +40,29 @@ module Moves (
                                 && (t > 0)
                                 && valid (n-t) ms
 
-  attack :: Country -> Country -> Attackers -> Defenders -> GameState -> Maybe GameState
-  attack cAtt cDef att def gs | valid = (Just . makeChange (doBattle att def $ currentStdGen gs)) gs
-                              | otherwise = Nothing
+  attack :: Country -> Country -> Attackers -> GameState -> Maybe GameState
+  attack cAtt cDef att gs | valid = (Just . changeMiniPhase (MidBattle cAtt cDef att)) gs
+                          | otherwise = Nothing
     where
       valid = (troops gs cAtt > fromEnum att) &&
-              (troops gs cDef >= fromEnum def) &&
               (owner gs cAtt == currPlayer gs) &&
               (owner gs cDef /= currPlayer gs) &&
               (cDef `isNeighbour` cAtt) &&
               (phase gs == Attack Normal)
-      makeChange (attLosses, defLosses, stdGen) =
-        if (defLosses == troops gs cDef) --attacker has won a country
-          then
-           (changeMiniPhase (WonBattle cAtt cDef (toEnum nInvaders))) . regularChanges
-          else regularChanges
-        where regularChanges = (changeTroops cAtt (-attLosses)) . (changeTroops cDef (-defLosses)) . (updateStdGen stdGen)
-              nInvaders = fromEnum att - attLosses
+
+  chooseDefenders :: Defenders -> GameState -> Maybe GameState
+  chooseDefenders def gs = f (phase gs)
+    where f (Attack (MidBattle cAtt cDef att)) | troops gs cDef >= fromEnum def = (Just . makeChange (doBattle att def $ currentStdGen gs)) gs
+                                               | otherwise = Nothing
+            where makeChange (attLosses, defLosses, stdGen) =
+                    if (defLosses == troops gs cDef) --attacker has won a country
+                      then
+                      (changeMiniPhase (WonBattle cAtt cDef (toEnum nInvaders))) . regularChanges
+                      else regularChanges
+                    where regularChanges = (changeTroops cAtt (-attLosses)) . (changeTroops cDef (-defLosses)) . (updateStdGen stdGen)
+                          nInvaders = fromEnum att - attLosses
+          f _ = Nothing
+
 
   -- Must invade with at least the number of attackers left, must leave at least 1 in the previous country
   invade :: Int -> GameState -> Maybe GameState

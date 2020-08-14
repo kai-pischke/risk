@@ -2,7 +2,8 @@ module SetupBoard
         ( SetupState(..),
           emptyBoard,
           placeTroop,
-          completeBoardOwner
+          completeBoardOwner,
+          incompleteBoardOwner
         ) where
 
 import Data.Map (Map)
@@ -104,6 +105,11 @@ completeBoardOwner :: SetupState -> Country -> (Player, Int)
 completeBoardOwner (Complete s) c = result
         where Just result = (,) <$> (join $ Map.lookup c $ playerMap s) <*> (Map.lookup c $ troopMap s)
 completeBoardOwner _ _ = error "completeBoardOwner only defined for Complete SetupBoardState"
+
+incompleteBoardOwner :: SetupState -> Country -> (Maybe Player, Int)
+incompleteBoardOwner (Incomplete s) c = result
+  where Just result = (,) <$> (Map.lookup c $ playerMap s) <*> (Map.lookup c $ troopMap s)
+incompleteBoardOwner _ _ = error "incompleteBoardOwner only defined for Incomplete SetupBoardState"
 
 -- private --
 initialTroops :: Int -> Int

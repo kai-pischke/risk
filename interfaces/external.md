@@ -17,7 +17,6 @@ Error = InvalidMove
   | SetupComplete
   | NotInSetup
   | NotInPlay
-  | NotRequestingDefenders
 ```
 
 ```hs
@@ -49,29 +48,38 @@ total function. For any request, checks whether it is valid and returns an
 appropriate response message along with the new Game with the correct changes made.
 
 ```hs
-addPlayer :: Game -> (Game, Player)
+addPlayer :: Game -> (Player, Game)
 ```
 Errors if we aren't in the waiting phase, or if the waiting room is full, or if
 the given waiting room is invalid (i.e. there are repeats)
 
 export
 
-```
-Response
+```hs
+Response(..)
 ```
 
-```
-Request
+```hs
+Request(..)
 ```
 
 ## Parse.hs
-```
-readRequest :: ByteString -> Maybe Request
-```
+Note we are using `Data.ByteString.Lazy (ByteString)`.
 
 ```
-showResponse ::  Response -> ByteString
+type parseError = ByteString
 ```
+`parseError` is a `ByteString` holding the JSON-encoded response to a parse error.
+
+```
+decodeRequest :: ByteString -> Either Request ParseError
+```
+Reads in a received `ByteString` and returns a `Left Request` or a `Right ParseError`.
+
+```
+encodeResponse ::  Response -> ByteString
+```
+encodes a `Response` to a `ByteString`.
 
 ## Server.hs
 
