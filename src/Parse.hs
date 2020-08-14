@@ -35,6 +35,7 @@ type ParseError = ByteString
 parseError :: ParseError
 parseError = fromString "{\"Invalid JSON\"}"
 
+
 instance FromJSON Request where
     parseJSON (Object v) = do
         sender <- v .: pack "sender"
