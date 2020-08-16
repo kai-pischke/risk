@@ -62,12 +62,12 @@ module Interface  (
 
   -- Attack
   receive (Request s (M.Attack cAtt cDef att)) g@(GamePlay gstate)
-    | validMove =
+    | s == currentPlayer gstate =
       case attack cAtt cDef att gstate of
         Nothing -> (Invalid InvalidMove s, g)
         Just gstate' -> (Special NumDefenders defender, GamePlay gstate')
-    where validMove = (s == currentPlayer gstate)
-          defender = owner gstate cDef
+    | otherwise = (Invalid NotTurn s, g)
+    where defender = owner gstate cDef
   receive (Request s (M.Attack _ _ _)) g = (Invalid NotInPlay s, g)
 
   -- Reinforce
@@ -76,7 +76,7 @@ module Interface  (
       case reinforce troopMap gstate of
         Nothing -> (Invalid InvalidMove s, g)
         Just gstate' -> (General (Play gstate'), GamePlay gstate')
-    | otherwise = (Invalid InvalidMove s, g)
+    | otherwise = (Invalid NotTurn s, g)
 
   receive (Request s (M.Reinforce _)) g = (Invalid NotInPlay s, g)
 
@@ -86,7 +86,7 @@ module Interface  (
       case fortify cFrom cTo nTroops gstate of
         Nothing -> (Invalid InvalidMove s, g)
         Just gstate' -> (General (Play gstate'), GamePlay gstate')
-    | otherwise = (Invalid InvalidMove s, g)
+    | otherwise = (Invalid NotTurn s, g)
 
   receive (Request s (M.Fortify _ _ _)) g = (Invalid NotInPlay s, g)
 
@@ -96,7 +96,7 @@ module Interface  (
       case invade nTroops gstate of
         Nothing -> (Invalid InvalidMove s, g)
         Just gstate' -> (General(Play gstate'), GamePlay gstate')
-    | otherwise = (Invalid InvalidMove s, g)
+    | otherwise = (Invalid NotTurn s, g)
   receive (Request s (Invade _)) g = (Invalid NotInPlay s, g)
 
   -- ChooseDefenders
@@ -105,7 +105,7 @@ module Interface  (
       case chooseDefenders def gstate of
         Nothing -> (Invalid InvalidMove s, g)
         Just gstate' -> (General (Play gstate'), GamePlay gstate')
-    | otherwise = (Invalid InvalidMove s, g)
+    | otherwise = (Invalid NotRequestingDefenders s, g)
     where valid =
             case phase gstate of
               State.Attack (MidBattle cAtt cDef att) -> s == owner gstate cDef
@@ -119,7 +119,7 @@ module Interface  (
       case endAttack gstate of
         Nothing -> (Invalid InvalidMove s, g)
         Just gstate' -> (General (Play gstate'), GamePlay gstate')
-    | otherwise = (Invalid InvalidMove s, g)
+    | otherwise = (Invalid NotTurn s, g)
   receive (Request s EndAttack) g = (Invalid InvalidMove s, g)
 
   -- SkipFortify
@@ -128,7 +128,7 @@ module Interface  (
       case skipFortify gstate of
         Nothing -> (Invalid InvalidMove s, g)
         Just gstate' -> (General (Play gstate'), GamePlay gstate')
-    | otherwise = (Invalid InvalidMove s, g)
+    | otherwise = (Invalid NotTurn s, g)
 
   --------------------------------------
 
