@@ -19,7 +19,6 @@ completeBoard n (c:cs) (p:ps) g = completeBoard (n-1) (cs++[c]) (ps++[p]) $ snd 
 makePlay :: Int -> [Player]-> Game -> Game
 makePlay n ps = completeBoard n [minBound ::Country ..] ps . makeSetup
 
-a = b
 
 spec :: Spec
 spec = do
