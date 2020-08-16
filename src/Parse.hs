@@ -17,18 +17,47 @@ import Control.Monad
 import Data.Map (Map, fromList)
 import Data.ByteString.Lazy (ByteString)
 import Data.ByteString.Lazy.UTF8 (fromString)
-import Data.Text (Text, pack)
+import Data.Text (pack)
+import Data.Maybe (fromJust)
+import Text.Read (readMaybe)
+import Data.Typeable (typeOf)
 
+import SetupBoard
 import qualified State as S (MiniPhase(..), Phase(..), turnOrder, phase, troops, owner)
 import RiskBoard
 import GameElements
 ---------------------------------------------
+
+---- Helpter DataType -----------------------
+data Switch a b = LSwitch a | RSwitch b
+
+instance (ToJSON a , ToJSON b) => ToJSON (Switch a b) where
+    toJSON (RSwitch x) = toJSON x
+    toJSON (LSwitch x) = toJSON x
+
+data Owner = Owner Player | Unowned
+
+instance ToJSON (Owner) where
+    toJSON (Owner p) = String $ pack $ show p
+    toJSON Unowned = String $ pack "Unowned"
+
+---------------------------------------------
+
+
+
+---- Public Functions -----------------------
 
 decodeRequest :: ByteString -> Either Request ParseError
 decodeRequest = maybe (Right parseError) Left . decode
 
 encodeResponse :: Response -> ByteString
 encodeResponse = encode
+
+setupBoardOwner:: SetupState -> Country -> (Maybe Player, Int)
+setupBoardOwner (Incomplete s) c = incompleteBoardOwner (Incomplete s) c
+setupBoardOwner s c = (Just p, n)
+    where
+        (p,n) = (completeBoardOwner s c)
 
 type ParseError = ByteString
 
@@ -38,44 +67,66 @@ parseError = fromString "{\"Invalid JSON\"}"
 
 instance FromJSON Request where
     parseJSON (Object v) = do
-        sender <- v .: pack "sender"
-        requestType  <- v .: pack "action"
-        if (requestType == ("StartGame" :: String))
-            then return (Request (read sender) StartGame)
-        else if (requestType == ("PlaceTroop" :: String))
-            then do
-                c <- v .: pack "country"
-                return (Request (read sender) (PlaceTroop $ read c))
-        else if (requestType == ("Attack" :: String))
-            then do
-                ac <- v .: pack "attacking_country"
-                dc <- v .: pack "defending_country"
-                na <- v .: pack "number_of_attackers"
-                return (Request (read sender) (Attack (read ac) (read dc) (toEnum na)))
-        else if (requestType == ("Reinforce" :: String))
-            then do
-                troops <- v.: pack "troops"
-                return (Request (read sender) (Reinforce $ map (\x -> (read $ fst x, snd x)) troops))
-        else if (requestType == ("Fortify" :: String))
-            then do
-                fc <- v .: pack "from_country"
-                tc <- v .: pack "to_country"
-                nt <- v .: pack "number_of_troops"
-                return (Request (read sender) (Fortify (read fc) (read tc) nt))
-        else if (requestType == ("Invade" :: String))
-            then do
-                nt <- v .: pack "number_of_troops"
-                return (Request (read sender) (Invade nt))
-        else if (requestType == ("ChooseDefenders" :: String))
-            then do
-                nd <- v .: pack "number_of_defenders"
-                return (Request (read sender) (ChooseDefenders $ toEnum nd))
-        else if (requestType == ("EndAttack" :: String))
-            then return (Request (read sender) EndAttack)
-        else if (requestType == ("SkipFortify" :: String))
-            then return (Request (read sender) SkipFortify)
-        else empty
-    parseJSON _ = empty
+        sender <- (v .: pack "sender")
+        let senderR = readMaybe sender
+        if (senderR == Nothing)
+            then do mempty
+        else do
+            requestType  <- v .: pack "action"
+            if (requestType == ("StartGame" :: String))
+                then return (Request (read sender) StartGame)
+            else if (requestType == ("PlaceTroop" :: String))
+                then do
+                    c <- (v .: pack "country")
+                    let cR = readMaybe c
+                    if (cR == Nothing)
+                        then do mempty
+                        else do return (Request (fromJust senderR) (PlaceTroop $ fromJust cR))
+            else if (requestType == ("Attack" :: String))
+                then do
+                    ac <- v .: pack "attacking_country"
+                    let acR = readMaybe ac
+                    dc <- v .: pack "defending_country"
+                    let dcR = readMaybe dc
+                    na <- v .: pack "number_of_attackers"
+                    if (acR == Nothing || dcR == Nothing || not (typeOf na == typeOf (1 :: Int)) || na <1 || na>3)
+                        then do mempty
+                        else do return (Request (fromJust senderR) (Attack (fromJust acR) (fromJust dcR) (toEnum na)))
+            else if (requestType == ("Reinforce" :: String))
+                then do
+                    troops <- v.: pack "troops"
+                    let troopsR = map (\x -> (readMaybe $ fst x, snd x)) troops
+                    if (any (\p -> fst p == Nothing) troopsR)
+                        then do mempty
+                        else do return (Request (fromJust senderR) (Reinforce $ map (\p -> (fromJust $ fst p, snd p)) troopsR))
+            else if (requestType == ("Fortify" :: String))
+                then do
+                    fc <- v .: pack "from_country"
+                    let fcR = readMaybe fc
+                    tc <- v .: pack "to_country"
+                    let tcR = readMaybe tc
+                    nt <- v .: pack "number_of_troops"
+                    if (fcR == Nothing || tcR == Nothing || not (typeOf nt == typeOf (1 :: Int)))
+                        then do mempty
+                        else do return (Request (fromJust senderR) (Fortify (fromJust fcR) (fromJust tcR) nt))
+            else if (requestType == ("Invade" :: String))
+                then do
+                    nt <- v .: pack "number_of_troops"
+                    if (not (typeOf nt == typeOf (1 :: Int)))
+                        then do mempty
+                        else do return (Request (fromJust senderR) (Invade nt))
+            else if (requestType == ("ChooseDefenders" :: String))
+                then do
+                    nd <- v .: pack "number_of_defenders"
+                    if (not (typeOf nd == typeOf (1 :: Int)) || nd < 1 || nd > 2)
+                        then do mempty
+                        else do return (Request (fromJust senderR) (ChooseDefenders $ toEnum nd))
+            else if (requestType == ("EndAttack" :: String))
+                then return (Request (fromJust senderR) EndAttack)
+            else if (requestType == ("SkipFortify" :: String))
+                then return (Request (fromJust senderR) SkipFortify)
+            else do mempty
+    parseJSON _ = mempty
 
 
 
@@ -90,8 +141,7 @@ phaseToJson (S.Attack (S.WonBattle ac dc na)) =
 phaseToJson p = object [pack "kind" .= pack "Simple",
                         pack "phase" .= (pack $ show p)]
 
--- I use show and then a string here to avoid an error with haskell forcing it
---  to be a string despite having OverloadedStrings
+
 instance ToJSON Response where
 ---- General Updates ------------------------
 
@@ -103,7 +153,16 @@ instance ToJSON Response where
     toJSON (General (Setup setup)) =
         object [pack "kind" .= pack "State",
                 pack "state" .= pack "Setup",
-                pack "players" .= map show [1]] --Flag
+                pack "players" .= map (pack.show) (setUpTurnOrder setup),
+                pack "board" .= ((fromList.zip (map show countries)) $ map getOwnerTroopMap countries)]
+        where
+            countries = [(minBound :: Country)..]
+            getOwnerTroopMap:: Country -> Map String (Switch Int Owner)
+            getOwnerTroopMap c = fromList [("number_of_troops", LSwitch n), ("owner", RSwitch owner)]
+                where
+                    (mp, n) = setupBoardOwner setup c
+                    owner = if (mp ==Nothing) then Unowned else Owner $ fromJust mp
+
 
     toJSON (General (Play g)) =
         object [pack "kind" .= pack "State",
@@ -113,16 +172,18 @@ instance ToJSON Response where
                 pack "phase" .= (phaseToJson $ S.phase g)]
         where
             countries = [(minBound :: Country)..]
-            getOwnerTroopMap:: Country -> Map String (Either Int String)
-            getOwnerTroopMap c = fromList [("number_of_troops", Left $ S.troops g c), ("owner", Right $ show $ S.owner g c)]
+            getOwnerTroopMap:: Country -> Map String (Switch Int String)
+            getOwnerTroopMap c = fromList [("number_of_troops", LSwitch $ S.troops g c), ("owner", RSwitch $ show $ S.owner g c)]
 
 ---- Special Questions ----------------------
 
     toJSON (Special NumDefenders p) =
         object [pack "kind" .= pack "Question",
+                pack "player" .= (pack $ show p),
                 pack "question" .= pack "ChooseDefenders"]
 
 ---- Invalid Errors -------------------------
     toJSON (Invalid e p) =
         object [pack "kind".= pack "Error",
-                pack "error" .= (pack $ show e)]
+                pack "error" .= (pack $ show e),
+                pack "player" .= (pack $ show p)]

@@ -3,7 +3,8 @@ module SetupBoard
           emptyBoard,
           placeTroop,
           completeBoardOwner,
-          incompleteBoardOwner
+          incompleteBoardOwner,
+          setUpTurnOrder
         ) where
 
 import Data.Map (Map)
@@ -111,6 +112,9 @@ incompleteBoardOwner (Incomplete s) c = result
   where Just result = (,) <$> (Map.lookup c $ playerMap s) <*> (Map.lookup c $ troopMap s)
 incompleteBoardOwner _ _ = error "incompleteBoardOwner only defined for Incomplete SetupBoardState"
 
+setUpTurnOrder :: SetupState -> [Player]
+setUpTurnOrder = statePlayers . internalBoard 
+
 -- private --
 initialTroops :: Int -> Int
 initialTroops 6 = 20
@@ -120,3 +124,8 @@ initialTroops 3 = 35
 initialTroops 2 = 40
 initialTroops n = error $ "Game rules only specified for 2-6 players. Not sure what to do for "
                         ++ show n ++ " players."
+                        
+internalBoard :: SetupState -> SetupBoardState
+internalBoard (Incomplete s) = s
+internalBoard (PartiallyComplete s) = s
+internalBoard (Complete s) = s
