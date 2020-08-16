@@ -34,6 +34,13 @@ data Switch a b = LSwitch a | RSwitch b
 instance (ToJSON a , ToJSON b) => ToJSON (Switch a b) where
     toJSON (RSwitch x) = toJSON x
     toJSON (LSwitch x) = toJSON x
+
+data Owner = Owner Player | Unowned
+
+instance ToJSON (Owner) where
+    toJSON (Owner p) = String $ pack $ show p
+    toJSON Unowned = String $ pack "Unowned"
+
 ---------------------------------------------
 
 
@@ -46,9 +53,11 @@ decodeRequest = maybe (Right parseError) Left . decode
 encodeResponse :: Response -> ByteString
 encodeResponse = encode
 
---setupBoardOwner:: SetupState -> Country -> (Player, Int)
---setupBoardOwner (Incomplete s) = incompleteBoardOwner (Incomplete s)
---setupBoardOwner s = completeBoardOwner s
+setupBoardOwner:: SetupState -> Country -> (Maybe Player, Int)
+setupBoardOwner (Incomplete s) c = incompleteBoardOwner (Incomplete s) c
+setupBoardOwner s c = (Just p, n)
+    where
+        (p,n) = (completeBoardOwner s c)
 
 type ParseError = ByteString
 
@@ -144,8 +153,16 @@ instance ToJSON Response where
     toJSON (General (Setup setup)) =
         object [pack "kind" .= pack "State",
                 pack "state" .= pack "Setup",
-                pack "players" .= map (pack.show) ["hi I'm an error"]]--(setupTurnOrder setup)]
---                pack "board" .= ]
+                pack "players" .= map (pack.show) (setUpTurnOrder setup),
+                pack "board" .= ((fromList.zip (map show countries)) $ map getOwnerTroopMap countries)]
+        where
+            countries = [(minBound :: Country)..]
+            getOwnerTroopMap:: Country -> Map String (Switch Int Owner)
+            getOwnerTroopMap c = fromList [("number_of_troops", LSwitch n), ("owner", RSwitch owner)]
+                where
+                    (mp, n) = setupBoardOwner setup c
+                    owner = if (mp ==Nothing) then Unowned else Owner $ fromJust mp
+
 
     toJSON (General (Play g)) =
         object [pack "kind" .= pack "State",
