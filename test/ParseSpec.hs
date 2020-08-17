@@ -2,7 +2,7 @@ module ParseSpec where
   ---- Imports ---------------------
   import Test.Hspec
   import Test.QuickCheck
-  import Message
+  import Message as M
   import Parse
   import Data.ByteString.Lazy.UTF8 (ByteString, fromString)
   import Data.ByteString.Lazy.Char8 (unpack)
@@ -10,7 +10,10 @@ module ParseSpec where
   import GameElements
   import RiskBoard
   import Battle
+  import SetupBoard
+  import State as S
   import Data.List (isInfixOf)
+  import Data.Maybe
   ----------------------------------
 
 
@@ -57,9 +60,9 @@ module ParseSpec where
     ]
 
   attackValidDecoded = [
-    Request Blue (Attack Yakutsk Ontario ThreeAtt),
-    Request Green (Attack Japan Japan OneAtt),
-    Request Black (Attack Brazil Peru TwoAtt)
+    Request Blue (M.Attack Yakutsk Ontario ThreeAtt),
+    Request Green (M.Attack Japan Japan OneAtt),
+    Request Black (M.Attack Brazil Peru TwoAtt)
     ]
 
   attackInvalid = [
@@ -80,9 +83,9 @@ module ParseSpec where
     ]
 
   reinforceValidDecoded = [
-    Request Yellow (Reinforce []),
-    Request Blue (Reinforce [(Alaska, 3)]),
-    Request Green (Reinforce [(Alaska, 3), (EastAfrica, 7), (Congo,0)])
+    Request Yellow (M.Reinforce []),
+    Request Blue (M.Reinforce [(Alaska, 3)]),
+    Request Green (M.Reinforce [(Alaska, 3), (EastAfrica, 7), (Congo,0)])
     ]
 
   reinforceInvalid = [
@@ -100,9 +103,9 @@ module ParseSpec where
     ]
 
   fortifyValidDecoded = [
-    Request Yellow (Fortify Ontario Venezuela 3),
-    Request Green (Fortify Peru Brazil 100),
-    Request Yellow (Fortify Quebec SouthAfrica 0)
+    Request Yellow (M.Fortify Ontario Venezuela 3),
+    Request Green (M.Fortify Peru Brazil 100),
+    Request Yellow (M.Fortify Quebec SouthAfrica 0)
     ]
 
   fortifyInvalid = [
@@ -264,16 +267,97 @@ module ParseSpec where
           wellFormedWaitingRoom [Blue, Blue]  (encodeResponse (General (WaitingRoom [Blue, Blue]))) `shouldBe` True
 
       context "Setup" $ do
-        it "Correctly encodes" $ do
-          pendingWith "Not Yet Testing"
+        it "Correctly encodes incomplete" $ do
+          let state1 = emptyBoard [Yellow, Blue]
+          wellFormedSetup (incompleteBoardOwner state1) (setUpTurnOrder state1) (encodeResponse (General (Setup state1))) `shouldBe` True
+
+        it "Correctly encodes partially complete" $ do
+          let state2 = placeList [toEnum 0..toEnum 40] (emptyBoard [Yellow, Green, Blue])
+          pendingWith ("Need partiallyCompleteBoardOwner")
+          --wellFormedSetup (partiallyCompleteBoardOwner state2) [Yellow, Green, Blue] (encodeResponse (General (Setup state2))) `shouldBe` True
+
+        it "Correctly encodes complete" $ do
+          let state3 = placeList ([toEnum 0..toEnum 41] ++ [toEnum 0..toEnum 41] ++ [toEnum 0 .. toEnum 20])  (emptyBoard [Red, Green, Blue])
+          let toMaybeFunc g c= (Just $ fst (g c), snd (g c))
+          wellFormedSetup (toMaybeFunc $ completeBoardOwner state3) [Red, Green, Blue] (encodeResponse (General (Setup state3))) `shouldBe` True
 
       context "Game" $ do
-        it "Correctly encodes" $ do
-          pendingWith "Not Yet Testing"
+        it "Correctly encodes in Reinforce" $ do
+          wellFormedGame game (encodeResponse (General (Play game))) `shouldBe` True
+        it "Correctly encodes in Attack Normal" $ do
+          let game' = nextPhase game
+          wellFormedGame game' (encodeResponse (General (Play game'))) `shouldBe` True
+        it "Correctly encodes in Attack MidBattle" $ do
+          let game' =  changeMiniPhase (MidBattle NorthAfrica SouthAfrica ThreeAtt) $ nextPhase game
+          wellFormedGame game' (encodeResponse (General (Play game'))) `shouldBe` True
+        it "Correctly encodes in Attack WonBattle" $ do
+          let game' = changeMiniPhase (WonBattle NorthAfrica SouthAfrica OneAtt) $ nextPhase game
+          wellFormedGame game' (encodeResponse (General (Play game'))) `shouldBe` True
+        it "Correctly encodes in Fortify" $ do
+          let game' = nextPhase $ nextPhase game
+          wellFormedGame game' (encodeResponse (General (Play game'))) `shouldBe` True
+        it "Correctly encodes on next turn" $ do
+          let game' = nextTurn game
+          wellFormedGame game' (encodeResponse (General (Play game'))) `shouldBe` True
 
       context "Error" $ do
-        it "Correctly encodes" $ do
-          pendingWith "Not Yet Testing"
+        it "Correctly encodes InvalidMove" $ do
+          wellFormedError InvalidMove Yellow (encodeResponse (Invalid InvalidMove Yellow)) `shouldBe` True
+        it "Correctly encodes NotYourTurn" $ do
+          wellFormedError NotYourTurn Yellow (encodeResponse (Invalid NotYourTurn Yellow)) `shouldBe` True
+        it "Correctly encodes NotEnoughPlayers" $ do
+          wellFormedError NotEnoughPlayers Yellow (encodeResponse (Invalid NotEnoughPlayers Yellow)) `shouldBe` True
+        it "Correctly encodes NotInWaitingRoom" $ do
+          wellFormedError NotInWaitingRoom Yellow (encodeResponse (Invalid NotInWaitingRoom Yellow)) `shouldBe` True
+        it "Correctly encodes SetupComplete" $ do
+          wellFormedError SetupComplete Yellow (encodeResponse (Invalid SetupComplete Yellow)) `shouldBe` True
+        it "Correctly encodes NotInSetup" $ do
+          wellFormedError NotInSetup Yellow (encodeResponse (Invalid NotInSetup Yellow)) `shouldBe` True
+        it "Correctly encodes NotInPlay" $ do
+          wellFormedError NotInPlay Yellow (encodeResponse (Invalid NotInPlay Yellow)) `shouldBe` True
+        it "Correctly encodes NotRequestingDefenders" $ do
+          wellFormedError NotRequestingDefenders Yellow (encodeResponse (Invalid NotRequestingDefenders Yellow)) `shouldBe` True
+
+  wellFormedWaitingRoom :: [Player] -> ByteString -> Bool
+  wellFormedWaitingRoom players b = head s == '{'
+                                    && last s == '}'
+                                    && "\"state\":\"WaitingRoom\"" `elem` fields
+                                    && "\"kind\":\"State\"" `elem` fields
+                                    && extractPlayerList s == jsonPlayerList players
+                                    where s = unpack b
+                                          fields = splitOn ',' (drop 1 (init s))
+
+  wellFormedSetup :: (Country -> (Maybe Player,Int)) -> [Player] -> ByteString -> Bool
+  wellFormedSetup f ps b = validJSONBoard (extractBoard s) f
+                         && head s == '{'
+                         && last s == '}'
+                         && "\"kind\":\"State\"" `elem` fields
+                         && "\"state\":\"Setup\"" `elem` fields
+                         && extractPlayerList s == jsonPlayerList ps
+                        where s = unpack b
+                              fields = splitOn ',' (drop 1 (init s))
+
+  wellFormedGame :: GameState -> ByteString -> Bool
+  wellFormedGame g b = validJSONBoard (extractBoard s) f
+                         && head s == '{'
+                         && last s == '}'
+                         && "\"kind\":\"State\"" `elem` fields
+                         && "\"state\":\"Play\"" `elem` fields
+                         && extractPlayerList s == jsonPlayerList ps
+                         && validPhase (phase g) (extractPhase s)
+                        where s = unpack b
+                              ps = turnOrder g
+                              fields = splitOn ',' (drop 1 (init s))
+                              f c = (Just (owner g c), troops g c)
+
+  wellFormedError :: Error -> Player ->ByteString -> Bool
+  wellFormedError e p b = head s == '{'
+                                    && last s == '}'
+                                    && "\"error\":\"" ++ show e ++ "\"" `elem` fields
+                                    && "\"kind\":\"Error\"" `elem` fields
+                                    && "\"player\":\"" ++ show p ++ "\"" `elem` fields
+                                    where s = unpack b
+                                          fields = splitOn ',' (drop 1 (init s))
 
   splitOn :: Char -> String  -> [String]
   splitOn c s = case dropWhile (\x -> x == c) s of
@@ -295,11 +379,80 @@ module ParseSpec where
                                 showJSON (p:ps) = showJSON [p] ++ "," ++ showJSON ps
 
 
-  wellFormedWaitingRoom :: [Player] -> ByteString -> Bool
-  wellFormedWaitingRoom players b = head s == '{'
-                                    && last s == '}'
-                                    && "\"state\":\"WaitingRoom\"" `elem` fields
-                                    && "\"kind\":\"State\"" `elem` fields
-                                    && take (grep "]" (drop (grep "\"players\":" s) s)) (drop (grep "\"players\":" s) s) == jsonPlayerList players
-                                    where s = unpack b
-                                          fields = splitOn ',' (drop 1 (init s))
+  extractPlayerList :: String -> String
+  extractPlayerList s = take (grep "]" (drop (grep "\"players\":" s) s)) (drop (grep "\"players\":" s) s)
+
+  placeList :: [Country] -> SetupState -> SetupState
+  placeList [] = id
+  placeList (c:cs) = (placeList cs) .fromJust . (placeTroop c)
+
+  extractBoard :: String -> String
+  extractBoard s = take (snd poss + 1) s'
+    where s' = drop (grep "\"board\":" s) s
+          poss = head $ filter ((== 0) . fst) (parenPairs s')
+
+  extractPhase :: String -> String
+  extractPhase s = take (snd poss + 1) s'
+    where s' = drop (grep "\"phase\":" s) s
+          poss = head $ filter ((== 0) . fst) (parenPairs s')
+
+  validPhase :: Phase -> String -> Bool
+  validPhase (S.Attack (MidBattle catt cdef att)) s =
+    head s == '{'
+    && last s == '}'
+    && "\"kind\":\"MidBattle\"" `elem` fields
+    && "\"attacking_country\":\"" ++ show catt ++ "\"" `elem` fields
+    && "\"defending_country\":\"" ++ show cdef ++ "\"" `elem` fields
+    && "\"attackers\":" ++ show (fromEnum att) ++ "\"" `elem` fields
+    where fields = splitOn ',' (drop 1 (init s))
+
+  validPhase (S.Attack (WonBattle catt cdef att)) s =
+    head s == '{'
+    && last s == '}'
+    && "\"kind\":\"BattleEnd\"" `elem` fields
+    && "\"attacking_country\":\"" ++ show catt ++ "\"" `elem` fields
+    && "\"defending_country\":\"" ++ show cdef ++ "\"" `elem` fields
+    && "\"attackers_remaining\":" ++ show (fromEnum att) ++ "\"" `elem` fields
+    where fields = splitOn ',' (drop 1 (init s))
+
+  validPhase (S.Attack Normal) s =
+    head s == '{'
+    && last s == '}'
+    && "\"kind\":\"Simple\"" `elem` fields
+    && "\"phase\":\"Attack\"" `elem` fields
+    where fields = splitOn ',' (drop 1 (init s))
+
+  validPhase ph s =
+    head s == '{'
+    && last s == '}'
+    && "\"kind\":\"Simple\"" `elem` fields
+    && "\"phase\":\"" ++ show ph ++ "\"" `elem` fields
+    where fields = splitOn ',' (drop 1 (init s))
+
+  validJSONBoard :: String -> (Country -> (Maybe Player, Int)) -> Bool
+  validJSONBoard s f = head s == '{'
+                    && last s == '}' && last (init s) == '}'
+                    && all id [ (f' c) `isInfixOf` s | c <- [minBound :: Country ..]]
+                      where f' c = case f c of
+                                   (Nothing, k) -> '\"' : show c ++ "\":{\"owner\":\"Unowned\",\"number_of_troops\":0}"
+                                   (Just p, k) -> '\"' : show c ++ "\":{\"owner\":\"" ++ show p ++ "\",\"number_of_troops\":" ++ show k ++ "}"
+
+  c :: Country -> (Player, Int)
+  c WesternAustralia  = (Red, 3)
+  c EasternAustralia = (Blue, 3)
+  c NewGuinea = (Green, 100)
+  c Indonesia =  (Red, 3)
+  c Siam = (Red, 3)
+  c Brazil = (Blue, 3)
+  c Peru =  (Blue, 3)
+  c _ = (Black, 3)
+
+  game = newGame [Red, Blue, Green] c (mkStdGen 0)
+
+  parenPairs = go 0 []
+               where
+                 go _ _        []         = []
+                 go j acc      ('{' : cs) =          go (j + 1) (j : acc) cs
+                 go j []       ('}' : cs) =          go (j + 1) []        cs -- unbalanced parentheses!
+                 go j (i : is) ('}' : cs) = (i, j) : go (j + 1) is        cs
+                 go j acc      (c   : cs) =          go (j + 1) acc       cs
