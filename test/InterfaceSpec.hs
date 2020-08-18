@@ -42,58 +42,58 @@ spec = do
         describe "StartGame" $ do
             context "Valid Inputs" $ do
                 it "Should start the game correctly" $ do
-                    pending
+                    pendingWith "Needs to work"
             context "Invalid Inputs" $ do
                 it "Doesn't work with too many Players" $ do
-                    pending
+                    pendingWith "Needs to work"
                 it "Doesn't work in other phases" $ do
-                    pending
+                    pendingWith "Needs to work"
 
         describe "PlaceTroop" $ do
             context "Valid Inputs" $ do
-                pending
+                pendingWith "Needs to work"
 
             context "Invalid Inputs" $ do
-                pending
+                pendingWith "Needs to work"
         describe "Attack" $ do
             context "Valid Inputs" $ do
-                pending
+                pendingWith "Needs to work"
 
             context "Invalid Inputs" $ do
-                pending
+                pendingWith "Needs to work"
         describe "Reinforce" $ do
             context "Valid Inputs" $ do
-                pending
+                pendingWith "Needs to work"
 
             context "Invalid Inputs" $ do
-                pending
+                pendingWith "Needs to work"
         describe "Fortify" $ do
             context "Valid Inputs" $ do
-                pending
+                pendingWith "Needs to work"
 
             context "Invalid Inputs" $ do
-                pending
+                pendingWith "Needs to work"
         describe "Invade" $ do
             context "Valid Inputs" $ do
-                pending
+                pendingWith "Needs to work"
 
             context "Invalid Inputs" $ do
-                pending
+                pendingWith "Needs to work"
         describe "ChooseDefenders" $ do
             context "Valid Inputs" $ do
-                pending
+                pendingWith "Needs to work"
 
             context "Invalid Inputs" $ do
-                pending
+                pendingWith "Needs to work"
         describe "EndAttack" $ do
             context "Valid Inputs" $ do
-                pending
+                pendingWith "Needs to work"
 
             context "Invalid Inputs" $ do
-                pending
+                pendingWith "Needs to work"
         describe "SkipFortify" $ do
             context "Valid Inputs" $ do
-                pending
+                pendingWith "Needs to work"
 
             context "Invalid Inputs" $ do
-                pending
+                pendingWith "Needs to work"
