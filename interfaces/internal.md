@@ -40,9 +40,21 @@ Given two countries, returns `True` if there is an edge connecting them and `Fal
 ## GameElements
 ### Types
 ```hs
-Player (Black | Blue | Green | Red | Yellow) -- (Eq, Show)
+Player (Black | Blue | Green | Red | Yellow) -- (Eq, Show, Read, Ord)
 ```
 Each player is represented by the colour they play as.
+
+```hs
+Card = (Infantry | Cavalry | Artillery | Wild) -- (Eq,Show)
+```
+
+```hs
+type CardSet = (Card, Card, Card)
+```
+
+```hs
+data TradeIn = None | OneSet CardSet | TwoSet CardSet CardSet --(Eq,Show)
+```
 ## State
 ### Types
 ```hs
@@ -121,6 +133,31 @@ changeMiniPhase :: MiniPhase -> GameState -> GameState
 ```
 Does nothing if not in attack phase, otherwise sets phase to Attack MiniPhase (inserting the provided MiniPhase).
 
+```hs
+cards :: GameState -> Player -> [Card]
+```
+Returns the list of cards in the player's hand
+
+```hs
+useCard :: Player -> Card -> GameState -> GameState
+```
+puts the card in the discard pile
+
+```hs
+drawCard :: Player -> ([Card] -> [Card]) -> GameState -> GameState
+```
+Adds the top card to the player's hand. Shuffles the discard pile if necessary.
+
+```hs
+kick :: Player -> Player -> GameState -> GameState
+```
+Removes the second player from the game and gives all cards to the first player.
+
+```hs
+hasDrawn :: GameState -> Bool
+```
+True iff the current player has drawn a card
+
 ## SetupBoard
 ### Types
 ```hs
@@ -167,6 +204,7 @@ completeBoardOwner :: SetupState -> Country -> (Player, Int)
 Partial function, defined for (partially) complete `SetupState`, gives the owner and number of troops in each country.
  - Should error if called on a incomplete `SetupState`
 
+
 ## Battle
 ### Types
 ```hs
@@ -188,20 +226,20 @@ Takes the number of Attackers and the number of defenders and returns the outcom
 ## Moves
 
 ```hs
-reinforce :: [(Country, Int)] -> GameState -> Maybe GameState
+reinforce :: TradeIn -> [(Country, Int)] -> GameState -> Maybe GameState
 ```
-Add reinforcements (specified as a list of pairs of country and non-negative integer number of troops to add). Must be during the correct phase.  Should update phase to Attack Normal.
+Add reinforcements (specified as a list of pairs of country and non-negative integer number of troops to add). Must be during the correct phase.  Should update phase to Attack Normal. Continent and country bonuses should be taken into account.
 
 ```hs
 fortify :: Country -> Country -> Int -> GameState -> Maybe GameState
 ```
-Moves troops from one country to another. Countries must be neighbours and owned by the current player. Must be during the correct phase. Troops are sent from the first country to the second one. Should update phase to Reincorce and call nextTurn. Has to fortify 5 troops
+Moves troops from one country to another. Countries must be neighbours and owned by the current player. Must be during the correct phase. Troops are sent from the first country to the second one. Should update phase to Reincorce and call nextTurn.
 
 
 ```hs
 attack :: Country -> Country -> Attackers -> GameState -> Maybe GameState
 ```
-Puts the state into the MidBattle MiniPhase, which records the attacking and defending country, and the number of attackers. Must Be neighbouring countries owned by different players. Must be during the correct phase. Attacker must have < number of attackers in the attacking country. If 2nd Country ends up with 0 troops must start a WonBattle MiniPhase, with the number of troops left after casualties from the attack.
+Puts the state into the MidBattle MiniPhase, which records the attacking and defending country, and the number of attackers. Must Be neighbouring countries owned by different players. Must be during the correct phase. Attacker must have < number of attackers in the attacking country.
 
 ```hs
 chooseDefenders :: Defenders -> GameState -> Maybe GameState
@@ -211,12 +249,12 @@ Only defined for MidBattle MiniPhase. Chooses the number of defenders the defend
 ```hs
 invade :: Int -> GameState -> Maybe GameState
 ```
-Invades a country from another with Int number of troops, meaning owner is changed and Int troops are tranferred from the attacking country to the defending country. Should be only able to be called in WonBattle MiniPhase. Can't invade  with less than the number of attackers left. Should move back to a Normal Attack MiniPhase. Gives an error if called with a MiniPhase which shouldn't be possible.
+Invades a country from another with Int number of troops, meaning owner is changed and Int troops are tranferred from the attacking country to the defending country. Should be only able to be called in WonBattle MiniPhase. Can't invade  with less than the number of attackers left. Should move back to a Normal Attack MiniPhase. Gives an error if called with a MiniPhase which shouldn't be possible. Kicks players out if their last country is invaded. Also calculates when winning.
 
 ```hs
 skipFortify :: GameState -> Maybe GameState
 ```
-Must be during the correct phase. Should update phase to Reincorce and call nextTurn.
+Must be during the correct phase. Should update phase to Reinforce and call nextTurn.
 
 
 ```hs

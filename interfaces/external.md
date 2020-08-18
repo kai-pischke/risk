@@ -1,7 +1,7 @@
 
 ## Message.hs
 ```hs
-Response = General Update | Invalid Error Player
+Response = General Update | Invalid Error Player | GameWon Player 
 ```
 ```hs
 Update = WaitingRoom [Player] | Setup SetupState | Play GameState
