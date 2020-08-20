@@ -71,8 +71,6 @@ emptyBoard ps = Incomplete $ InternalGameState
     where
         countries = [(minBound :: Country)..]
 
-
-
 placeTroop :: Country -> SetupState -> Maybe SetupState
 placeTroop c (Incomplete s) = case Map.lookup c (playerMap s) of
     Just Nothing -> if valid then Just $ toSetupState $ newBoard else Nothing

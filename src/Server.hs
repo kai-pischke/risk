@@ -1,6 +1,6 @@
 module Server where
-import Message (Response(..), Request(..), RequestType(..)) -- Alex should really export this
-import Interface
+import Message (RequestType(..)) -- Alex should really export this
+import Interface 
 import GameElements (Player)
 import Parse
 import Data.ByteString.Lazy (ByteString)

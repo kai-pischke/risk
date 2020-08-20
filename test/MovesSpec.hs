@@ -101,14 +101,14 @@ spec = do
         let testGame = (nextPhase) game
         context "Valid Inputs" $ do
             it "Correctly updates attackers,defenders and stdGen" $ do
-                let t1g = (fromJust.attack WesternAustralia EasternAustralia TwoAtt TwoDef) testGame
+                let t1g = (fromJust . attack WesternAustralia EasternAustralia TwoAtt) testGame
 
                 (troops t1g WesternAustralia == 2) `shouldBe` True
                 (troops t1g EasternAustralia == 2) `shouldBe` True
                 ((currentStdGen t1g) == mkStdGen 0) `shouldBe` False
                 (phase t1g == Attack Normal) `shouldBe` True
             it "Correctly leaves game in WonBattle state if defenders wiped out" $ do
-                let t1g = (fromJust.attack WesternAustralia EasternAustralia ThreeAtt OneDef .updateStdGen (mkStdGen 3).changeTroops WesternAustralia 1 .(changeTroops EasternAustralia (-2))) testGame
+                let t1g = (fromJust . attack WesternAustralia EasternAustralia ThreeAtt . updateStdGen (mkStdGen 3).changeTroops WesternAustralia 1 .(changeTroops EasternAustralia (-2))) testGame
                 (phase t1g == Attack (WonBattle WesternAustralia EasternAustralia ThreeAtt))
 
         context "Invalid Inputs" $ do
