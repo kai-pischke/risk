@@ -12,8 +12,6 @@ ParseError
 ---- Imports --------------------------------
 import Message
 import Data.Aeson
-import Control.Applicative
-import Control.Monad
 import Data.Map (Map, fromList)
 import Data.ByteString.Lazy (ByteString)
 import Data.ByteString.Lazy.UTF8 (fromString)
@@ -24,11 +22,11 @@ import Data.Typeable (typeOf)
 
 import SetupBoard
 import qualified State as S (MiniPhase(..), Phase(..), turnOrder, phase, troops, owner)
-import RiskBoard
-import GameElements
+import RiskBoard (Country)
+import GameElements (Player)
 ---------------------------------------------
 
----- Helpter DataType -----------------------
+---- Helper DataType ------------------------
 data Switch a b = LSwitch a | RSwitch b
 
 instance (ToJSON a , ToJSON b) => ToJSON (Switch a b) where
@@ -41,9 +39,27 @@ instance ToJSON (Owner) where
     toJSON (Owner p) = String $ pack $ show p
     toJSON Unowned = String $ pack "Unowned"
 
----------------------------------------------
+---- Helper Functions -----------------------
 
+phaseToJson:: S.Phase -> Value
+phaseToJson (S.Attack (S.WonBattle ac dc na)) =
+    object [pack "kind" .= pack "BattleEnd",
+            pack "attacking_country" .= (pack $ show ac),
+            pack "defending_country" .= (pack $ show dc),
+            pack "attackers_remaining" .= (fromEnum na)]
 
+phaseToJson (S.Attack (S.MidBattle ac dc na)) =
+    object [pack "kind" .= pack "MidBattle",
+            pack "attacking_country" .= (pack $ show ac),
+            pack "defending_country" .= (pack $ show dc),
+            pack "attackers" .= (fromEnum na)]
+
+phaseToJson (S.Attack (S.Normal)) =
+    object [pack "kind" .= pack "Simple",
+            pack "phase" .= (pack "Attack")]
+
+phaseToJson p = object [pack "kind" .= pack "Simple",
+                        pack "phase" .= (pack $ show p)]
 
 ---- Public Functions -----------------------
 
@@ -131,16 +147,6 @@ instance FromJSON Request where
 
 
 ---- ToJSON ---------------------------------
-
-phaseToJson:: S.Phase -> Value
-phaseToJson (S.Attack (S.WonBattle ac dc na)) =
-    object [pack "kind" .= pack "BattleEnd",
-            pack "attacking_country" .= (pack $ show ac),
-            pack "defending_country" .= (pack $ show dc),
-            pack "attackers_remaining" .= (fromEnum na)]
-phaseToJson p = object [pack "kind" .= pack "Simple",
-                        pack "phase" .= (pack $ show p)]
-
 
 instance ToJSON Response where
 ---- General Updates ------------------------

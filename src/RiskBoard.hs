@@ -1,10 +1,19 @@
 module RiskBoard
     ( Country(..),
+      Continent,
       neighbours,
-      isNeighbour
+      isNeighbour,
+      northAmerica,
+      europe,
+      asia,
+      southAmerica,
+      africa,
+      australia
     ) where
 
 import qualified Graph
+
+type Continent = [Country]
 
 data Country = Alaska
              | Alberta
@@ -183,6 +192,30 @@ riskBoard = Graph.makeGraph [(Alaska , [Alberta, NorthwestTerritory,Kamchatka]),
                             (Indonesia , [Siam, NewGuinea, WesternAustralia]),
                             (NewGuinea ,  [Indonesia, WesternAustralia, EasternAustralia]),
                             (WesternAustralia , [Indonesia, NewGuinea, EasternAustralia])]
+
+northAmerica :: Continent
+northAmerica = [toEnum 0 .. toEnum 8]
+
+southAmerica :: Continent
+southAmerica = [toEnum 9 .. toEnum 12]
+
+europe :: Continent
+europe = [toEnum 13 .. toEnum 19]
+
+africa :: Continent
+africa = [toEnum 20 .. toEnum 25]
+
+asia :: Continent
+asia = [toEnum 26 .. toEnum 37]
+
+australia :: Continent
+australia = [toEnum 38 .. toEnum 41]
+
+
+
+
+
+
 
 -- Simple Renamings
 neighbours :: Country -> [Country]
