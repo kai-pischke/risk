@@ -23,7 +23,38 @@ module Moves (
 
   --change later to  calculate continent bonuses
   nReinforcements :: GameState -> Player -> Int
-  nReinforcements _ _ = 5
+  nReinforcements g p = territoryBonus g p + continentBonus g p
+
+  territoryBonus :: GameState -> Player -> Int
+  territoryBonus g p = max (territoriesOwned `div` 3) 3
+    where territoriesOwned = length (filter ((== p).owner g) [toEnum 0 :: Country ..])
+
+  continentBonus :: GameState -> Player -> Int
+  continentBonus g p = australiaBonus g p
+                     + africaBonus g p
+                     + southAmericaBonus g p
+                     + europeBonus g p
+                     + asiaBonus g p
+                     + northAmericaBonus g p
+
+  australiaBonus g p | all ((== p).owner g) australia = 2
+                     | otherwise = 0
+
+  africaBonus g p | all ((== p).owner g) africa = 3
+                  | otherwise = 0
+
+  southAmericaBonus g p | all ((== p).owner g) southAmerica = 2
+                        | otherwise = 0
+
+  europeBonus g p | all ((== p).owner g) europe = 5
+                  | otherwise = 0
+
+  asiaBonus g p | all ((== p).owner g) asia = 7
+                | otherwise = 0
+
+  northAmericaBonus g p | all ((== p).owner g) northAmerica = 5
+                        | otherwise = 0
+
 
   -----------------------------------------------
 
