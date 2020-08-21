@@ -17,7 +17,7 @@ module Message (
 
   ---- Types ---------------------
 
-  data Response = General Update | Special Question Player | Invalid Error Player
+  data Response = General Update | Special Question Player | Invalid Error Player | GameWon Player
     deriving (Eq, Show)
 
   data Update = WaitingRoom [Player] | Setup SetupState | Play GameState

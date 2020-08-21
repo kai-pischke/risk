@@ -102,9 +102,13 @@ module Moves (
       f (Attack (WonBattle cAtt cDef attLeft))
         | not (cAtt `isNeighbour` cDef) || (owner gs cAtt == owner gs cDef) || (owner gs cAtt /= currPlayer gs) = error "Impossible MiniPhase"
         | (nTroops >= fromEnum attLeft) && (nTroops < troops gs cAtt) =
-          Just $ ((changeMiniPhase Normal) . (changeOwner cDef (currPlayer gs)). (changeTroops cAtt (-nTroops)) . (changeTroops cDef nTroops)) gs
+          Just $ ((changeMiniPhase Normal) . (tryKick (owner gs cAtt) (owner gs cDef)) . (changeOwner cDef (currPlayer gs)). (changeTroops cAtt (-nTroops)) . (changeTroops cDef nTroops)) gs
         | otherwise = Nothing
       f _ = Nothing
+      tryKick :: Player -> Player -> GameState -> GameState
+      tryKick pAtt pDef = if all ((/= pDef).owner gs) [toEnum 0 :: Country ..]
+                        then kick pAtt pDef
+                        else id
 
   endAttack :: GameState -> Maybe GameState
   endAttack gs = f (phase gs)

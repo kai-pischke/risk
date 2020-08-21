@@ -95,7 +95,9 @@ module Interface  (
     | s == currentPlayer gstate =
       case invade nTroops gstate of
         Nothing -> (Invalid InvalidMove s, g)
-        Just gstate' -> (General(Play gstate'), GamePlay gstate')
+        Just gstate' -> if (length (turnOrder gstate') > 1)
+                          then (General(Play gstate'), GamePlay gstate')
+                          else (GameWon (head $ turnOrder gstate'), GamePlay gstate')
     | otherwise = (Invalid NotYourTurn s, g)
   receive (Request s (Invade _)) g = (Invalid NotInPlay s, g)
 
