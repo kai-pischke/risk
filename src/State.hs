@@ -37,7 +37,11 @@ data GameState = InternalGameState
      playerMap :: Map Country Player,
      stateStdGen :: StdGen,
      statePhase :: Phase,
-     statePayers :: [Player]
+     statePayers :: [Player],
+     getsCard :: Bool,
+     discardPile :: [Card],
+     deck :: [Card],
+     hand :: Map Player [Card] 
    } deriving (Eq, Show)
 ----------------------------------------------
 
@@ -58,25 +62,52 @@ updateMiniPhase m (Attack x) = Attack m
 updateMiniPhase _ y = y
 
 -- general helper functions --
+fmaybe :: a -> Maybe a -> a
+fmaybe d = maybe d id 
+
 rotate :: [a] -> [a]
 rotate [] = []
 rotate (x:xs) = xs ++ [x]
 
+removeOne :: Eq a => a -> [a] -> [a]
+removeOne _ [] = []
+removeOne a (x:xs) = if x == a then xs else x : removeOne a xs
+
+removeOneWithError :: Eq a => a -> String -> [a] -> [a]
+removeOneWithError _ s [] = error s
+removeOneWithError a s (x:xs) = if x == a then xs else x : removeOneWithError a s xs
+
+modifyMapWithError :: Ord a => a -> (b -> b) -> String -> Map a b -> Map a b 
+modifyMapWithError k f s m = Map.insert k (f v) m 
+   where v = fmaybe (error s) (Map.lookup k m)
+
 -- map functions for Internal State --
 changeTroopMap :: (Map Country Int -> Map Country Int) -> GameState -> GameState
-changeTroopMap f (InternalGameState t p g h l) = InternalGameState (f t) p g h l
+changeTroopMap f (InternalGameState t p g h l g' d d' h') = InternalGameState (f t) p g h l g' d d' h'
 
 changePlayerMap :: (Map Country Player -> Map Country Player) -> GameState -> GameState
-changePlayerMap f (InternalGameState t p g h l) = InternalGameState t (f p) g h l
+changePlayerMap f (InternalGameState t p g h l g' d d' h') = InternalGameState t (f p) g h l  g' d d' h'
 
 changeGen :: (StdGen -> StdGen) -> GameState -> GameState
-changeGen f (InternalGameState t p g h l) = InternalGameState t p (f g) h l
+changeGen f (InternalGameState t p g h l g' d d' h') = InternalGameState t p (f g) h l g' d d' h'
 
 changePhase :: (Phase -> Phase) -> GameState -> GameState
-changePhase f (InternalGameState t p g h l) = InternalGameState t p g (f h) l
+changePhase f (InternalGameState t p g h l g' d d' h') = InternalGameState t p g (f h) l g' d d' h'
 
 changePlayer :: ([Player] -> [Player]) -> GameState -> GameState
-changePlayer f (InternalGameState t p g h l) = InternalGameState t p g h (f l)
+changePlayer f (InternalGameState t p g h l g' d d' h') = InternalGameState t p g h (f l) g' d d' h'
+
+changeGetCard :: (Bool -> Bool) -> GameState -> GameState
+changeGetCard f (InternalGameState t p g h l g' d d' h') = InternalGameState t p g h l (f g') d d' h'
+
+changeDisc :: ([Card] -> [Card]) -> GameState -> GameState
+changeDisc f (InternalGameState t p g h l g' d d' h') = InternalGameState t p g h l g' (f d) d' h'
+
+changeDeck :: ([Card] -> [Card]) -> GameState -> GameState
+changeDeck f (InternalGameState t p g h l g' d d' h') = InternalGameState t p g h l g' d (f d') h'
+
+changeHand :: (Map Player [Card] -> Map Player [Card]) -> GameState -> GameState
+changeHand f (InternalGameState t p g h l g' d d' h') = InternalGameState t p g h l g' d d' (f h')
 
 -- publicly exposed functions --
 newGame :: [Player] -> (Country -> (Player, Int))-> StdGen -> GameState
@@ -87,16 +118,20 @@ newGame listOfPlayer countryFunc startingStdGen = InternalGameState
    startingStdGen
    Reinforce
    listOfPlayer
+   False
+   (Wild : Wild : concat (map (replicate 14) [Infantry, Cavalry, Artillery]))
+   []
+   (Map.fromList $ zip listOfPlayer $ repeat [])
    where countries = [(minBound :: Country)..]
 
 troops :: GameState -> Country -> Int
-troops g c = fromMaybe (error "unexpected country") (Map.lookup c (troopMap g))
+troops g c = troopMap g Map.! c
 
 turnOrder :: GameState -> [Player]
 turnOrder = statePayers
 
 owner :: GameState -> Country -> Player
-owner g c = fromMaybe (error "unexpected country") (Map.lookup c (playerMap g))
+owner g c = playerMap g Map.! c
 
 changeTroops :: Country -> Int -> GameState -> GameState
 changeTroops c i = changeTroopMap (Map.insertWith (+) c i)
@@ -123,16 +158,40 @@ changeMiniPhase :: MiniPhase -> GameState -> GameState
 changeMiniPhase = changePhase . updateMiniPhase
 
 cards :: GameState -> Player -> [Card]
-cards = undefined
+cards g p = fmaybe errP $ Map.lookup p (hand g)
+   where errP = error $ "Player '" ++ show p ++ "' isn't in the game."
 
 useCard :: Player -> Card -> GameState -> GameState
-useCard = undefined
+useCard p c = addToDiscard . removeCard
+   where
+   removeCard = changeHand $ modifyMapWithError p (removeOneWithError c errC) errP
+   errP = "Player '" ++ show p ++ "' isn't in the game so can't use a card." 
+   errC = "Player doesn't have card " ++ show c ++ "."
+   addToDiscard = changeDisc (c:)
 
 drawCard :: Player -> ([Card] -> [Card]) -> GameState -> GameState
-drawCard = undefined
-
+drawCard p shuff = takeTop . fillDeck
+   where 
+   fillDeck :: GameState -> GameState 
+   fillDeck g = if null (deck g)
+                then changeDeck (const $ shuff $ discardPile g) $ changeDisc (const []) g
+                else g
+   takeTop :: GameState -> GameState
+   takeTop g = let c = head (deck g)
+               in changeDeck tail $ changeHand (modifyMapWithError p (c:) errP) g
+   errP = "Player '" ++ show p ++ "' isn't in the game so can't take a card." 
+               
 kick :: Player -> Player -> GameState -> GameState
-kick = undefined
-
+kick p1 p2 = updateCards . removePlayer
+   where 
+   removePlayer = changePlayer (removeOneWithError p2 errP2)
+   moveCards m = let cs = (m Map.! p2) 
+                 in modifyMapWithError p1 (cs++) errP1 $ Map.delete p2 m
+   updateCards = changeHand moveCards
+   errP2 = "Can't kick '" ++ show p2 ++ "' since they aren't in the game."
+   errP1 = show p2  ++ " can't be kick by " 
+         ++ show p1 ++ " since " 
+         ++ show p1 ++ " isn't in the game."
+   
 hasDrawn :: GameState -> Bool
-hasDrawn = undefined
+hasDrawn = getsCard
