@@ -13,7 +13,12 @@ module State
       updateStdGen,
       phase,
       nextPhase,
-      changeMiniPhase
+      changeMiniPhase,
+      cards,
+      useCard,
+      drawCard,
+      kick,
+      hasDrawn
     ) where
 
 -- imports --
@@ -116,3 +121,18 @@ nextPhase = changePhase advancePhase
 
 changeMiniPhase :: MiniPhase -> GameState -> GameState
 changeMiniPhase = changePhase . updateMiniPhase
+
+cards :: GameState -> Player -> [Card]
+cards = undefined
+
+useCard :: Player -> Card -> GameState -> GameState
+useCard = undefined
+
+drawCard :: Player -> ([Card] -> [Card]) -> GameState -> GameState
+drawCard = undefined
+
+kick :: Player -> Player -> GameState -> GameState
+kick = undefined
+
+hasDrawn :: GameState -> Bool
+hasDrawn = undefined

@@ -37,6 +37,6 @@ main = do
     let (players, start) = nPlayerGame 4 g -- 4 player game
     let (_, start') = Request (head players) StartGame `receive` start -- start the game
     let turnOrder = players ++ turnOrder -- infinite list of turnOrder
-    let k = toPartial turnOrder start' -- 
+    let k = toPartial turnOrder start'
     let n = toPartial turnOrder start'
     print $ k

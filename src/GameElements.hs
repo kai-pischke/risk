@@ -1,5 +1,8 @@
 module GameElements
-    ( Player(..)
+    ( Player(..),
+      Card(..),
+      CardSet,
+      TradeIn(..)
     ) where
 
 data Player = Black | Blue | Green | Red | Yellow
@@ -7,3 +10,8 @@ data Player = Black | Blue | Green | Red | Yellow
 
 data Card = Infantry | Cavalry | Artillery | Wild
             deriving (Eq, Show, Ord)
+
+type CardSet = (Card, Card, Card)
+
+data TradeIn = None | OneSet CardSet | TwoSet CardSet CardSet
+            deriving (Eq, Show)
