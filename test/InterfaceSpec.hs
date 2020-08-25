@@ -4,6 +4,7 @@ import Test.Hspec
 import Test.QuickCheck
 import Test.QuickCheck.Gen
 import Test.QuickCheck.Monadic
+import Control.Monad (foldM)
 import Control.Exception (evaluate, try, Exception, SomeException)
 import System.Random (mkStdGen, StdGen)
 import Data.Either (isLeft)
@@ -20,14 +21,22 @@ newtype Permutation a = Permutation [a]
 
 data NewGame = NewGame Game [Player] ShowableGen deriving Eq
 
-instance Show NewGame where 
-    show (NewGame g ps sg) = "NewGame " ++ show ps ++ " " ++ show sg
-    
+data NewPartial = NewPartial Game [Player] [Country] ShowableGen | NewPartialError deriving Eq
+
 instance Arbitrary ShowableGen where 
     arbitrary = do
         s <- (arbitrary :: Gen Int)
         return $ ShowableGen (mkStdGen s) s
 
+instance Arbitrary NewPartial where 
+    arbitrary = do
+        NewGame g ps sg <- (arbitrary :: Gen NewGame)
+        Permutation cs <- (arbitrary :: Gen (Permutation Country))
+        let result = maybeRequests (zipWith (flip Request . PlaceTroop) cs (cycle ps)) g
+        case result of
+            Just (General (Setup (PartiallyComplete s)), g') -> return $ NewPartial g' ps cs sg
+            _ -> return NewPartialError
+        
 instance Arbitrary NewGame where 
     arbitrary = do
         sg@(ShowableGen g _) <- (arbitrary :: Gen ShowableGen)
@@ -36,6 +45,12 @@ instance Arbitrary NewGame where
         let game' = snd $ receive (Request p StartGame) game
         return $ NewGame game' players sg
 
+instance Show NewPartial where 
+    show (NewPartial g ps cs sg) = "NewPartial " ++ show ps ++ " " ++ show cs ++ " " ++ show sg
+
+instance Show NewGame where 
+    show (NewGame g ps sg) = "NewGame " ++ show ps ++ " " ++ show sg
+            
 instance Show a => Show (Permutation a) where
     show (Permutation s) = show s
     
@@ -47,7 +62,7 @@ instance (Enum a, Bounded a) => Arbitrary (Permutation a) where
         let xs = [minBound..]
         xs' <- shuffle xs
         return $ Permutation xs' 
-                        
+                
 throwsException :: a -> Property
 throwsException = runPropIO . fmap (isLeft ::  Either SomeException a -> Bool) . try . evaluate
 
@@ -67,14 +82,18 @@ distinct :: Eq a => [a] -> Bool
 distinct [] = True
 distinct (x:xs) = not (x `elem` xs) && distinct xs
 
-manyRequests :: [Request] -> Game -> Maybe (Response, Game)
-manyRequests [] g = Just (undefined, g)
-manyRequests (r:rs) g = maybe Nothing nextReq $ manyRequests rs g
-    where 
-    nextReq (_, g') = let (resp, g'') = receive r g' in  
-                 case resp of
-                         (Invalid _ _) -> Nothing
-                         _ -> Just (resp, g'')
+isEmptyBoard :: SetupState -> Bool
+isEmptyBoard s = all (==(Nothing, 0)) $ map (incompleteBoardOwner s) countries
+
+maybeRequests :: [Request] -> Game -> Maybe (Response, Game)
+maybeRequests rs g = foldM modRec (error "no request", g) rs
+ 
+modRec :: (Response, Game) -> Request -> Maybe (Response, Game)
+modRec (_ , g') r = let (resp, g'') = receive r g' 
+                     in case resp of 
+                        (Invalid _ _) -> Nothing
+                        _ -> Just (resp, g'')
+    
                         
 spec :: Spec
 spec = do
@@ -101,8 +120,14 @@ spec = do
         describe "Receive" $ do
             describe "StartGame" $ do
                 context "using valid inputs" $ do
-                    it "should start the game correctly" $ do
-                        pendingWith "test not implemented yet"
+                    it "should start the game correctly with all countries empty" $ property $
+                        \sg@(ShowableGen g _) -> forAll (elements [2..5]) 
+                        $ \n -> label ("using " ++ show n ++ " players") $
+                                let (players@(p:_), game) = nPlayerGame g n
+                                in let resp = fst $ receive (Request p StartGame) game
+                                in case resp of 
+                                    General (Setup s@(Incomplete _)) -> isEmptyBoard s
+                                    _ -> False
                 context "using invalid inputs" $ do
                     it "should throw an error in other phases" $ do
                         pendingWith "test not implemented yet"
@@ -111,14 +136,8 @@ spec = do
 
             describe "PlaceTroop" $ do     
                 context "during the Incomplete subphase" $ do
-                    it "places troops correctly for valid input" $ property $ \game@(NewGame g ps _) ->
-                        property
-                        $ \(Permutation cs) -> 
-                                 let result = manyRequests (zipWith (flip Request . PlaceTroop) cs ps) g
-                                 in counterexample (show $ cs) $ case result of 
-                                    Just (General (Setup (PartiallyComplete s)), _) -> True
-                                    _ -> False
-                                    
+                    it "places troops correctly for valid input" $ property $ \game ->
+                        game /= NewPartialError
                     it "does not allow players to place troops in occupied countries" $ do
                         pendingWith "test not implemented yet"
                     it "enforces the turn order" $ do
