@@ -22,8 +22,26 @@ module Moves (
   currPlayer = head.turnOrder
 
   --change later to  calculate continent bonuses
-  nReinforcements :: GameState -> Player -> Int
-  nReinforcements g p = territoryBonus g p + continentBonus g p
+  nReinforcements :: GameState -> TradeIn -> Player -> Int
+  nReinforcements g t p = tradeInBonus t + territoryBonus g p + continentBonus g p
+
+  tradeInBonus :: TradeIn -> Int
+  tradeInBonus None = 0
+  tradeInBonus (OneSet s) = getValue s
+  tradeInBonus (TwoSet s1 s2) = getValue s1 + getValue s2
+
+  getValue (Infantry, Infantry, Infantry) = 4
+  getValue (Cavalry, Cavalry, Cavalry) = 6
+  getValue (Artillery, Artillery, Artillery) = 8
+  getValue (Wild, x, y) = getValue (Infantry, x, y)
+                          `max` getValue (Cavalry, x, y)
+                          `max` getValue (Artillery, x, y)
+
+  getValue (x, Wild, y) = getValue (Wild, x, y)
+  getValue (x, y, Wild) = getValue (Wild, x, y)
+  getValue (x, y, z) = if (x /= y && y /= z && x /= z)
+                         then 10
+                         else 0
 
   territoryBonus :: GameState -> Player -> Int
   territoryBonus g p = max (territoriesOwned `div` 3) 3
@@ -60,16 +78,26 @@ module Moves (
 
   ----Public Functions ---------------------
 
-  reinforce :: [(Country, Int)] -> GameState -> Maybe GameState
-  reinforce movs gs | phase gs == Reinforce && validMovList movs =
-    Just $ nextPhase $ foldr ((.).(uncurry changeTroops)) id movs gs
+  reinforce :: TradeIn -> [(Country, Int)] -> GameState -> Maybe GameState
+  reinforce trade movs gs | validTrade trade && phase gs == Reinforce && validMovList movs =
+    Just $ nextPhase $ (useCards trade) $ foldr ((.).(uncurry changeTroops)) id movs gs
                     | otherwise = Nothing
-    where validMovList = valid (nReinforcements gs (currPlayer gs))
+    where validMovList = valid (nReinforcements gs trade (currPlayer gs))
           valid 0 []  = True
           valid _ []  = False
           valid n ((c,t) : ms) = (owner gs c == currPlayer gs)
                                 && (t > 0)
                                 && valid (n-t) ms
+          validTrade None = True
+          validTrade (OneSet s) = t s
+          validTrade (TwoSet s1 s2) = t s1 && t s2
+          t (Wild, _, _) = True
+          t (_, Wild, _) = True
+          t (_, _, Wild) = True
+          t (x, y, z) = (x == y && y == z) || (x /= y && x /= z && y /= z)
+          useCards None = id
+          useCards (OneSet (x, y, z)) = (useCard (currPlayer gs) x) . (useCard (currPlayer gs) y) . (useCard (currPlayer gs) z)
+          useCards (TwoSet s1 s2) = (useCards (OneSet s1)) . (useCards (OneSet s2))
 
   attack :: Country -> Country -> Attackers -> GameState -> Maybe GameState
   attack cAtt cDef att gs | valid = (Just . changeMiniPhase (MidBattle cAtt cDef att)) gs
@@ -102,8 +130,10 @@ module Moves (
       f (Attack (WonBattle cAtt cDef attLeft))
         | not (cAtt `isNeighbour` cDef) || (owner gs cAtt == owner gs cDef) || (owner gs cAtt /= currPlayer gs) = error "Impossible MiniPhase"
         | (nTroops >= fromEnum attLeft) && (nTroops < troops gs cAtt) =
-          Just $ ((changeMiniPhase Normal) . (tryKick (owner gs cAtt) (owner gs cDef)) . (changeOwner cDef (currPlayer gs)). (changeTroops cAtt (-nTroops)) . (changeTroops cDef nTroops)) gs
+          Just $ ((changeMiniPhase Normal) .forceDiscard . (tryKick (owner gs cAtt) (owner gs cDef)) . (drawCard (currPlayer gs) shuffle) . (changeOwner cDef (currPlayer gs)). (changeTroops cAtt (-nTroops)) . (changeTroops cDef nTroops)) gs
         | otherwise = Nothing
+        where shuffle = undefined --Make shuffle a thing
+              forceDiscard = undefined --TODO make force discard a thing
       f _ = Nothing
       tryKick :: Player -> Player -> GameState -> GameState
       tryKick pAtt pDef = if all ((/= pDef).owner gs) [toEnum 0 :: Country ..]
