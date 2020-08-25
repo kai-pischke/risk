@@ -185,7 +185,8 @@ nextPhase :: GameState -> GameState
 nextPhase = changePhase advancePhase
 
 -- |Does nothing if not in 'Attack' 'Phase', otherwise sets phase to 'Attack' 'MiniPhase' 
--- (inserting the provided 'MiniPhase').
+-- (inserting the provided 'MiniPhase'). 
+-- Note that calling this function on a 'WonBattle' will cause it to remember that the current player gets a card this turn.
 changeMiniPhase :: MiniPhase -> GameState -> GameState
 changeMiniPhase = (updateCardDrawing .) . changePhase . updateMiniPhase
 
