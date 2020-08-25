@@ -150,6 +150,7 @@ instance Show Country where
     show WesternAustralia = "Western Australia"
 
 --Riskboard made from adjacency list
+riskBoard :: Graph.Graph Country
 riskBoard = Graph.makeGraph [(Alaska , [Alberta, NorthwestTerritory,Kamchatka]),
                             (Alberta , [Alaska, NorthwestTerritory, Ontario, WesternUnitedStates]),
                             (CentralAmerica , [EasternUnitedStates, WesternUnitedStates, Venezuela]),

@@ -3,7 +3,6 @@ import Message (RequestType(..)) -- Alex should really export this
 import Interface 
 import GameElements (Player)
 import Parse
-import Data.ByteString.Lazy (ByteString)
 import qualified Network.WebSockets as WS
 import System.Random (getStdGen)
 import Control.Exception (finally)
@@ -42,7 +41,7 @@ send state player bytes = do
 
 -- deals with one cycle of receiving and then sending responses
 respond :: WS.Connection -> MVar State -> Request -> IO ()
-respond conn state req = do
+respond _ state req = do
     State _ game <- readMVar state
     let (response, game') = receive req game
     modifyMVar_ state (return . updateGame game')
@@ -51,6 +50,7 @@ respond conn state req = do
         General _ -> broadcast state bytesResp
         Special _ toPlayer -> send state toPlayer bytesResp
         Invalid _ toPlayer -> send state toPlayer bytesResp
+        GameWon _ -> undefined
         
 -- prints information about a request
 reqInfo :: Player -> RequestType -> String 
@@ -58,11 +58,11 @@ reqInfo p StartGame = show p ++ " started the game."
 reqInfo p (PlaceTroop c) = show p ++ " placed a troop in " ++ show c ++ "."
 reqInfo p (Attack c1 c2 _) = show p ++ " attacked " ++ show c2 ++ " from " ++ show c1 ++ "."
 reqInfo p (Reinforce ts) = show p ++ " placed " ++ show (sum $ map snd ts) ++ " reinforcements."
-reqInfo p (Fortify c1 c2 n) = undefined
-reqInfo p (Invade c) = undefined
-reqInfo p (ChooseDefenders d) = undefined
-reqInfo p EndAttack = undefined
-reqInfo p SkipFortify = undefined
+reqInfo p (Fortify c1 c2 n) = show p ++ " fortified their position, moving " ++ show n ++ " troops."
+reqInfo p (Invade c) = show p ++ " invaded " ++ show c ++ "."
+reqInfo p (ChooseDefenders d) = show p ++ " chose to roll " ++ show (fromEnum d) ++ " dice."
+reqInfo p EndAttack = show p ++ " ended the attack phase."
+reqInfo p SkipFortify = show p ++ " skipped the fortify phase."
 
 -- deals with one cycle of receiving and then sending responses    
 play :: WS.Connection -> Player -> MVar State -> IO ()

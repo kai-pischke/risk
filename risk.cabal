@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5907c62c8dd15740b8b5380571fa6eadd780b0ea0cfe69a5c618f6e34d75a15a
+-- hash: 6479596840d86d6e7bcb6985bb22c3c205831012cca41c8bb0dab61abad919d1
 
 name:           risk
 version:        0.1.0.0
@@ -44,6 +44,7 @@ library
       Paths_risk
   hs-source-dirs:
       src
+  ghc-options: -Wall -fwarn-incomplete-uni-patterns
   build-depends:
       aeson
     , base >=4.8 && <5
@@ -80,6 +81,7 @@ test-suite risk-test
   other-modules:
       BattleSpec
       GraphSpec
+      InterfaceSpec
       MovesSpec
       ParseSpec
       RiskBoardSpec

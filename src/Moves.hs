@@ -1,3 +1,10 @@
+{-|
+Module      : Moves
+Description : Core game logic.
+Maintainer  : Alex
+
+The basic implementation of the rules for the game, verifying individual actions that manipulate the state.
+-}
 module Moves (
     Country(..),
     reinforce,
@@ -55,24 +62,28 @@ module Moves (
                      + asiaBonus g p
                      + northAmericaBonus g p
 
+  australiaBonus :: GameState -> Player -> Int
   australiaBonus g p | all ((== p).owner g) australia = 2
                      | otherwise = 0
-
+  africaBonus :: GameState -> Player -> Int
   africaBonus g p | all ((== p).owner g) africa = 3
                   | otherwise = 0
 
+  southAmericaBonus :: GameState -> Player -> Int
   southAmericaBonus g p | all ((== p).owner g) southAmerica = 2
                         | otherwise = 0
 
-  europeBonus g p | all ((== p).owner g) europe = 5
-                  | otherwise = 0
-
+  asiaBonus :: GameState -> Player -> Int
   asiaBonus g p | all ((== p).owner g) asia = 7
+                      | otherwise = 0
+
+  europeBonus :: GameState -> Player -> Int
+  europeBonus g p | all ((== p).owner g) europe = 5
                 | otherwise = 0
 
+  northAmericaBonus :: GameState -> Player -> Int
   northAmericaBonus g p | all ((== p).owner g) northAmerica = 5
                         | otherwise = 0
-
 
   -----------------------------------------------
 
