@@ -77,6 +77,11 @@ updateMiniPhase :: MiniPhase -> Phase -> Phase
 updateMiniPhase m (Attack _) = Attack m
 updateMiniPhase _ y = y
 
+updateCardDrawing :: GameState -> GameState
+updateCardDrawing g = case statePhase g of 
+   (Attack (WonBattle _ _ _)) -> changeGetCard (const True) g
+   _ -> g
+    
 -- general helper functions --
 fmaybe :: a -> Maybe a -> a
 fmaybe d = maybe d id 
@@ -109,8 +114,8 @@ changePhase f (InternalGameState t p g h l g' d d' h') = InternalGameState t p g
 changePlayer :: ([Player] -> [Player]) -> GameState -> GameState
 changePlayer f (InternalGameState t p g h l g' d d' h') = InternalGameState t p g h (f l) g' d d' h'
 
--- changeGetCard :: (Bool -> Bool) -> GameState -> GameState
--- changeGetCard f (InternalGameState t p g h l g' d d' h') = InternalGameState t p g h l (f g') d d' h'
+changeGetCard :: (Bool -> Bool) -> GameState -> GameState
+changeGetCard f (InternalGameState t p g h l g' d d' h') = InternalGameState t p g h l (f g') d d' h'
 
 changeDisc :: ([Card] -> [Card]) -> GameState -> GameState
 changeDisc f (InternalGameState t p g h l g' d d' h') = InternalGameState t p g h l g' (f d) d' h'
@@ -161,7 +166,7 @@ changeOwner c p = changePlayerMap (Map.insert c p)
 
 -- |Advances to the next turn (and updates the phase).
 nextTurn :: GameState -> GameState
-nextTurn = changePlayer rotate . changePhase (const Reinforce)
+nextTurn = changeGetCard (const False) . changePlayer rotate . changePhase (const Reinforce)
 
 -- |Gets the current StdGen.
 currentStdGen :: GameState -> StdGen
@@ -182,7 +187,7 @@ nextPhase = changePhase advancePhase
 -- |Does nothing if not in 'Attack' 'Phase', otherwise sets phase to 'Attack' 'MiniPhase' 
 -- (inserting the provided 'MiniPhase').
 changeMiniPhase :: MiniPhase -> GameState -> GameState
-changeMiniPhase = changePhase . updateMiniPhase
+changeMiniPhase = (updateCardDrawing .) . changePhase . updateMiniPhase
 
 -- |Returns the list of cards in the player's hand
 cards :: GameState -> Player -> [Card]
