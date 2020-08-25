@@ -12,7 +12,6 @@ import Data.Maybe
 import Control.Monad (join)
 import qualified Data.Map as Map
 import RiskBoard
-import Battle
 import GameElements
 
 data SetupBoardState = InternalGameState
@@ -63,14 +62,17 @@ distinct (x:xs) = (not $ x `elem` xs) && distinct xs
 
 -- public --
 emptyBoard :: [Player] -> SetupState
-emptyBoard ps = Incomplete $ InternalGameState
+emptyBoard ps = if distinct ps then 
+    Incomplete $ InternalGameState 
     (Map.fromList $ zip countries $ repeat 0)
     (Map.fromList $ zip countries $ repeat Nothing)
     ps
     (Map.fromList $ zip ps $ repeat $ initialTroops $ length ps)
+    else errDup
     where
         countries = [(minBound :: Country)..]
-
+        errDup = error "Duplicate players given to emptyBoard"
+        
 placeTroop :: Country -> SetupState -> Maybe SetupState
 placeTroop c (Incomplete s) = case Map.lookup c (playerMap s) of
     Just Nothing -> if valid then Just $ toSetupState $ newBoard else Nothing
@@ -101,13 +103,18 @@ placeTroop c (PartiallyComplete s) = case Map.lookup c (playerMap s) of
 placeTroop _ _ = error "invalid call to placeTroop: called on 'Complete' SetupState."
 
 completeBoardOwner :: SetupState -> Country -> (Player, Int)
-completeBoardOwner (Complete s) c = result
-        where Just result = (,) <$> (join $ Map.lookup c $ playerMap s) <*> (Map.lookup c $ troopMap s)
+completeBoardOwner (Complete s) c = case result of 
+                                    (Just r) -> r
+                                    Nothing  -> error "Shouldn't be possibe. Missing owner in completeBoard!"
+        where 
+          result = (,) <$> (join $ Map.lookup c $ playerMap s) <*> (Map.lookup c $ troopMap s)
 completeBoardOwner _ _ = error "completeBoardOwner only defined for Complete SetupBoardState"
 
 incompleteBoardOwner :: SetupState -> Country -> (Maybe Player, Int)
-incompleteBoardOwner (Incomplete s) c = result
-  where Just result = (,) <$> (Map.lookup c $ playerMap s) <*> (Map.lookup c $ troopMap s)
+incompleteBoardOwner (Incomplete s) c = case result of 
+                                        (Just r) -> r
+                                        Nothing  -> error "incompleteBoardOwner: Map should be total. Shouldn't be possible."
+  where result = (,) <$> (Map.lookup c $ playerMap s) <*> (Map.lookup c $ troopMap s)
 incompleteBoardOwner _ _ = error "incompleteBoardOwner only defined for Incomplete SetupBoardState"
 
 setUpTurnOrder :: SetupState -> [Player]

@@ -11,16 +11,34 @@ import Interface (Game, empty, addPlayer, receive)
 import Message
 import RiskBoard
 import GameElements
+import SetupBoard
 
 
-data ShowableGen = ShowableGen StdGen Int
+data ShowableGen = ShowableGen StdGen Int deriving Eq
+
 newtype Permutation a = Permutation [a]
 
+data NewGame = NewGame Game [Player] ShowableGen deriving Eq
+
+instance Show NewGame where 
+    show (NewGame g ps sg) = "NewGame " ++ show ps ++ " " ++ show sg
+    
 instance Arbitrary ShowableGen where 
     arbitrary = do
         s <- (arbitrary :: Gen Int)
         return $ ShowableGen (mkStdGen s) s
 
+instance Arbitrary NewGame where 
+    arbitrary = do
+        sg@(ShowableGen g _) <- (arbitrary :: Gen ShowableGen)
+        n <- elements [2..5]
+        let (players@(p:_), game) = nPlayerGame g n
+        let game' = snd $ receive (Request p StartGame) game
+        return $ NewGame game' players sg
+
+instance Show a => Show (Permutation a) where
+    show (Permutation s) = show s
+    
 instance Show ShowableGen where 
     show (ShowableGen _ s) = "(mkStdGen " ++ show s ++ ")"
 
@@ -49,6 +67,15 @@ distinct :: Eq a => [a] -> Bool
 distinct [] = True
 distinct (x:xs) = not (x `elem` xs) && distinct xs
 
+manyRequests :: [Request] -> Game -> Maybe (Response, Game)
+manyRequests [] g = Just (undefined, g)
+manyRequests (r:rs) g = maybe Nothing nextReq $ manyRequests rs g
+    where 
+    nextReq (_, g') = let (resp, g'') = receive r g' in  
+                 case resp of
+                         (Invalid _ _) -> Nothing
+                         _ -> Just (resp, g'')
+                        
 spec :: Spec
 spec = do
         describe "addPlayer" $ do
@@ -68,7 +95,7 @@ spec = do
                              throwsException $ snd $ nPlayerGame g n
         
             context "using a non-WaitingRoom" $ do
-                it "should throw an error" $ property $ \sg@(ShowableGen g _) ->
+                it "should throw an error" $
                     pendingWith "test not implemented yet"
 
         describe "Receive" $ do
@@ -84,8 +111,14 @@ spec = do
 
             describe "PlaceTroop" $ do     
                 context "during the Incomplete subphase" $ do
-                    it "places troops correctly for valid input" $ do
-                        pendingWith "test not implemented yet"
+                    it "places troops correctly for valid input" $ property $ \game@(NewGame g ps _) ->
+                        property
+                        $ \(Permutation cs) -> 
+                                 let result = manyRequests (zipWith (flip Request . PlaceTroop) cs ps) g
+                                 in counterexample (show $ cs) $ case result of 
+                                    Just (General (Setup (PartiallyComplete s)), _) -> True
+                                    _ -> False
+                                    
                     it "does not allow players to place troops in occupied countries" $ do
                         pendingWith "test not implemented yet"
                     it "enforces the turn order" $ do

@@ -30,6 +30,9 @@ dependencies:
 
 library:
   source-dirs: src
+  ghc-options:
+  - -Wall 
+  - -fwarn-incomplete-uni-patterns
 
 executables:
   risk-exe:
