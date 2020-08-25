@@ -73,7 +73,7 @@ module Interface  (
   -- Reinforce
   receive (Request s (M.Reinforce troopMap)) g@(GamePlay gstate)
     | s == currentPlayer gstate =
-      case reinforce troopMap gstate of
+      case reinforce None troopMap gstate of
         Nothing -> (Invalid InvalidMove s, g)
         Just gstate' -> (General (Play gstate'), GamePlay gstate')
     | otherwise = (Invalid NotYourTurn s, g)

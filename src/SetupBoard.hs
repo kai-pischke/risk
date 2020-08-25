@@ -3,6 +3,7 @@ module SetupBoard
           emptyBoard,
           placeTroop,
           completeBoardOwner,
+          partiallyCompleteBoardOwner,
           incompleteBoardOwner,
           setUpTurnOrder
         ) where
@@ -105,10 +106,18 @@ placeTroop _ _ = error "invalid call to placeTroop: called on 'Complete' SetupSt
 completeBoardOwner :: SetupState -> Country -> (Player, Int)
 completeBoardOwner (Complete s) c = case result of 
                                     (Just r) -> r
-                                    Nothing  -> error "Shouldn't be possibe. Missing owner in completeBoard!"
+                                    Nothing  -> error "Shouldn't be possibe. Missing owner in CompleteBoard!"
         where 
           result = (,) <$> (join $ Map.lookup c $ playerMap s) <*> (Map.lookup c $ troopMap s)
 completeBoardOwner _ _ = error "completeBoardOwner only defined for Complete SetupBoardState"
+
+partiallyCompleteBoardOwner :: SetupState -> Country -> (Player, Int)
+partiallyCompleteBoardOwner (PartiallyComplete s) c = case result of 
+                                    (Just r) -> r
+                                    Nothing  -> error "Shouldn't be possibe. Missing owner in PartiallyCompleteBoard!"
+        where 
+          result = (,) <$> (join $ Map.lookup c $ playerMap s) <*> (Map.lookup c $ troopMap s)
+partiallyCompleteBoardOwner _ _ = error "partiallyCompleteBoardOwner only defined for PartiallyComplete SetupBoardState"
 
 incompleteBoardOwner :: SetupState -> Country -> (Maybe Player, Int)
 incompleteBoardOwner (Incomplete s) c = case result of 

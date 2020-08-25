@@ -6,6 +6,7 @@ module ParseSpec where
   import Parse
   import Data.ByteString.Lazy.UTF8 (ByteString, fromString)
   import Data.ByteString.Lazy.Char8 (unpack)
+  import Data.Bifunctor (first)
   import System.Random
   import GameElements
   import RiskBoard
@@ -261,44 +262,42 @@ module ParseSpec where
     describe "Encode" $ do
       context "WaitingRoom" $ do
         it "Correctly encodes" $ do
-          wellFormedWaitingRoom [] (encodeResponse (General (WaitingRoom []))) `shouldBe` True
-          wellFormedWaitingRoom [Green] (encodeResponse (General (WaitingRoom [Green]))) `shouldBe` True
-          wellFormedWaitingRoom [Blue, Black, Green] (encodeResponse (General (WaitingRoom [Blue, Black, Green]))) `shouldBe` True
-          wellFormedWaitingRoom [Blue, Blue]  (encodeResponse (General (WaitingRoom [Blue, Blue]))) `shouldBe` True
+          (encodeResponse (General (WaitingRoom []))) `shouldSatisfy` wellFormedWaitingRoom []
+          (encodeResponse (General (WaitingRoom [Green]))) `shouldSatisfy` wellFormedWaitingRoom [Green] 
+          (encodeResponse (General (WaitingRoom [Blue, Black, Green]))) `shouldSatisfy` wellFormedWaitingRoom [Blue, Black, Green]
+          (encodeResponse (General (WaitingRoom [Blue, Blue]))) `shouldSatisfy` wellFormedWaitingRoom [Blue, Blue]
 
       context "Setup" $ do
         it "Correctly encodes incomplete" $ do
           let state1 = emptyBoard [Yellow, Blue]
-          wellFormedSetup (incompleteBoardOwner state1) (setUpTurnOrder state1) (encodeResponse (General (Setup state1))) `shouldBe` True
+          (encodeResponse (General (Setup state1))) `shouldSatisfy` wellFormedSetup (incompleteBoardOwner state1) (setUpTurnOrder state1)
 
         it "Correctly encodes partially complete" $ do
-          let state2 = placeList [toEnum 0..toEnum 40] (emptyBoard [Yellow, Green, Blue])
-          pendingWith ("Need partiallyCompleteBoardOwner")
-          --wellFormedSetup (partiallyCompleteBoardOwner state2) [Yellow, Green, Blue] (encodeResponse (General (Setup state2))) `shouldBe` True
+          let state2 = placeList [toEnum 0..toEnum 41] (emptyBoard [Yellow, Green, Blue])
+          (encodeResponse (General (Setup state2))) `shouldSatisfy` wellFormedSetup (first Just . partiallyCompleteBoardOwner state2) [Yellow, Green, Blue]  
 
         it "Correctly encodes complete" $ do
           let state3 = placeList ([toEnum 0..toEnum 41] ++ [toEnum 0..toEnum 41] ++ [toEnum 0 .. toEnum 20])  (emptyBoard [Red, Green, Blue])
-          let toMaybeFunc g c= (Just $ fst (g c), snd (g c))
-          wellFormedSetup (toMaybeFunc $ completeBoardOwner state3) [Red, Green, Blue] (encodeResponse (General (Setup state3))) `shouldBe` True
+          (encodeResponse (General (Setup state3))) `shouldSatisfy` wellFormedSetup (first Just . completeBoardOwner state3) [Red, Green, Blue]  
 
       context "Game" $ do
         it "Correctly encodes in Reinforce" $ do
-          wellFormedGame game (encodeResponse (General (Play game))) `shouldBe` True
+          (encodeResponse (General (Play game))) `shouldSatisfy` wellFormedGame game
         it "Correctly encodes in Attack Normal" $ do
           let game' = nextPhase game
-          wellFormedGame game' (encodeResponse (General (Play game'))) `shouldBe` True
+          (encodeResponse (General (Play game'))) `shouldSatisfy` wellFormedGame game'
         it "Correctly encodes in Attack MidBattle" $ do
           let game' =  changeMiniPhase (MidBattle NorthAfrica SouthAfrica ThreeAtt) $ nextPhase game
-          wellFormedGame game' (encodeResponse (General (Play game'))) `shouldBe` True
+          (encodeResponse (General (Play game'))) `shouldSatisfy` wellFormedGame game'
         it "Correctly encodes in Attack WonBattle" $ do
           let game' = changeMiniPhase (WonBattle NorthAfrica SouthAfrica OneAtt) $ nextPhase game
-          wellFormedGame game' (encodeResponse (General (Play game'))) `shouldBe` True
+          (encodeResponse (General (Play game'))) `shouldSatisfy` wellFormedGame game'
         it "Correctly encodes in Fortify" $ do
           let game' = nextPhase $ nextPhase game
-          wellFormedGame game' (encodeResponse (General (Play game'))) `shouldBe` True
+          (encodeResponse (General (Play game'))) `shouldSatisfy` wellFormedGame game'
         it "Correctly encodes on next turn" $ do
           let game' = nextTurn game
-          wellFormedGame game' (encodeResponse (General (Play game'))) `shouldBe` True
+          (encodeResponse (General (Play game'))) `shouldSatisfy` wellFormedGame game'
 
       context "Error" $ do
         it "Correctly encodes InvalidMove" $ do
