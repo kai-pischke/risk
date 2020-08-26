@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: fe2df18c218b543114d8ce009541f580bcb6c7083313b6a43aa96ca10273aceb
+-- hash: 6479596840d86d6e7bcb6985bb22c3c205831012cca41c8bb0dab61abad919d1
 
 name:           risk
 version:        0.1.0.0
@@ -44,6 +44,7 @@ library
       Paths_risk
   hs-source-dirs:
       src
+  ghc-options: -Wall -fwarn-incomplete-uni-patterns
   build-depends:
       aeson
     , base >=4.8 && <5
