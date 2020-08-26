@@ -24,10 +24,7 @@ import Data.Map(assocs)
 import SetupBoard
 import qualified State as S (MiniPhase(..), Phase(..), turnOrder, phase, troops, owner)
 import RiskBoard (Country)
---import GameElements (Player)
-
-import Debug.Trace (trace)
-import GameElements
+import GameElements (Player)
 ---------------------------------------------
 
 ---- Helper DataType ------------------------
@@ -193,6 +190,10 @@ instance ToJSON Response where
             getOwnerTroopMap:: Country -> Map String (Switch Int String)
             getOwnerTroopMap c = fromList [("number_of_troops", LSwitch $ S.troops g c), ("owner", RSwitch $ show $ S.owner g c)]
 
+    toJSON (General (GameWon p)) =
+        object [pack "kind" .= pack "State",
+                pack "state" .= pack "Won",
+                pack "winner" .= pack $ show p]
 ---- Special Questions ----------------------
 
     toJSON (Special NumDefenders p) =
