@@ -77,7 +77,7 @@ module ParseSpec where
     ]
 
   reinforceValid = [
-    "{\"action\": \"Reinforce\", \"sender\": \"Yellow\", \"troops\": { \'\' }}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Yellow\", \"troops\": { \"\" }}",
     "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Alaska\": 3}}",
     "{\"action\": \"Reinforce\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"Congo\":0, \"East Africa\" : 7}}"
     ]
@@ -85,11 +85,11 @@ module ParseSpec where
   reinforceValidDecoded = [
     Request Yellow (M.Reinforce []),
     Request Blue (M.Reinforce [(Alaska, 3)]),
-    Request Green (M.Reinforce [(Alaska, 3), (EastAfrica, 7), (Congo,0)])
+    Request Green (M.Reinforce [(Alaska, 3), (Congo,0), (EastAfrica, 7)])
     ]
 
   reinforceInvalid = [
-    "{\"action\": \"Reiorce\", \"sender\": \"Yellow\", \"troops\": { \'\' }}",
+    "{\"action\": \"Reiorce\", \"sender\": \"Yellow\", \"troops\": { \"\" }}",
     "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Aska\": 3}}",
     "{\"action\": \"Reinforce\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"East Africa\" : \"20\", \"Congo\":0}}",
     "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Ontario\"}}",
@@ -403,7 +403,7 @@ module ParseSpec where
     && "\"kind\":\"MidBattle\"" `elem` fields
     && "\"attacking_country\":\"" ++ show catt ++ "\"" `elem` fields
     && "\"defending_country\":\"" ++ show cdef ++ "\"" `elem` fields
-    && "\"attackers\":" ++ show (fromEnum att) ++ "\"" `elem` fields
+    && "\"attackers\":" ++ show (fromEnum att) `elem` fields
     where fields = splitOn ',' (drop 1 (init s))
 
   validPhase (S.Attack (WonBattle catt cdef att)) s =
@@ -412,7 +412,7 @@ module ParseSpec where
     && "\"kind\":\"BattleEnd\"" `elem` fields
     && "\"attacking_country\":\"" ++ show catt ++ "\"" `elem` fields
     && "\"defending_country\":\"" ++ show cdef ++ "\"" `elem` fields
-    && "\"attackers_remaining\":" ++ show (fromEnum att) ++ "\"" `elem` fields
+    && "\"attackers_remaining\":" ++ show (fromEnum att) `elem` fields
     where fields = splitOn ',' (drop 1 (init s))
 
   validPhase (S.Attack Normal) s =
