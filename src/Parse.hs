@@ -19,11 +19,15 @@ import Data.Text (pack)
 import Data.Maybe (fromJust)
 import Text.Read (readMaybe)
 import Data.Typeable (typeOf)
+import qualified Data.Map as Map (lookup)
 
 import SetupBoard
 import qualified State as S (MiniPhase(..), Phase(..), turnOrder, phase, troops, owner)
 import RiskBoard (Country)
-import GameElements (Player)
+--import GameElements (Player)
+
+import Debug.Trace (trace)
+import GameElements
 ---------------------------------------------
 
 ---- Helper DataType ------------------------
@@ -111,10 +115,15 @@ instance FromJSON Request where
             else if (requestType == ("Reinforce" :: String))
                 then do
                     troops <- v.: pack "troops"
-                    let troopsR = map (\x -> (readMaybe $ fst x, snd x)) troops
-                    if (any (\p -> fst p == Nothing) troopsR)
+                    t <- parseJSON troops
+                    {-let troopsR = map (\x -> (readMaybe $ fst x, snd x)) t
+
+                    if (any (\p -> fst p == Nothing) troopsR)-}
+                    let troopsR = (filter (\p -> snd p /= Nothing) .map (\c -> (c, Map.lookup (show c) t))) [minBound ::Country ..]
+                    let troopsFromMaybe = map (\p -> (fst p, fromJust $ snd p)) troopsR
+                    if not (all (\p -> (typeOf $ snd p) == typeOf (1 :: Int)) troopsFromMaybe)
                         then do mempty
-                        else do return (Request (fromJust senderR) (Reinforce $ map (\p -> (fromJust $ fst p, snd p)) troopsR))
+                        else do return (Request (fromJust senderR) (Reinforce $ troopsFromMaybe))
             else if (requestType == ("Fortify" :: String))
                 then do
                     fc <- v .: pack "from_country"

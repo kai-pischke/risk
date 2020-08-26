@@ -65,41 +65,75 @@ spec = do
             it  "Only allows for neighbouring countries" $ do
                 (fortify Siam WesternAustralia 2 testGame == Nothing) `shouldBe` True
 
--- PLEASE FIX TO WORK WITH NEW TYPE SIGNATURE -- 
-{-
+-- PLEASE FIX REINFORCE WITH NEW TYPE SIGNATURE --
 
+{-
     describe "Reinforce" $ do
         let testGame = game
         context "Valid Inputs" $ do
             it "Reinforcing one country" $ do
-                let t1g = (fromJust.(reinforce [(WesternAustralia,5)])) testGame
-                (troops t1g WesternAustralia == 8) `shouldBe` True
+                let t1g = (fromJust.(reinforce None [(WesternAustralia,3)])) testGame
+                (troops t1g WesternAustralia == 6) `shouldBe` True
 
             it "Reinforcing multiple country" $ do
-                let t1g = (fromJust.(reinforce [(WesternAustralia,2), (Siam, 3)])) testGame
+                let t1g = (fromJust.(reinforce None [(WesternAustralia,2), (Siam, 1)])) testGame
                 (troops t1g WesternAustralia == 5) `shouldBe` True
-                (troops t1g Siam == 6) `shouldBe` True
+                (troops t1g Siam == 4) `shouldBe` True
+
+            it "Using Cards" $ do
+                let t1g = (fromJust.(reinforce [Artillery, Artillery, Artillery] [(WesternAustralia,11)])) testGame
+                (troops t1g WesternAustralia == 14) `shouldBe` True
+
+            it "Picks the best option when using Cards" $ do
+                let t1g = (fromJust.(reinforce [Wild, Wild, Infantry] [(WesternAustralia,13)])) testGame
+                (troops t1g WesternAustralia == 16) `shouldBe` True
 
         context "Invalid Inputs" $ do
             it "Reinforcing a country owned by another Player" $ do
-                (reinforce [(EasternAustralia, 5)] testGame == Nothing) `shouldBe` True
-                (reinforce [(WesternAustralia, 3), (EasternAustralia, 2)] testGame == Nothing) `shouldBe` True
-
-            it "Reinforcing a country owned by no-one" $ do
-                (reinforce [(India, 5)] testGame == Nothing) `shouldBe` True
-                (reinforce [(WesternAustralia, 3), (India, 2)] testGame == Nothing) `shouldBe` True
+                (reinforce None [(EasternAustralia, 3)] testGame == Nothing) `shouldBe` True
+                (reinforce None [(WesternAustralia, 1), (EasternAustralia, 2)] testGame == Nothing) `shouldBe` True
 
             it "Doesn't let reinforce with invalid number of troops" $ do
-               (reinforce [(WesternAustralia,4)] testGame == Nothing) `shouldBe` True
-               (reinforce [(WesternAustralia,6)] testGame == Nothing) `shouldBe` True
+               (reinforce None [(WesternAustralia,4)] testGame == Nothing) `shouldBe` True
+               (reinforce None [(WesternAustralia,6)] testGame == Nothing) `shouldBe` True
 
-               (reinforce [(WesternAustralia, 5), (Siam, 2)] testGame == Nothing) `shouldBe` True
-               (reinforce [(WesternAustralia, 2), (Siam, 2)] testGame == Nothing) `shouldBe` True
+               (reinforce None [(WesternAustralia, 5), (Siam, 2)] testGame == Nothing) `shouldBe` True
+               (reinforce None [(WesternAustralia, 2), (Siam, 2)] testGame == Nothing) `shouldBe` True
 
-            -- Trying to reinforce with more than valid num of troops
+               (reinforce [Artillery, Artillery, Artillery] [(WesternAustralia, 5), (Siam, 2)] testGame == Nothing) `shouldBe` True
+               (reinforce [Artillery, Artillery, Artillery] [(WesternAustralia, 21), (Siam, 2)] testGame == Nothing) `shouldBe` True
+
+            it "Doesn't work with invalid cards" $ do
+                (reinforce [Artillery, Cavalry, Artillery] [(WesternAustralia, 5), (Siam, 2)] testGame) `shouldBe` Nothing
+                (reinforce [Cavalry, Cavalry, Artillery] [(WesternAustralia, 5), (Siam, 2)] testGame) `shouldBe` Nothing
+
+-}
 
 
+    describe "Attack" $ do
+        let testGame = (nextPhase) game
+        context "Valid Inputs" $ do
+            it "Correctly leaves it in the correct MidBattle miniphase" $ do
+                let t1g = (fromJust . attack WesternAustralia EasternAustralia TwoAtt) testGame
+                (phase t1g) `shouldBe` Attack $ MidBattle WesternAustralia EasternAustralia TwoAtt
+        context "Invalid Inputs" $ do
+            it "Check it doesn't work in any other phase/miniphase" $ do
+                ((attack WesternAustralia EasternAustralia OneAtt) game == Nothing) `shouldBe` True
+                (((attack WesternAustralia EasternAustralia OneAtt).changeMiniPhase (WonBattle EasternAustralia WesternAustralia TwoAtt).nextPhase) game == Nothing) `shouldBe` True
+                (((attack WesternAustralia EasternAustralia OneAtt).nextPhase.nextPhase) game == Nothing) `shouldBe` True
 
+            it "Check it doesn't work if you try and attack with too many troops" $ do
+                let t1g = changeTroops WesternAustralia (-2) testGame
+                ((attack WesternAustralia EasternAustralia TwoAtt) t1g == Nothing) `shouldBe` True
+
+            it "Doesn't let you attack with an invalid country pair" $ do
+                ((attack WesternAustralia Peru OneAtt testGame == Nothing) `shouldBe` True)
+                ((attack Siam Indonesia OneAtt testGame == Nothing) `shouldBe` True)
+                ((attack EasternAustralia WesternAustralia OneAtt testGame == Nothing) `shouldBe` True)
+                ((attack Peru Brazil OneAtt testGame == Nothing) `shouldBe` True)
+                ((attack WesternAustralia WesternAustralia OneAtt testGame == Nothing) `shouldBe` True)
+                ((attack EasternAustralia EasternAustralia OneAtt testGame == Nothing) `shouldBe` True)
+{-
     describe "Attack" $ do
         let testGame = (nextPhase) game
         context "Valid Inputs" $ do

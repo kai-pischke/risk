@@ -79,7 +79,7 @@ module ParseSpec where
   reinforceValid = [
     "{\"action\": \"Reinforce\", \"sender\": \"Yellow\", \"troops\": { \'\' }}",
     "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Alaska\": 3}}",
-    "{\"action\": \"Reinforce\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"East Africa\" : 7, \"Congo\":0}}"
+    "{\"action\": \"Reinforce\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"Congo\":0, \"East Africa\" : 7}}"
     ]
 
   reinforceValidDecoded = [
