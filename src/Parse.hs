@@ -75,6 +75,10 @@ encodeResponse = encode
 
 setupBoardOwner:: SetupState -> Country -> (Maybe Player, Int)
 setupBoardOwner (Incomplete s) c = incompleteBoardOwner (Incomplete s) c
+setupBoardOwner (PartiallyComplete s)  c = (Just p, n)
+    where
+        (p,n) = (partiallyCompleteBoardOwner (PartiallyComplete s) c)
+
 setupBoardOwner s c = (Just p, n)
     where
         (p,n) = (completeBoardOwner s c)
