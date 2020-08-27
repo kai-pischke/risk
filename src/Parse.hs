@@ -190,10 +190,6 @@ instance ToJSON Response where
             getOwnerTroopMap:: Country -> Map String (Switch Int String)
             getOwnerTroopMap c = fromList [("number_of_troops", LSwitch $ S.troops g c), ("owner", RSwitch $ show $ S.owner g c)]
 
-    toJSON (General (GameWon p)) =
-        object [pack "kind" .= pack "State",
-                pack "state" .= pack "Won",
-                pack "winner" .= pack $ show p]
 ---- Special Questions ----------------------
 
     toJSON (Special NumDefenders p) =
@@ -206,3 +202,9 @@ instance ToJSON Response where
         object [pack "kind".= pack "Error",
                 pack "error" .= (pack $ show e),
                 pack "player" .= (pack $ show p)]
+
+---- Game Won -------------------------------
+    toJSON (GameWon p) =
+        object [pack "kind" .= pack "State",
+                pack "state" .= pack "Won",
+                pack "winner" .= (pack $ show p)]

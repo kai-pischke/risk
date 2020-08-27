@@ -115,7 +115,7 @@ spec = do
         context "Valid Inputs" $ do
             it "Correctly leaves it in the correct MidBattle miniphase" $ do
                 let t1g = (fromJust . attack WesternAustralia EasternAustralia TwoAtt) testGame
-                (phase t1g) `shouldBe` Attack $ MidBattle WesternAustralia EasternAustralia TwoAtt
+                (phase t1g) `shouldBe` (Attack $ MidBattle WesternAustralia EasternAustralia TwoAtt)
         context "Invalid Inputs" $ do
             it "Check it doesn't work in any other phase/miniphase" $ do
                 ((attack WesternAustralia EasternAustralia OneAtt) game == Nothing) `shouldBe` True
@@ -133,56 +133,49 @@ spec = do
                 ((attack Peru Brazil OneAtt testGame == Nothing) `shouldBe` True)
                 ((attack WesternAustralia WesternAustralia OneAtt testGame == Nothing) `shouldBe` True)
                 ((attack EasternAustralia EasternAustralia OneAtt testGame == Nothing) `shouldBe` True)
-{-
+
     describe "Attack" $ do
         let testGame = (nextPhase) game
         context "Valid Inputs" $ do
             it "Correctly updates attackers,defenders and stdGen" $ do
-                let t1g = (fromJust . attack WesternAustralia EasternAustralia TwoAtt) testGame
+                let t1g = (fromJust. chooseDefenders TwoDef. attack WesternAustralia EasternAustralia TwoAtt) testGame
 
                 (troops t1g WesternAustralia == 2) `shouldBe` True
                 (troops t1g EasternAustralia == 2) `shouldBe` True
                 ((currentStdGen t1g) == mkStdGen 0) `shouldBe` False
                 (phase t1g == Attack Normal) `shouldBe` True
             it "Correctly leaves game in WonBattle state if defenders wiped out" $ do
-                let t1g = (fromJust . attack WesternAustralia EasternAustralia ThreeAtt . updateStdGen (mkStdGen 3).changeTroops WesternAustralia 1 .(changeTroops EasternAustralia (-2))) testGame
+                let t1g = (fromJust. chooseDefenders OneDef. attack WesternAustralia EasternAustralia ThreeAtt . updateStdGen (mkStdGen 3).changeTroops WesternAustralia 1 .(changeTroops EasternAustralia (-2))) testGame
                 (phase t1g == Attack (WonBattle WesternAustralia EasternAustralia ThreeAtt))
-
 
         context "Invalid Inputs" $ do
             it "Check it doesn't work in any other phase/miniphase" $ do
-                ((attack WesternAustralia EasternAustralia OneAtt OneDef) game == Nothing) `shouldBe` True
-                (((attack WesternAustralia EasternAustralia OneAtt OneDef).changeMiniPhase (WonBattle EasternAustralia WesternAustralia TwoAtt).nextPhase) game == Nothing) `shouldBe` True
-                (((attack WesternAustralia EasternAustralia OneAtt OneDef).nextPhase.nextPhase) game == Nothing) `shouldBe` True
+                ((chooseDefenders OneDef . attack WesternAustralia EasternAustralia OneAtt) game == Nothing) `shouldBe` True
+                (((chooseDefenders OneDef . attack WesternAustralia EasternAustralia OneAtt).changeMiniPhase (WonBattle EasternAustralia WesternAustralia TwoAtt).nextPhase) game == Nothing) `shouldBe` True
+                (((chooseDefenders OneDef . attack WesternAustralia EasternAustralia OneAtt).changeMiniPhase (MidBattle EasternAustralia WesternAustralia TwoAtt).nextPhase) game == Nothing) `shouldBe` True
+                (((chooseDefenders OneDef . attack WesternAustralia EasternAustralia OneAtt).nextPhase.nextPhase) game == Nothing) `shouldBe` True
 
-            it "Check it doesn't work if you try and attack with too many troops" $ do
-                let t1g = changeTroops WesternAustralia (-2) testGame
-                ((attack WesternAustralia EasternAustralia TwoAtt OneDef) game == Nothing) `shouldBe` True
-
-            it "Doesn't let you attack with an invalid country pair" $ do
-                ((attack WesternAustralia Peru OneAtt OneDef testGame == Nothing) `shouldBe` True)
-                ((attack Siam Indonesia OneAtt OneDef testGame == Nothing) `shouldBe` True)
-                ((attack EasternAustralia WesternAustralia OneAtt OneDef testGame == Nothing) `shouldBe` True)
-                ((attack Peru Brazil OneAtt OneDef testGame == Nothing) `shouldBe` True)
-                ((attack WesternAustralia WesternAustralia OneAtt OneDef testGame == Nothing) `shouldBe` True)
-                ((attack EasternAustralia EasternAustralia OneAtt OneDef testGame == Nothing) `shouldBe` True)
-
--}
+            it "Check it doesn't work if you try and defend with too many troops" $ do
+                let t1g = changeTroops EasternAustralia (-2) testGame
+                ((chooseDefenders TwoDef .attack WesternAustralia EasternAustralia TwoAtt) game == Nothing) `shouldBe` True
 
     describe "Invade" $ do
         let testGame = nextPhase game
         context "Valid Inputs" $ do
             it "Check it moves the troops correctly" $ do
                 let t1g = (fromJust.invade 2.changeMiniPhase (WonBattle WesternAustralia EasternAustralia TwoAtt).changeTroops EasternAustralia (-3)) testGame
-                (owner t1g EasternAustralia == Red `shouldBe` True)
-                (troops t1g EasternAustralia == 2 `shouldBe` True)
-                (troops t1g WesternAustralia == 1 `shouldBe` True)
+                (owner t1g EasternAustralia == Red) `shouldBe` True
+                (troops t1g EasternAustralia == 2) `shouldBe` True
+                (troops t1g WesternAustralia == 1) `shouldBe` True
 
             it "Check it moves the troops correctly on another players turn" $ do
                 let t1g = (fromJust.invade 2.changeMiniPhase (WonBattle EasternAustralia WesternAustralia TwoAtt).(changeTroops WesternAustralia (-3)) .nextPhase.nextTurn) testGame
-                (owner t1g WesternAustralia == Blue `shouldBe` True)
-                (troops t1g EasternAustralia == 1 `shouldBe` True)
-                (troops t1g WesternAustralia == 2 `shouldBe` True)
+                (owner t1g WesternAustralia == Blue) `shouldBe` True
+                (troops t1g EasternAustralia == 1) `shouldBe` True
+                (troops t1g WesternAustralia == 2) `shouldBe` True
+            it "Correctly kicks a player when they loose all their territory" $ do
+                let t1g = (fromJust.invade 1. changeMiniPhase (WonBattle WesternAustralia NewGuinea OneAtt).(changeTroops NewGuinea (-100))) testGame
+                (elem Green (turnOrder t1g)) `shouldBe` False
 
         context "Invalid Inputs" $ do
             it "Check it doesn't work in any other phase/miniphase" $ do
