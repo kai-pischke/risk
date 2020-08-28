@@ -82,6 +82,7 @@ test-suite risk-test
       BattleSpec
       GraphSpec
       InterfaceSpec
+      MovesSpec
       ParseSpec
       RiskBoardSpec
       SetupBoardSpec

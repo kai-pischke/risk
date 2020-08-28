@@ -28,6 +28,11 @@ instance Arbitrary ShowableGen where
         s <- (arbitrary :: Gen Int)
         return $ ShowableGen (mkStdGen s) s
 
+instance Arbitrary Country where 
+    arbitrary = do 
+        c <- elements [minBound..]
+        return c
+        
 instance Arbitrary NewPartial where 
     arbitrary = do
         NewGame g ps sg <- (arbitrary :: Gen NewGame)
@@ -138,10 +143,17 @@ spec = do
                 context "during the Incomplete subphase" $ do
                     it "places troops correctly for valid input" $ property $ \game ->
                         game /= NewPartialError
-                    it "does not allow players to place troops in occupied countries" $ do
-                        pendingWith "test not implemented yet"
-                    it "enforces the turn order" $ do
-                        pendingWith "test not implemented yet"
+                    it "does not allow players to place troops in occupied countries" $ property $ do
+                        NewGame g ps sg <- (arbitrary :: Gen NewGame)
+                        cs <- (arbitrary :: Gen [Country])
+                        let result = maybeRequests (zipWith (flip Request . PlaceTroop) cs (cycle ps)) g
+                        return $ (not $ distinct cs) ==> (result === Nothing)
+                    it "enforces the turn order" $ property $ do
+                        NewGame g ps sg <- (arbitrary :: Gen NewGame)
+                        Permutation cs <- (arbitrary :: Gen (Permutation Country))
+                        order <- vectorOf (length cs) (elements ps)
+                        let result = maybeRequests (zipWith (flip Request . PlaceTroop) cs order) g
+                        return $ (not $ and $ zipWith (==) order (cycle ps)) ==> (result === Nothing)
                 context "during the PartiallyComplete subphase" $ do
                     it "places troops correctly for valid input" $ do
                         pendingWith "test not implemented yet"
