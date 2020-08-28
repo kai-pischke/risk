@@ -27,12 +27,13 @@ Request = Request Player RequestType
 RequestType = StartGame
             | PlaceTroop Country
             | Attack Country Country Attackers
-            | Reinforce [(Country, Int)]
+            | Reinforce TradeIn [(Country, Int)]
             | Fortify Country Country Int
             | Invade Int
             | ChooseDefenders Defenders
             | EndAttack
             | SkipFortify
+            | Trade TradeIn [(Country, Int)]
 ```
 
 ## Interface.hs
