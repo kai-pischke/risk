@@ -144,7 +144,7 @@ useCard :: Player -> Card -> GameState -> GameState
 puts the card in the discard pile
 
 ```hs
-drawCard :: Player -> ([Card] -> [Card]) -> GameState -> GameState
+drawCard :: Player -> ([Card] -> StdGen -> ([Card],StdGen)) -> GameState -> GameState
 ```
 Adds the top card to the player's hand. Shuffles the discard pile if necessary.
 
