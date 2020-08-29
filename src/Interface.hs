@@ -33,7 +33,7 @@ module Interface  (
   --------------------------------------
 
   ---- Public Functions ----------------
-  
+
   -- |Creates a new empty game with a given 'StdGen'.
   empty :: StdGen -> Game
   empty stdGen = (GameWR [] stdGen)
@@ -59,12 +59,15 @@ module Interface  (
 
   -- PlaceTroop
   receive (Request s (PlaceTroop c)) g@(GameSetup sstate ps std) =
-    case sstate of
-      Complete boardState -> (Invalid SetupComplete s, g)
-      _ -> case placeTroop c sstate of
-        Just (Complete boardState) -> let g' = newGame ps (completeBoardOwner (Complete boardState)) std in (General (Play g'), GamePlay g')
-        Just sstate' -> (General (Setup sstate'), GameSetup sstate' ps std)
-        Nothing -> (Invalid InvalidMove s, g)
+    if s == (head (setUpTurnOrder sstate))
+      then
+        case sstate of
+          Complete _ -> (Invalid SetupComplete s, g)
+          _ -> case placeTroop c sstate of
+            Just (Complete boardState) -> let g' = newGame ps (completeBoardOwner (Complete boardState)) std in (General (Play g'), GamePlay g')
+            Just sstate' -> (General (Setup sstate'), GameSetup sstate' ps std)
+            Nothing -> (Invalid InvalidMove s, g)
+      else (Invalid NotYourTurn s, g)
 
   receive (Request s (PlaceTroop _)) g = (Invalid NotInSetup s, g)
 
@@ -119,7 +122,7 @@ module Interface  (
     | otherwise = (Invalid NotRequestingDefenders s, g)
     where valid =
             case phase gstate of
-              State.Attack (MidBattle cAtt cDef att) -> s == owner gstate cDef
+              State.Attack (MidBattle _ cDef _) -> s == owner gstate cDef
               _ -> False
 
   receive (Request s (ChooseDefenders _)) g = (Invalid NotInPlay s, g)
@@ -140,6 +143,7 @@ module Interface  (
         Nothing -> (Invalid InvalidMove s, g)
         Just gstate' -> (General (Play gstate'), GamePlay gstate')
     | otherwise = (Invalid NotYourTurn s, g)
+  receive (Request s SkipFortify) g = (Invalid InvalidMove s, g)
 
   --------------------------------------
 
