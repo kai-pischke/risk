@@ -27,6 +27,7 @@ import RiskBoard (Country)
 import GameElements (Player)
 ---------------------------------------------
 
+
 ---- Helper DataType ------------------------
 data Switch a b = LSwitch a | RSwitch b
 
@@ -117,6 +118,7 @@ instance FromJSON Request where
                 then do
                     troops <- v.: pack "troops"
                     t <- parseJSON troops
+
                     {-let troopsR = map (\x -> (readMaybe $ fst x, snd x)) t
 
                     -}
