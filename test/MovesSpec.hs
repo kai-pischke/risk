@@ -22,7 +22,7 @@ c Indonesia =  (Red, 3)
 c Siam = (Red, 3)
 c Brazil = (Blue, 3)
 c Peru =  (Blue, 3)
-c _ = (Black, 3)
+c _ = (Blue, 3)
 
 
 
@@ -186,9 +186,9 @@ spec = do
 
             it "Check it moves the troops correctly on another players turn" $ do
                 let t1g = (fromJust.invade 2.changeMiniPhase (WonBattle EasternAustralia WesternAustralia TwoAtt).(changeTroops WesternAustralia (-3)) .nextPhase.nextTurn) testGame
-                (owner t1g WesternAustralia == Blue) `shouldBe` True
-                (troops t1g EasternAustralia == 1) `shouldBe` True
-                (troops t1g WesternAustralia == 2) `shouldBe` True
+                (owner t1g WesternAustralia) `shouldBe` Blue
+                (troops t1g EasternAustralia) `shouldBe` 1
+                (troops t1g WesternAustralia) `shouldBe` 2
             it "Correctly kicks a player when they loose all their territory" $ do
                 let t1g = (fromJust.invade 1. changeMiniPhase (WonBattle WesternAustralia NewGuinea OneAtt).(changeTroops NewGuinea (-100))) testGame
                 (elem Green (turnOrder t1g)) `shouldBe` False
