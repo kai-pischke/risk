@@ -9,9 +9,10 @@ import Battle
 import System.Random
 import GameElements
 
-spec :: Spec
 
-game = newGame [Red, Blue, Green] c (mkStdGen 0)
+
+game = newGame [Red, Blue, Green] c $ mkStdGen 0
+
 
 c:: Country -> (Player, Int)
 c WesternAustralia  = (Red, 3)
@@ -24,6 +25,14 @@ c Peru =  (Blue, 3)
 c _ = (Black, 3)
 
 
+
+instance Arbitrary StdGen where
+    arbitrary = do
+        n <- (arbitrary :: Gen Int)
+        return $ mkStdGen n
+
+
+spec :: Spec
 spec = do
     describe "Fortify" $ do
         let testGame = (nextPhase.nextPhase) game
@@ -56,14 +65,10 @@ spec = do
             it "Doesn't let another player fortify" $ do
                 fortify Brazil Peru 2 testGame `shouldBe` Nothing
 
-
         context "Rule variations" $ do
             it  "Only allows for neighbouring countries" $ do
                 fortify Siam WesternAustralia 2 testGame `shouldBe` Nothing
 
--- PLEASE FIX REINFORCE WITH NEW TYPE SIGNATURE --
-
-{-
     describe "Reinforce" $ do
         let testGame = game
         context "Valid Inputs" $ do
@@ -77,11 +82,11 @@ spec = do
                 (troops t1g Siam == 4) `shouldBe` True
 
             it "Using Cards" $ do
-                let t1g = (fromJust.(reinforce [Artillery, Artillery, Artillery] [(WesternAustralia,11)])) testGame
+                let t1g = (fromJust.(reinforce (OneSet (Artillery, Artillery, Artillery)) [(WesternAustralia,11)])) testGame
                 (troops t1g WesternAustralia == 14) `shouldBe` True
 
             it "Picks the best option when using Cards" $ do
-                let t1g = (fromJust.(reinforce [Wild, Wild, Infantry] [(WesternAustralia,13)])) testGame
+                let t1g = (fromJust.(reinforce (OneSet (Wild, Wild, Infantry)) [(WesternAustralia,13)])) testGame
                 (troops t1g WesternAustralia == 16) `shouldBe` True
 
         context "Invalid Inputs" $ do
@@ -96,14 +101,14 @@ spec = do
                (reinforce None [(WesternAustralia, 5), (Siam, 2)] testGame == Nothing) `shouldBe` True
                (reinforce None [(WesternAustralia, 2), (Siam, 2)] testGame == Nothing) `shouldBe` True
 
-               (reinforce [Artillery, Artillery, Artillery] [(WesternAustralia, 5), (Siam, 2)] testGame == Nothing) `shouldBe` True
-               (reinforce [Artillery, Artillery, Artillery] [(WesternAustralia, 21), (Siam, 2)] testGame == Nothing) `shouldBe` True
+               (reinforce (OneSet (Artillery, Artillery, Artillery)) [(WesternAustralia, 5), (Siam, 2)] testGame == Nothing) `shouldBe` True
+               (reinforce (OneSet (Artillery, Artillery, Artillery)) [(WesternAustralia, 21), (Siam, 2)] testGame == Nothing) `shouldBe` True
 
             it "Doesn't work with invalid cards" $ do
-                (reinforce [Artillery, Cavalry, Artillery] [(WesternAustralia, 5), (Siam, 2)] testGame) `shouldBe` Nothing
-                (reinforce [Cavalry, Cavalry, Artillery] [(WesternAustralia, 5), (Siam, 2)] testGame) `shouldBe` Nothing
+                (reinforce (OneSet (Artillery, Cavalry, Artillery)) [(WesternAustralia, 5), (Siam, 2)] testGame) `shouldBe` Nothing
+                (reinforce (OneSet (Cavalry, Cavalry, Artillery)) [(WesternAustralia, 5), (Siam, 2)] testGame) `shouldBe` Nothing
 
--}
+
 
 
     describe "Attack" $ do
@@ -130,34 +135,34 @@ spec = do
                 attack WesternAustralia WesternAustralia OneAtt testGame `shouldBe` Nothing
                 attack EasternAustralia EasternAustralia OneAtt testGame `shouldBe` Nothing
 
-    describe "Attack" $ do
+    describe "ChooseDefenders" $ do
         let testGame = (nextPhase) game
         context "Valid Inputs" $ do
-            -- This test needs to be fixed (so is marked xit) 
             it "Correctly updates attackers,defenders and stdGen" $ do
-                let t1g = fromJust 
-                        $ chooseDefenders TwoDef 
-                        $ fromJust 
+                let t1g = fromJust
+                        $ chooseDefenders TwoDef
+                        $ fromJust
                         $ attack WesternAustralia EasternAustralia TwoAtt
                         $ testGame
-                
-                --troops t1g WesternAustralia `shouldBe` 2 --NO NO NO!!!! We can't "predict" the outcome of the battle
-                --troops t1g EasternAustralia  `shouldBe` 2 -- This test will break if there is any change to Battle.hs
-                --currentStdGen t1g `shouldBe` mkStdGen 0 --TODO no we WANT the stdGen to be updated not the other way around
-                phase t1g `shouldBe` Attack Normal
-                
-            -- This test needs to be fixed (so is marked xit)
-            xit "Correctly leaves game in WonBattle state if defenders wiped out" $ do
-                let t1g = fromJust
-                        $ chooseDefenders OneDef
-                        $ fromJust
-                        $ attack WesternAustralia EasternAustralia ThreeAtt 
-                        $ updateStdGen (mkStdGen 3) -- :( No This is tightly coupled with the implementation 
-                        $ changeTroops WesternAustralia 1 
+
+                (troops t1g WesternAustralia + troops t1g EasternAustralia) `shouldBe` 4
+                currentStdGen t1g `shouldNotBe` mkStdGen 0
+                phase t1g `shouldBe` Attack Normal -- Can't be a won battle as has 3 troops in the defending territory
+
+            {-it "Correctly leaves game in WonBattle state if defenders wiped out" $ do
+                let t1g = changeTroops WesternAustralia 1
                         $ (changeTroops EasternAustralia (-2))
                         $ testGame
-                        
-                (phase t1g == Attack (WonBattle WesternAustralia EasternAustralia ThreeAtt))
+
+                let att a = fromJust
+                        $ chooseDefenders OneDef
+                        $ fromJust
+                        $ attack WesternAustralia EasternAustralia ThreeAtt a
+
+                g <- suchThatMaybe (arbitrary :: Gen StdGen) (\g -> (phase $ att $ updateStdGen g $ t1g) == Attack (WonBattle WesternAustralia EasternAustralia ThreeAtt))
+                (generate g) `shouldNotBe` (Nothing)-}
+
+
 
         context "Invalid Inputs" $ do
             it "Check it doesn't work in any other phase/miniphase" $ do

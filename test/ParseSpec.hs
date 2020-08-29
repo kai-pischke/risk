@@ -78,7 +78,7 @@ module ParseSpec where
     ]
 
   reinforceValid = [
-    "{\"action\": \"Reinforce\", \"sender\": \"Yellow\", \"troops\": { \"\" }}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Yellow\", \"troops\": {}}",
     "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Alaska\": 3}}",
     "{\"action\": \"Reinforce\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"Congo\":0, \"East Africa\" : 7}}"
     ]
@@ -90,7 +90,7 @@ module ParseSpec where
     ]
 
   reinforceInvalid = [
-    "{\"action\": \"Reiorce\", \"sender\": \"Yellow\", \"troops\": { \"\" }}",
+    "{\"action\": \"Reiorce\", \"sender\": \"Yellow\", \"troops\": {}}",
     "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Aska\": 3}}",
     "{\"action\": \"Reinforce\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"East Africa\" : \"20\", \"Congo\":0}}",
     "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Ontario\"}}",
@@ -263,7 +263,7 @@ module ParseSpec where
       context "WaitingRoom" $ do
         it "Correctly encodes" $ do
           (encodeResponse (General (WaitingRoom []))) `shouldSatisfy` wellFormedWaitingRoom []
-          (encodeResponse (General (WaitingRoom [Green]))) `shouldSatisfy` wellFormedWaitingRoom [Green] 
+          (encodeResponse (General (WaitingRoom [Green]))) `shouldSatisfy` wellFormedWaitingRoom [Green]
           (encodeResponse (General (WaitingRoom [Blue, Black, Green]))) `shouldSatisfy` wellFormedWaitingRoom [Blue, Black, Green]
           (encodeResponse (General (WaitingRoom [Blue, Blue]))) `shouldSatisfy` wellFormedWaitingRoom [Blue, Blue]
 
@@ -274,11 +274,11 @@ module ParseSpec where
 
         it "Correctly encodes partially complete" $ do
           let state2 = placeList [toEnum 0..toEnum 41] (emptyBoard [Yellow, Green, Blue])
-          (encodeResponse (General (Setup state2))) `shouldSatisfy` wellFormedSetup (first Just . partiallyCompleteBoardOwner state2) [Yellow, Green, Blue]  
+          (encodeResponse (General (Setup state2))) `shouldSatisfy` wellFormedSetup (first Just . partiallyCompleteBoardOwner state2) [Yellow, Green, Blue]
 
         it "Correctly encodes complete" $ do
           let state3 = placeList ([toEnum 0..toEnum 41] ++ [toEnum 0..toEnum 41] ++ [toEnum 0 .. toEnum 20])  (emptyBoard [Red, Green, Blue])
-          (encodeResponse (General (Setup state3))) `shouldSatisfy` wellFormedSetup (first Just . completeBoardOwner state3) [Red, Green, Blue]  
+          (encodeResponse (General (Setup state3))) `shouldSatisfy` wellFormedSetup (first Just . completeBoardOwner state3) [Red, Green, Blue]
 
       context "Game" $ do
         it "Correctly encodes in Reinforce" $ do
