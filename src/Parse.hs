@@ -1,5 +1,10 @@
----- Overloads ------------------------------
---{-# LANGUAGE OverloadedStrings #-}
+{-|
+Module      : Parse
+Description : JSON encoding and decoding.
+Maintainer  : River
+
+This module handles the encoding and decoding of JSON responses and requests.
+-}
 
 
 module Parse (
@@ -63,10 +68,11 @@ phaseToJson p = object [pack "kind" .= pack "Simple",
                         pack "phase" .= (pack $ show p)]
 
 ---- Public Functions -----------------------
-
+-- | Reads in a received 'ByteString' and returns a 'Left' 'Request' or a 'Right' 'ParseError'.
 decodeRequest :: ByteString -> Either Request ParseError
 decodeRequest = maybe (Right parseError) Left . decode
 
+-- | Encodes a 'Response' to a 'ByteString'.
 encodeResponse :: Response -> ByteString
 encodeResponse = encode
 
@@ -82,6 +88,7 @@ setupBoardOwner s c = (Just p, n)
 
 type ParseError = ByteString
 
+-- | This is the 'ByteString' holding the JSON-encoded response to a parse error.
 parseError :: ParseError
 parseError = fromString "{\"Invalid JSON\"}"
 
@@ -121,7 +128,7 @@ instance FromJSON Request where
 
                     -}
                     let troopsR = map (\p -> (readMaybe $ fst p, snd p)) $ assocs t
-                    if (any (\p -> fst p == Nothing) troopsR)-- || (any (\p -> (typeOf $ snd p) /= typeOf (1 :: Int)) troopsR)
+                    if (any (\p -> fst p == Nothing) troopsR)-- (any (\p -> (typeOf $ snd p) /= typeOf (1 :: Int)) troopsR)
                         then do mempty
                         else do return (Request (fromJust senderR) (Reinforce $ map (\p -> (fromJust $ fst p, snd p)) troopsR))
             else if (requestType == ("Fortify" :: String))

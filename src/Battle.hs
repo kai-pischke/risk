@@ -1,3 +1,10 @@
+{-|
+Module      : Battle
+Description : Battle interaction logic.
+Maintainer  : Kai
+
+This module deals with attacking and defending types and gives an interface to calculate battle outcomes.
+-}
 module Battle 
     ( Defenders(..),
       Attackers(..),
@@ -9,6 +16,7 @@ import Data.List
 data Defenders = OneDef | TwoDef deriving (Eq, Show, Ord)
 data Attackers = OneAtt | TwoAtt | ThreeAtt deriving (Eq, Show, Ord)
 
+-- | Note that for Enum, enumeration starts at 1 not 0.
 instance Enum Defenders where
     fromEnum OneDef = 1
     fromEnum TwoDef = 2 
@@ -16,6 +24,7 @@ instance Enum Defenders where
     toEnum 2 = TwoDef
     toEnum n = error ("toEnum{Defenders}: tag (" ++ show n ++ ") is outside of enumeration's range (1,2)")
 
+-- | Note that for Enum, enumeration starts at 1 not 0.
 instance Enum Attackers where
     fromEnum OneAtt = 1
     fromEnum TwoAtt = 2
@@ -30,6 +39,7 @@ roll 0 g = (g, [])
 roll n g = let (x, g') = uniformR (1, 6) g
            in (x:) <$> roll (n-1) g'
 
+-- | Takes a number of attackers ('Attackers') and a number of defenders ('Defenders') and calculates the attackers lost, the defeners lost and the new StdGen (returned in a tuple in that order).
 doBattle :: Attackers -> Defenders -> StdGen -> (Int, Int, StdGen)
 doBattle a d g = (attackerLosses, defenderLosses, g'')
   where

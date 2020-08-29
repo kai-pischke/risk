@@ -9,7 +9,6 @@ copyright:           "2020 Alex Pay, River Newbury and Kai Pischke"
 extra-source-files:
 - README.md
 - ChangeLog.md
-- interfaces/internal.md
 - interfaces/external.md
 
 # Metadata used when publishing your package
@@ -26,6 +25,7 @@ dependencies:
 - aeson
 - websockets
 - utf8-string
+- array
 - text
 
 library:

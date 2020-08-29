@@ -150,10 +150,14 @@ spec = do
                         return $ (not $ distinct cs) ==> (result === Nothing)
                     it "enforces the turn order" $ property $ do
                         NewGame g ps sg <- (arbitrary :: Gen NewGame)
+                        let n = length ps
                         Permutation cs <- (arbitrary :: Gen (Permutation Country))
-                        order <- vectorOf (length cs) (elements ps)
-                        let result = maybeRequests (zipWith (flip Request . PlaceTroop) cs order) g
-                        return $ (not $ and $ zipWith (==) order (cycle ps)) ==> (result === Nothing)
+                        turns <- chooseInt(1, length cs - 1)
+                        wrong <- elements (take (n-1) $ drop (turns+1) (cycle ps))
+                        let result = maybeRequests (zipWith (flip Request . PlaceTroop) cs (take turns (cycle ps))) g
+                        case result of
+                            Just (_, g') -> return $ counterexample ("It was actually meant to be " ++ show (cycle ps !! turns) ++ "'s turn, so I was expecting \"Invalid NotYourTurn " ++ show wrong ++ "\" when " ++ show wrong  ++ " tries to place troops.\n") $ fst (receive (Request wrong (PlaceTroop (cs !! turns))) g') === Invalid NotYourTurn wrong
+                            Nothing -> return $ counterexample "Failed before we even got to the test case" False
                 context "during the PartiallyComplete subphase" $ do
                     it "places troops correctly for valid input" $ do
                         pendingWith "test not implemented yet"

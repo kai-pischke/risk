@@ -1,3 +1,10 @@
+{-|
+Module      : RiskBoard
+Description : Basic gameboard.
+Maintainer  : River
+
+This module deals with representing the game board itself and also provides the 'Country' type.
+-}
 module RiskBoard
     ( Country(..),
       Continent,
@@ -13,8 +20,10 @@ module RiskBoard
 
 import qualified Graph
 
+-- | a 'Continent' is simply a list of the Countries it contains.
 type Continent = [Country]
 
+-- | The Country type should be inhabited by 42 nullary constructors with the names corresponding to the country names (including capitalisations, missing spaces where necessary).
 data Country = Alaska
              | Alberta
              | CentralAmerica
@@ -193,22 +202,28 @@ riskBoard = Graph.makeGraph [(Alaska , [Alberta, NorthwestTerritory,Kamchatka]),
                             (Indonesia , [Siam, NewGuinea, WesternAustralia]),
                             (NewGuinea ,  [Indonesia, WesternAustralia, EasternAustralia]),
                             (WesternAustralia , [Indonesia, NewGuinea, EasternAustralia])]
-
+                            
+-- | A list of the countries in North America.
 northAmerica :: Continent
 northAmerica = [toEnum 0 .. toEnum 8]
 
+-- | A list of the countries in South America.
 southAmerica :: Continent
 southAmerica = [toEnum 9 .. toEnum 12]
 
+-- | A list of the countries in Europe.
 europe :: Continent
 europe = [toEnum 13 .. toEnum 19]
 
+-- | A list of the countries in Africa.
 africa :: Continent
 africa = [toEnum 20 .. toEnum 25]
 
+-- | A list of the countries in Asia.
 asia :: Continent
 asia = [toEnum 26 .. toEnum 37]
 
+-- | A list of the countries in Australia.
 australia :: Continent
 australia = [toEnum 38 .. toEnum 41]
 
@@ -219,8 +234,10 @@ australia = [toEnum 38 .. toEnum 41]
 
 
 -- Simple Renamings
+-- | Given a 'Country', returns the list of all neighbouring countries (in no specific order).
 neighbours :: Country -> [Country]
 neighbours = Graph.neighbours riskBoard
 
+-- | Given two countries, returns 'True' if there is an edge connecting them and 'False' otherwise.
 isNeighbour :: Country -> Country -> Bool
 isNeighbour = Graph.isNeighbour riskBoard

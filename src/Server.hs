@@ -1,4 +1,13 @@
-module Server where
+{-|
+Module      : Server
+Description : Main game server.
+Maintainer  : Kai
+
+This module packages the whole game into a single functin ('run') that creates a websockets-based server for the game.
+-}
+module Server 
+    ( run
+    ) where
 import Message (RequestType(..)) -- Alex should really export this
 import Interface 
 import GameElements (Player)
@@ -105,7 +114,7 @@ application state pending = do
         -- will cleanup after connection closed
         finally (play conn player state) (disconnect player)
         
-    
+-- |Runs the game server. Requires an 'Int' which specifies the port.
 run :: Int -> IO ()
 run port = do
     -- create the game 

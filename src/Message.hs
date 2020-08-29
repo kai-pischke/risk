@@ -1,3 +1,10 @@
+{-|
+Module      : Message
+Description : Haskell requests and responses.
+Maintainer  : Alex
+
+This module defines the messages we make use of in 'Interface'.
+-}
 module Message (
   Response (..),
   Update (..),

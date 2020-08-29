@@ -1,3 +1,11 @@
+{-|
+Module      : Interface
+Description : The functions for playing the game.
+Maintainer  : Alex
+
+This module wraps many of the functions in moves in additional validation logic and exposes a Hasskell version of the JSON
+interface used to communicate with the Server.
+-}
 module Interface  (
   Game,
   Response(..),
@@ -14,12 +22,10 @@ module Interface  (
   import SetupBoard
   import State
   import System.Random
-  import Battle
-  import RiskBoard
-  import Data.Maybe --temp
   --------------------------------------
 
   ---- Types ---------------------------
+  -- |The main type holding all the needed information about the game.
   data Game = GameWR [Player] StdGen
     | GameSetup SetupState [Player] StdGen
     | GamePlay GameState
@@ -27,12 +33,14 @@ module Interface  (
   --------------------------------------
 
   ---- Public Functions ----------------
-
+  
+  -- |Creates a new empty game with a given 'StdGen'.
   empty :: StdGen -> Game
   empty stdGen = (GameWR [] stdGen)
 
   --works if the waiting room isn't in order of players,
   --even though this should never happen in practice
+  -- |Errors if we aren't in the waiting phase, or if the waiting room is full, or if the given waiting room is invalid (i.e. there are repeats)
   addPlayer :: Game -> (Player, Game)
   addPlayer (GameWR ps std)
     | repeats ps = error "Invalid waiting room: There are repeats"
@@ -41,6 +49,7 @@ module Interface  (
     where newPlayer = head $ filter (flip notElem ps) players
   addPlayer _ = error "The game has started, we can't add new players"
 
+  -- |Total function. For any 'Request', checks whether it is valid and returns an appropriate 'Response' message along with the new 'Game' with the correct changes made.
   receive :: Request -> Game -> (Response, Game)
   -- StartGame
   receive (Request s StartGame) g@(GameWR ps std)

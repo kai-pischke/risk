@@ -128,7 +128,7 @@ changeHand f (InternalGameState t p g h l g' d d' h') = InternalGameState t p g 
 
 -- publicly exposed functions --
 
--- |Creates a blank game with no troops in any country. 
+-- | Creates a blank game with no troops in any country. 
 -- Players should be given in turn order starting with the current player.
 newGame :: [Player] -> (Country -> (Player, Int))-> StdGen -> GameState
 newGame [] _ _ = error "empty list (can't create game with no players)"
@@ -144,58 +144,58 @@ newGame listOfPlayer countryFunc startingStdGen = InternalGameState
    (Map.fromList $ zip listOfPlayer $ repeat [])
    where countries = [(minBound :: Country)..]
 
--- |Gives the number of troops in a given country.
+-- | Gives the number of troops in a given country.
 troops :: GameState -> Country -> Int
 troops g c = troopMap g Map.! c
 
--- |Returns a list of players (in the order of play) starting with the current player.
+-- | Returns a list of players (in the order of play) starting with the current player.
 turnOrder :: GameState -> [Player]
 turnOrder = statePayers
 
--- |Gives the player who owns a certain country.
+-- | Gives the player who owns a certain country.
 owner :: GameState -> Country -> Player
 owner g c = playerMap g Map.! c
 
--- |Modifies (adds or subtracts) the given number of troops (to or from a country).
+-- | Modifies (adds or subtracts) the given number of troops (to or from a country).
 changeTroops :: Country -> Int -> GameState -> GameState
 changeTroops c i = changeTroopMap (Map.insertWith (+) c i)
 
--- |Replaces the owner of a country.
+-- | Replaces the owner of a country.
 changeOwner :: Country -> Player -> GameState -> GameState
 changeOwner c p = changePlayerMap (Map.insert c p)
 
--- |Advances to the next turn (and updates the phase).
+-- | Advances to the next turn (and updates the phase).
 nextTurn :: GameState -> GameState
 nextTurn = changeGetCard (const False) . changePlayer rotate . changePhase (const Reinforce)
 
--- |Gets the current StdGen.
+-- | Gets the current StdGen.
 currentStdGen :: GameState -> StdGen
 currentStdGen = stateStdGen
 
--- |Replaces the current StdGen.
+-- | Replaces the current StdGen.
 updateStdGen :: StdGen -> GameState -> GameState
 updateStdGen = changeGen . const
 
--- |Gets the current 'Phase'.
+-- | Gets the current 'Phase'.
 phase :: GameState -> Phase
 phase = statePhase
 
--- |Updates the current 'Phase'.
+-- | Updates the current 'Phase'.
 nextPhase :: GameState -> GameState
 nextPhase = changePhase advancePhase
 
--- |Does nothing if not in 'Attack' 'Phase', otherwise sets phase to 'Attack' 'MiniPhase' 
+-- | Does nothing if not in 'Attack' 'Phase', otherwise sets phase to 'Attack' 'MiniPhase' 
 -- (inserting the provided 'MiniPhase'). 
 -- Note that calling this function on a 'WonBattle' will cause it to remember that the current player gets a card this turn.
 changeMiniPhase :: MiniPhase -> GameState -> GameState
 changeMiniPhase = (updateCardDrawing .) . changePhase . updateMiniPhase
 
--- |Returns the list of cards in the player's hand
+-- | Returns the list of cards in the player's hand
 cards :: GameState -> Player -> [Card]
 cards g p = fmaybe errP $ Map.lookup p (hand g)
    where errP = error $ "Player '" ++ show p ++ "' isn't in the game."
 
--- |Puts the card in the discard pile.
+-- | Puts the card in the discard pile.
 useCard :: Player -> Card -> GameState -> GameState
 useCard p c = addToDiscard . removeCard
    where
@@ -204,11 +204,12 @@ useCard p c = addToDiscard . removeCard
    errC = "Player doesn't have card " ++ show c ++ "."
    addToDiscard = changeDisc (c:)
 
--- |Adds the top card to the player's hand. 
+-- | Adds the top card to the player's hand. 
 -- Shuffles the discard pile if necessary using a provided shuffle function.
-drawCard :: Player -> ([Card] -> [Card]) -> GameState -> GameState
-drawCard p shuff = takeTop . fillDeck
+drawCard :: Player -> GameState -> GameState
+drawCard p = takeTop . fillDeck
    where 
+   shuff = id
    fillDeck :: GameState -> GameState 
    fillDeck g = if null (deck g)
                 then changeDeck (const $ shuff $ discardPile g) $ changeDisc (const []) g
@@ -218,7 +219,7 @@ drawCard p shuff = takeTop . fillDeck
                in changeDeck tail $ changeHand (modifyMapWithError p (c:) errP) g
    errP = "Player '" ++ show p ++ "' isn't in the game so can't take a card." 
 
--- |Removes the 'Player' given in the second argument from the game.
+-- | Removes the 'Player' given in the second argument from the game.
 -- Gives all cards to the 'Player' given in the first argument.
 kick :: Player -> Player -> GameState -> GameState
 kick p1 p2 = updateCards . removePlayer
@@ -232,6 +233,6 @@ kick p1 p2 = updateCards . removePlayer
          ++ show p1 ++ " since " 
          ++ show p1 ++ " isn't in the game."
 
--- |@True@ if and only if the current player has drawn a card this turn.
+-- | @True@ if and only if the current player has drawn a card this turn.
 hasDrawn :: GameState -> Bool
 hasDrawn = getsCard

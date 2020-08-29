@@ -94,7 +94,7 @@ module Moves (
   -----------------------------------------------
 
   ----Public Functions ---------------------
-
+  -- |Add reinforcements (specified as a list of pairs of 'Country' and non-negative 'Int' number of troops to add). Must be during the correct phase. Should update phase to 'Attack' 'Normal'. Continent and country bonuses should be taken into account.
   reinforce :: TradeIn -> [(Country, Int)] -> GameState -> Maybe GameState
   reinforce trade movs gs | validTrade trade && phase gs == Reinforce && validMovList movs =
     Just $ nextPhase $ (useCards trade) $ foldr ((.).(uncurry changeTroops)) id movs gs
@@ -115,7 +115,8 @@ module Moves (
           useCards None = id
           useCards (OneSet (x, y, z)) = (useCard (currPlayer gs) x) . (useCard (currPlayer gs) y) . (useCard (currPlayer gs) z)
           useCards (TwoSet s1 s2) = (useCards (OneSet s1)) . (useCards (OneSet s2))
-
+          
+  -- |Puts the state into the 'MidBattle' 'MiniPhase', which records the attacking and defending country, and the number of attackers. Must Be neighbouring countries owned by different players. Must be during the correct phase. Attacker must have < number of attackers in the attacking country.
   attack :: Country -> Country -> Attackers -> GameState -> Maybe GameState
   attack cAtt cDef att gs | valid = (Just . changeMiniPhase (MidBattle cAtt cDef att)) gs
                           | otherwise = Nothing
@@ -125,7 +126,9 @@ module Moves (
               (owner gs cDef /= currPlayer gs) &&
               (cDef `isNeighbour` cAtt) &&
               (phase gs == Attack Normal)
-
+  
+  --TODO make sure it goes back to Attack Normal if the battle isn't won.
+  -- |Only defined for 'MidBattle' 'MiniPhase'. Chooses the number of defenders the defending country uses. The defending country must have >= number of defenders used. Enters 'WonBattle' phase if there are no defenders left, otherwise goes back to 'Attack' 'Normal' 'MiniPhase'.
   chooseDefenders :: Defenders -> GameState -> Maybe GameState
   chooseDefenders def gs = f (phase gs)
     where f (Attack (MidBattle cAtt cDef att)) | troops gs cDef >= fromEnum def = (Just . makeChange (doBattle att def $ currentStdGen gs)) gs
@@ -139,8 +142,8 @@ module Moves (
                           nInvaders = fromEnum att - attLosses
           f _ = Nothing
 
-
-  -- Must invade with at least the number of attackers left, must leave at least 1 in the previous country
+  -- |Invades a country from another with 'Int' number of troops, meaning owner is changed and 'Int' troops are tranferred from the attacking country to the defending country. Should be only able to be called in 'WonBattle' 'MiniPhase'. Can't invade with less than the number of attackers left. Should move back to a 'Normal' 'Attack' 'MiniPhase'. Gives an error if called with a 'MiniPhase' which shouldn't be possible. Kicks players out if their last country is invaded. Also calculates when winning.
+  -- It must invade with at least the number of attackers left, must leave at least 1 in the previous country.
   invade :: Int -> GameState -> Maybe GameState
   invade nTroops gs = f (phase gs)
     where
@@ -157,7 +160,8 @@ module Moves (
       tryKick pAtt pDef = if all ((/= pDef).owner gs) [toEnum 0 :: Country ..]
                         then kick pAtt pDef
                         else id
-
+                        
+  -- |Only valid during the 'Attack' 'TimeToTrade' 'MiniPhase'. Takes a 'TradeIn' (owned by the current player) and caches it in for troops.
   trade :: TradeIn -> [(Country, Int)] -> GameState -> Maybe GameState
   trade tr movs gs | validTrade tr && phase gs == Attack TimeToTrade && validMovList movs =
     Just $ nextPhase $ (useCards tr) $ foldr ((.).(uncurry changeTroops)) id movs gs
@@ -178,12 +182,14 @@ module Moves (
           useCards None = id
           useCards (OneSet (x, y, z)) = (useCard (currPlayer gs) x) . (useCard (currPlayer gs) y) . (useCard (currPlayer gs) z)
           useCards (TwoSet s1 s2) = (useCards (OneSet s1)) . (useCards (OneSet s2))
-
+          
+  -- |Must be during the 'Attack' 'Normal' 'MiniPhase'. Should update phase to 'Fortify'.
   endAttack :: GameState -> Maybe GameState
   endAttack gs = f (phase gs)
     where f (Attack Normal) = Just (nextPhase gs)
           f _ = Nothing
-
+          
+  -- |Moves troops from one country to another. Countries must be neighbours and owned by the current player. Must be during the correct phase. Troops are sent from the first country to the second one. Should update phase to 'Reinforce' and call nextTurn.
   fortify :: Country -> Country -> Int -> GameState -> Maybe GameState
   fortify cFrom cTo nTroops gs
     | valid = (Just . nextTurn . (changeTroops cFrom (-nTroops)) . (changeTroops cTo nTroops)) gs
@@ -194,7 +200,8 @@ module Moves (
                   (owner gs cFrom == currPlayer gs) &&
                   (owner gs cTo == currPlayer gs) &&
                   (cTo `isNeighbour` cFrom)
-
+                  
+  -- |Must be during the correct phase. Should update phase to Reinforce and call nextTurn.
   skipFortify :: GameState -> Maybe GameState
   skipFortify gs | phase gs == Fortify = Just (nextTurn gs)
                  | otherwise = Nothing
