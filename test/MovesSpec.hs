@@ -134,17 +134,17 @@ spec = do
         let testGame = (nextPhase) game
         context "Valid Inputs" $ do
             -- This test needs to be fixed (so is marked xit) 
-            xit "Correctly updates attackers,defenders and stdGen" $ do
+            it "Correctly updates attackers,defenders and stdGen" $ do
                 let t1g = fromJust 
                         $ chooseDefenders TwoDef 
                         $ fromJust 
                         $ attack WesternAustralia EasternAustralia TwoAtt
                         $ testGame
                 
-                troops t1g WesternAustralia `shouldBe` 2 --NO NO NO!!!! We can't "predict" the outcome of the battle
-                troops t1g EasternAustralia  `shouldBe` 2 -- This test will break if there is any change to Battle.hs
-                currentStdGen t1g `shouldBe` mkStdGen 0 --TODO no we WANT the stdGen to be updated not the other way around
-                phase t1g `shouldBe` Attack Normal --TODO should take into account MidBattle
+                --troops t1g WesternAustralia `shouldBe` 2 --NO NO NO!!!! We can't "predict" the outcome of the battle
+                --troops t1g EasternAustralia  `shouldBe` 2 -- This test will break if there is any change to Battle.hs
+                --currentStdGen t1g `shouldBe` mkStdGen 0 --TODO no we WANT the stdGen to be updated not the other way around
+                phase t1g `shouldBe` Attack Normal
                 
             -- This test needs to be fixed (so is marked xit)
             xit "Correctly leaves game in WonBattle state if defenders wiped out" $ do
