@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-|
+Module      : Graph
+Description : Polymorphic undirected graph types.
+Maintainer  : River
+
+The basic implementation of undirected graphs that forms the basis for the underlying representation of our Risk board.
+-}</span><span>
+</span><span id="line-8"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Graph</span><span>
+</span><span id="line-9"></span><span>    </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Graph.html#Graph"><span class="hs-identifier">Graph</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-10"></span><span>      </span><span class="annot"><a href="Graph.html#neighbours"><span class="hs-identifier">neighbours</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-11"></span><span>      </span><span class="annot"><a href="Graph.html#isNeighbour"><span class="hs-identifier">isNeighbour</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-12"></span><span>      </span><span class="annot"><a href="Graph.html#makeGraph"><span class="hs-identifier">makeGraph</span></a></span><span>
+</span><span id="line-13"></span><span>    </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-comment">--- EXTERNAL --- </span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-comment">-- |This type models an undirected (not necessarily connected) graph. </span><span>
+</span><span id="line-18"></span><span class="hs-comment">-- We consider the vertecies of the graph to be __nodes__ (which are members of the type @n@). </span><span>
+</span><span id="line-19"></span><span class="hs-comment">-- We require that each node is in a distinct equivelence class of the equivalence relation @Eq n@. </span><span>
+</span><span id="line-20"></span><span class="hs-comment">-- It is important to note that we consider all graphs (of type @'Graph' n@) to contain every inhabitant of the type @n@. </span><span>
+</span><span id="line-21"></span><span class="hs-comment">-- In general, we assume that all nodes are disconnected unless otherwise specified when creating the graph. </span><span>
+</span><span id="line-22"></span><span class="hs-comment">-- So for example a @'Graph' Integer@ contains an infinite number of nodes. </span><span>
+</span><span id="line-23"></span><span class="hs-comment">-- We say that two nodes are neighbours if (and only if) there is an edge between those two vertecies of the graph.</span><span>
+</span><span id="line-24"></span><span class="hs-keyword">data</span><span> </span><span id="Graph"><span class="annot"><a href="Graph.html#Graph"><span class="hs-identifier hs-var">Graph</span></a></span></span><span> </span><span id="local-6989586621679126845"><span class="annot"><a href="#local-6989586621679126845"><span class="hs-identifier hs-type">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Graph"><span class="annot"><a href="Graph.html#Graph"><span class="hs-identifier hs-var">Graph</span></a></span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679126845"><span class="hs-identifier hs-type">n</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679126845"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679126845"><span class="hs-identifier hs-type">n</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span>
+</span><span id="line-26"></span><span class="hs-comment">-- |Given a graph and a node (vertex of the graph), returns a list of the directly adjacent nodes. </span><span>
+</span><span id="line-27"></span><span class="hs-comment">-- Note that, as a consequence of the fact that we consider all members of a type to be nodes, </span><span>
+</span><span id="line-28"></span><span class="hs-comment">-- the function 'neighbours' is a total function, so defined for all possible n </span><span>
+</span><span id="line-29"></span><span class="hs-comment">-- (returning the empty list for nodes with no neighbours).</span><span>
+</span><span id="line-30"></span><span id="local-6989586621679126854"><span class="annot"><a href="Graph.html#neighbours"><span class="hs-identifier hs-type">neighbours</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679126854"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Graph.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679126854"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679126854"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679126854"><span class="hs-identifier hs-type">n</span></a></span><span class="hs-special">]</span></span><span>
+</span><span id="line-31"></span><span id="neighbours"><span class="annot"><span class="annottext">neighbours :: Graph n -&gt; n -&gt; [n]
+</span><a href="Graph.html#neighbours"><span class="hs-identifier hs-var hs-var">neighbours</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Graph.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="hs-identifier">_</span><span> </span><span id="local-6989586621679126831"><span class="annot"><span class="annottext">f :: n -&gt; [n]
+</span><a href="#local-6989586621679126831"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">n -&gt; [n]
+</span><a href="#local-6989586621679126831"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-32"></span><span>
+</span><span id="line-33"></span><span class="hs-comment">-- |Given a graph and two nodes, returns @True@ if there is an edge connecting them and @False@ otherwise. </span><span>
+</span><span id="line-34"></span><span class="hs-comment">-- 'isNeighbour' is also a total function (see 'neighbours').</span><span>
+</span><span id="line-35"></span><span id="local-6989586621679126830"><span class="annot"><a href="Graph.html#isNeighbour"><span class="hs-identifier hs-type">isNeighbour</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679126830"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Graph.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679126830"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679126830"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679126830"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span></span><span>
+</span><span id="line-36"></span><span id="isNeighbour"><span class="annot"><span class="annottext">isNeighbour :: Graph n -&gt; n -&gt; n -&gt; Bool
+</span><a href="Graph.html#isNeighbour"><span class="hs-identifier hs-var hs-var">isNeighbour</span></a></span></span><span> </span><span id="local-6989586621679126829"><span class="annot"><span class="annottext">g :: Graph n
+</span><a href="#local-6989586621679126829"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span id="local-6989586621679126828"><span class="annot"><span class="annottext">c :: n
+</span><a href="#local-6989586621679126828"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span id="local-6989586621679126827"><span class="annot"><span class="annottext">d :: n
+</span><a href="#local-6989586621679126827"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(n -&gt; Bool) -&gt; [n] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; (a -&gt; Bool) -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">any</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">n -&gt; n -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span class="annot"><span class="annottext">n
+</span><a href="#local-6989586621679126827"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Graph n -&gt; n -&gt; [n]
+forall n. Eq n =&gt; Graph n -&gt; n -&gt; [n]
+</span><a href="Graph.html#neighbours"><span class="hs-identifier hs-var">neighbours</span></a></span><span> </span><span class="annot"><span class="annottext">Graph n
+</span><a href="#local-6989586621679126829"><span class="hs-identifier hs-var">g</span></a></span><span> </span><span class="annot"><span class="annottext">n
+</span><a href="#local-6989586621679126828"><span class="hs-identifier hs-var">c</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="hs-comment">-- |Given a valid adjacency list for an undirected graph, returns the corresponding representation as a @'Graph' n@. </span><span>
+</span><span id="line-40"></span><span class="hs-comment">-- The adjacency list takes the form of a list of pairs. </span><span>
+</span><span id="line-41"></span><span class="hs-comment">-- Each pair contains a member of the type n followed by a (possibly empty) list of neighbours. </span><span>
+</span><span id="line-42"></span><span class="hs-comment">-- The ('isNeighbour') relation must be symmetric:</span><span>
+</span><span id="line-43"></span><span class="hs-comment">-- (so if @a, b :: n@ if @a@ has @b@ in its list, then @b@ must have @a@ in its list). </span><span>
+</span><span id="line-44"></span><span class="hs-comment">-- Any pairs containing the empty list as a second element are ignored </span><span>
+</span><span id="line-45"></span><span class="hs-comment">-- - these nodes (as well as any others not included) are treated as having no neighbours. </span><span>
+</span><span id="line-46"></span><span class="hs-comment">-- This well-formedness condition, together with the condition that no duplicate entries exist, </span><span>
+</span><span id="line-47"></span><span class="hs-comment">-- as precoditions to the function (which should throw an error if they are violated).</span><span>
+</span><span id="line-48"></span><span id="local-6989586621679126825"><span class="annot"><a href="Graph.html#makeGraph"><span class="hs-identifier hs-type">makeGraph</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679126825"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679126825"><span class="hs-identifier hs-type">n</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679126825"><span class="hs-identifier hs-type">n</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graph.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679126825"><span class="hs-identifier hs-type">n</span></a></span></span><span>
+</span><span id="line-49"></span><span id="makeGraph"><span class="annot"><span class="annottext">makeGraph :: [(n, [n])] -&gt; Graph n
+</span><a href="Graph.html#makeGraph"><span class="hs-identifier hs-var hs-var">makeGraph</span></a></span></span><span> </span><span id="local-6989586621679126824"><span class="annot"><span class="annottext">ls :: [(n, [n])]
+</span><a href="#local-6989586621679126824"><span class="hs-identifier hs-var">ls</span></a></span></span><span>
+</span><span id="line-50"></span><span>    </span><span class="hs-glyph">|</span><span>  </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; ((n -&gt; [n]) -&gt; Bool) -&gt; (n -&gt; [n]) -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">[n] -&gt; (n -&gt; [n]) -&gt; Bool
+forall n. Eq n =&gt; [n] -&gt; (n -&gt; [n]) -&gt; Bool
+</span><a href="Graph.html#testReflexivity"><span class="hs-identifier hs-var">testReflexivity</span></a></span><span> </span><span class="annot"><span class="annottext">[n]
+</span><a href="#local-6989586621679126820"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">n -&gt; [n]
+</span><a href="#local-6989586621679126819"><span class="hs-identifier hs-var">edge</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Graph n
+forall a. HasCallStack =&gt; [Char] -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="hs-string">&quot;Adjacency list Entered isn't reflexive&quot;</span></span><span>
+</span><span id="line-51"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[n] -&gt; (n -&gt; [n]) -&gt; Graph n
+forall n. [n] -&gt; (n -&gt; [n]) -&gt; Graph n
+</span><a href="Graph.html#Graph"><span class="hs-identifier hs-var">Graph</span></a></span><span> </span><span class="annot"><span class="annottext">[n]
+</span><a href="#local-6989586621679126820"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">n -&gt; [n]
+</span><a href="#local-6989586621679126819"><span class="hs-identifier hs-var">edge</span></a></span><span>  </span><span>
+</span><span id="line-52"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-53"></span><span>        </span><span id="local-6989586621679126820"><span class="annot"><span class="annottext">v :: [n]
+</span><a href="#local-6989586621679126820"><span class="hs-identifier hs-var hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">((n, [n]) -&gt; n) -&gt; [(n, [n])] -&gt; [n]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">(n, [n]) -&gt; n
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span> </span><span class="annot"><span class="annottext">[(n, [n])]
+</span><a href="#local-6989586621679126824"><span class="hs-identifier hs-var">ls</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-54"></span><span>        </span><span id="local-6989586621679126819"><span class="annot"><span class="annottext">edge :: n -&gt; [n]
+</span><a href="#local-6989586621679126819"><span class="hs-identifier hs-var hs-var">edge</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[(n, [n])] -&gt; n -&gt; [n]
+forall n. Eq n =&gt; [(n, [n])] -&gt; n -&gt; [n]
+</span><a href="Graph.html#makef"><span class="hs-identifier hs-var">makef</span></a></span><span> </span><span class="annot"><span class="annottext">[(n, [n])]
+</span><a href="#local-6989586621679126824"><span class="hs-identifier hs-var">ls</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span class="hs-comment">--- INTERNAL --- </span><span>
+</span><span id="line-57"></span><span>
+</span><span id="line-58"></span><span class="hs-comment">-- Makes the function which maps an n to the list in the tuple with it</span><span>
+</span><span id="line-59"></span><span id="local-6989586621679126840"><span class="annot"><a href="Graph.html#makef"><span class="hs-identifier hs-type">makef</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679126840"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679126840"><span class="hs-identifier hs-type">n</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679126840"><span class="hs-identifier hs-type">n</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679126840"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679126840"><span class="hs-identifier hs-type">n</span></a></span><span class="hs-special">]</span></span><span>
+</span><span id="line-60"></span><span id="makef"><span class="annot"><span class="annottext">makef :: [(n, [n])] -&gt; n -&gt; [n]
+</span><a href="Graph.html#makef"><span class="hs-identifier hs-var hs-var">makef</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-61"></span><span class="annot"><a href="Graph.html#makef"><span class="hs-identifier hs-var">makef</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679126816"><span class="annot"><span class="annottext">n :: (n, [n])
+</span><a href="#local-6989586621679126816"><span class="hs-identifier hs-var">n</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679126815"><span class="annot"><span class="annottext">ns :: [(n, [n])]
+</span><a href="#local-6989586621679126815"><span class="hs-identifier hs-var">ns</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679126814"><span class="annot"><span class="annottext">x :: n
+</span><a href="#local-6989586621679126814"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span>
+</span><span id="line-62"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">(n, [n]) -&gt; n
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span> </span><span class="annot"><span class="annottext">(n, [n])
+</span><a href="#local-6989586621679126816"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">n -&gt; n -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">n
+</span><a href="#local-6989586621679126814"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(n, [n]) -&gt; [n]
+forall a b. (a, b) -&gt; b
+</span><span class="hs-identifier hs-var">snd</span></span><span> </span><span class="annot"><span class="annottext">(n, [n])
+</span><a href="#local-6989586621679126816"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(n, [n])] -&gt; n -&gt; [n]
+forall n. Eq n =&gt; [(n, [n])] -&gt; n -&gt; [n]
+</span><a href="Graph.html#makef"><span class="hs-identifier hs-var">makef</span></a></span><span> </span><span class="annot"><span class="annottext">[(n, [n])]
+</span><a href="#local-6989586621679126815"><span class="hs-identifier hs-var">ns</span></a></span><span> </span><span class="annot"><span class="annottext">n
+</span><a href="#local-6989586621679126814"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span class="hs-comment">-- Tests that &#11375; A, B &#8712; Dom f (A &#8712; (f B) =&gt; B &#8712; (f A)) </span><span>
+</span><span id="line-66"></span><span id="local-6989586621679126849"><span class="annot"><a href="Graph.html#testReflexivity"><span class="hs-identifier hs-type">testReflexivity</span></a></span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679126849"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679126849"><span class="hs-identifier hs-type">n</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679126849"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679126849"><span class="hs-identifier hs-type">n</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span></span><span>
+</span><span id="line-67"></span><span id="testReflexivity"><span class="annot"><span class="annottext">testReflexivity :: [n] -&gt; (n -&gt; [n]) -&gt; Bool
+</span><a href="Graph.html#testReflexivity"><span class="hs-identifier hs-var hs-var">testReflexivity</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-68"></span><span class="annot"><a href="Graph.html#testReflexivity"><span class="hs-identifier hs-var">testReflexivity</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679126813"><span class="annot"><span class="annottext">n :: n
+</span><a href="#local-6989586621679126813"><span class="hs-identifier hs-var">n</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679126812"><span class="annot"><span class="annottext">ns :: [n]
+</span><a href="#local-6989586621679126812"><span class="hs-identifier hs-var">ns</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679126811"><span class="annot"><span class="annottext">f :: n -&gt; [n]
+</span><a href="#local-6989586621679126811"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(n -&gt; Bool) -&gt; [n] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; (a -&gt; Bool) -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">all</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679126809"><span class="annot"><span class="annottext">x :: n
+</span><a href="#local-6989586621679126809"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(n -&gt; Bool) -&gt; [n] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; (a -&gt; Bool) -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">any</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">n -&gt; n -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span class="annot"><span class="annottext">n
+</span><a href="#local-6989586621679126813"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">n -&gt; [n]
+</span><a href="#local-6989586621679126811"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">n
+</span><a href="#local-6989586621679126809"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>  </span><span class="hs-special">(</span><span class="annot"><span class="annottext">n -&gt; [n]
+</span><a href="#local-6989586621679126811"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">n
+</span><a href="#local-6989586621679126813"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">[n] -&gt; (n -&gt; [n]) -&gt; Bool
+forall n. Eq n =&gt; [n] -&gt; (n -&gt; [n]) -&gt; Bool
+</span><a href="Graph.html#testReflexivity"><span class="hs-identifier hs-var">testReflexivity</span></a></span><span> </span><span class="annot"><span class="annottext">[n]
+</span><a href="#local-6989586621679126812"><span class="hs-identifier hs-var">ns</span></a></span><span> </span><span class="annot"><span class="annottext">n -&gt; [n]
+</span><a href="#local-6989586621679126811"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span>
+</span><span id="line-69"></span></pre></body></html>
