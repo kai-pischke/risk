@@ -208,7 +208,7 @@ spec = do
         (phase changeToWonBattle2) `shouldBe` (Attack (WonBattle India Brazil TwoAtt))
     context "In WonBattle attack phase" $ do
       it "correctly changes to Normal phase" $ do
-        changeToNormal `shouldBe` game'
+        phase changeToNormal `shouldBe` (Attack Normal)
     context "calling nextPhase" $ do
       it "correctly goes to Fortify when in normal attack phase" $ do
         (phase nextFromNormal) `shouldBe` Fortify

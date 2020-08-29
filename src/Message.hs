@@ -39,6 +39,7 @@ module Message (
       && map (owner gs1) countries == map (owner gs2) countries
       && map (troops gs1) countries == map (troops gs2) countries
       where countries = [minBound :: Country .. maxBound :: Country]
+    _ == _ = False
 
   data Question = NumDefenders
     deriving (Eq, Show)
