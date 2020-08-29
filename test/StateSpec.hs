@@ -76,7 +76,7 @@ spec = do
         (turnOrder game) `shouldBe` [Yellow, Black, Yellow, Blue]
     context "Empty player list" $ do
       it "correctly throws an error when given empty player list" $ do
-        evaluate (newGame [] (\x -> (Green, 0)) (mkStdGen 45)) `shouldThrow` anyErrorCall
+        evaluate (newGame [] (\x -> (Green, 0)) (mkStdGen 45)) `shouldThrow` anyException
 
   describe "changeTroops" $ do
     let game = allRed
@@ -198,7 +198,7 @@ spec = do
     let nextFromNormal = nextPhase changeToNormal
     let nextFromWonBattle = nextPhase changeToWonBattle
     let fortified = changeMiniPhase (WonBattle India Brazil OneAtt) nextFromNormal
-    context "New GAme" $ do
+    context "New Game" $ do
       it "correctly does nothing when in Reinforce phase" $ do
         reinforceChange `shouldBe` game
     context "In normal attack phase" $ do
@@ -206,6 +206,9 @@ spec = do
         (phase changeToWonBattle) `shouldBe` (Attack (WonBattle Peru Argentina TwoAtt))
       it "correctly changes to WonBattle for non-adjacent countries" $ do
         (phase changeToWonBattle2) `shouldBe` (Attack (WonBattle India Brazil TwoAtt))
+      it "correctly sets hasDrawn to True" $ do
+        (hasDrawn changeToWonBattle) `shouldBe` True
+        (hasDrawn changeToWonBattle) `shouldBe` True
     context "In WonBattle attack phase" $ do
       it "correctly changes to Normal phase" $ do
         phase changeToNormal `shouldBe` (Attack Normal)
@@ -219,3 +222,53 @@ spec = do
     context "In Fortify phase" $ do
       it "correctly no change when changeMiniPhase called" $ do
         fortified `shouldBe` nextFromNormal
+
+  describe "drawCard" $ do
+    let game = allRed
+    let draw1 = drawCard Red game
+    let draw2 = drawCard Red draw1
+    context "Valid draws" $ do
+      it "Correctly adds card into player's hand" $ do
+        length (cards draw1 Red) `shouldBe` 1
+        length (cards draw2 Red) `shouldBe` 2
+      it "Correctly doesn't change other players' hands" $ do
+        cards draw1 Blue `shouldBe` []
+        cards draw1 Green `shouldBe` []
+    context "Invalid Draws" $ do
+      it "Correctly errors when a player not in the game draws a card" $ do
+        print (drawCard Black game) `shouldThrow` anyException
+
+  describe "useCard" $ do
+    let game = allRed
+    let draw1 = drawCard Red game
+    let draw2 = drawCard Red draw1
+    let draw3 = drawCard Red draw2
+    let drawAll = (foldr (.) id (replicate 42 (drawCard Red))) game
+    let game' = useCard Red (head (cards drawAll Red)) drawAll
+    let cardNotDrawn = head (filter (`notElem` (cards draw3 Red)) [Artillery, Infantry, Cavalry, Wild])
+    context "Valid uses" $ do
+      it "correctly removes card from hand" $ do
+        cards (useCard Red (head (cards draw3 Red)) draw3) Red `shouldBe` tail (cards draw3 Red)
+      it "correctly reshuffles discard pile when cards run out" $ do
+        cards (drawCard Red game') Red `shouldBe` cards drawAll Red
+    context "Invalid uses" $ do
+      it "correctly errors when the player doesn't have the card" $ do
+        print (useCard Blue Artillery draw3) `shouldThrow` anyException
+        print (useCard Red cardNotDrawn draw3) `shouldThrow` anyException
+      it "correctly errors when a player not in the game uses a card" $ do
+        print (drawCard Black game) `shouldThrow` anyException
+
+  describe "kick" $ do
+    let game = allRed
+    let g' = (drawCard Blue . drawCard Blue . drawCard Blue) game
+    let g'' = kick Red Blue g'
+    context "Valid kicks" $ do
+      it "correctly removes kicked player" $ do
+        turnOrder g'' `shouldSatisfy` notElem Blue
+      it "correctly gives cards to the attacker" $ do
+        cards g'' Red `shouldBe` cards  g' Blue
+    context "Invalid kicks" $ do
+      it "correctly errors when the attacker not in turnOrder" $ do
+        print (kick Black Red game) `shouldThrow` anyException
+      it "correctly errors when the defender isn't in turnOrder" $ do
+        print (kick Red Yellow game) `shouldThrow` anyException
