@@ -144,7 +144,7 @@ useCard :: Player -> Card -> GameState -> GameState
 puts the card in the discard pile
 
 ```hs
-drawCard :: Player -> ([Card] -> StdGen -> ([Card],StdGen)) -> GameState -> GameState
+drawCard :: Player -> GameState -> GameState
 ```
 Adds the top card to the player's hand. Shuffles the discard pile if necessary.
 
@@ -249,7 +249,13 @@ Only defined for MidBattle MiniPhase. Chooses the number of defenders the defend
 ```hs
 invade :: Int -> GameState -> Maybe GameState
 ```
-Invades a country from another with Int number of troops, meaning owner is changed and Int troops are tranferred from the attacking country to the defending country. Should be only able to be called in WonBattle MiniPhase. Can't invade  with less than the number of attackers left. Should move back to a Normal Attack MiniPhase. Gives an error if called with a MiniPhase which shouldn't be possible. Kicks players out if their last country is invaded. Also calculates when winning.
+Invades a country from another with Int number of troops, meaning owner is changed and Int troops are tranferred from the attacking country to the defending country. Should be only able to be called in WonBattle MiniPhase. Can't invade  with less than the number of attackers left. Should move back to a Normal Attack MiniPhase. Gives an error if called with a MiniPhase which shouldn't be possible. Kicks players out if their last country is invaded. Also calculates when winning. Puts the game into the 'TimeToTrade' state where appropriate.
+
+```hs
+trade :: TradeIn -> [(Country, Int)] -> GameState -> Maybe GameState
+```
+
+Allows a player who has just kicked out another player to discard their hand until they have less than 5 cards if they end up with 6 or more.
 
 ```hs
 skipFortify :: GameState -> Maybe GameState
