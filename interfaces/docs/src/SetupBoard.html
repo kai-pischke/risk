@@ -1,0 +1,713 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-|
+Module      : SetupBoard
+Description : Game representation during setup.
+Maintainer  : Kai
+
+The is a basic representation of the Game during the initial troop placement rounds.
+-}</span><span>
+</span><span id="line-8"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SetupBoard</span><span>
+</span><span id="line-9"></span><span>        </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="SetupBoard.html#SetupState"><span class="hs-identifier">SetupState</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-10"></span><span>          </span><span class="annot"><a href="SetupBoard.html#emptyBoard"><span class="hs-identifier">emptyBoard</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-11"></span><span>          </span><span class="annot"><a href="SetupBoard.html#placeTroop"><span class="hs-identifier">placeTroop</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-12"></span><span>          </span><span class="annot"><a href="SetupBoard.html#completeBoardOwner"><span class="hs-identifier">completeBoardOwner</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-13"></span><span>          </span><span class="annot"><a href="SetupBoard.html#partiallyCompleteBoardOwner"><span class="hs-identifier">partiallyCompleteBoardOwner</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-14"></span><span>          </span><span class="annot"><a href="SetupBoard.html#incompleteBoardOwner"><span class="hs-identifier">incompleteBoardOwner</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span>          </span><span class="annot"><a href="SetupBoard.html#setUpTurnOrder"><span class="hs-identifier">setUpTurnOrder</span></a></span><span>
+</span><span id="line-16"></span><span>        </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Map</span></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">join</span></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="RiskBoard.html"><span class="hs-identifier">RiskBoard</span></a></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="GameElements.html"><span class="hs-identifier">GameElements</span></a></span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-comment">-- | Keeps track of how many troops on each country, who owns each country as well as player order and number of troops remaining to be placed for each player.</span><span>
+</span><span id="line-26"></span><span class="hs-keyword">data</span><span> </span><span id="SetupBoardState"><span class="annot"><a href="SetupBoard.html#SetupBoardState"><span class="hs-identifier hs-var">SetupBoardState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="InternalGameState"><span class="annot"><a href="SetupBoard.html#InternalGameState"><span class="hs-identifier hs-var">InternalGameState</span></a></span></span><span>
+</span><span id="line-27"></span><span>                </span><span class="hs-special">{</span><span> </span><span id="troopMap"><span class="annot"><span class="annottext">SetupBoardState -&gt; Map Country Int
+</span><a href="SetupBoard.html#troopMap"><span class="hs-identifier hs-var hs-var">troopMap</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">,</span><span>
+</span><span id="line-28"></span><span>                    </span><span id="playerMap"><span class="annot"><span class="annottext">SetupBoardState -&gt; Map Country (Maybe Player)
+</span><a href="SetupBoard.html#playerMap"><span class="hs-identifier hs-var hs-var">playerMap</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-29"></span><span>                    </span><span id="statePlayers"><span class="annot"><span class="annottext">SetupBoardState -&gt; [Player]
+</span><a href="SetupBoard.html#statePlayers"><span class="hs-identifier hs-var hs-var">statePlayers</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-30"></span><span>                    </span><span id="playerRemaining"><span class="annot"><span class="annottext">SetupBoardState -&gt; Map Player Int
+</span><a href="SetupBoard.html#playerRemaining"><span class="hs-identifier hs-var hs-var">playerRemaining</span></a></span></span><span> </span><span class="hs-glyph">::</span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-31"></span><span>                </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679127003"><span id="local-6989586621679127005"><span class="annot"><span class="annottext">SetupBoardState -&gt; SetupBoardState -&gt; Bool
+(SetupBoardState -&gt; SetupBoardState -&gt; Bool)
+-&gt; (SetupBoardState -&gt; SetupBoardState -&gt; Bool)
+-&gt; Eq SetupBoardState
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: SetupBoardState -&gt; SetupBoardState -&gt; Bool
+$c/= :: SetupBoardState -&gt; SetupBoardState -&gt; Bool
+== :: SetupBoardState -&gt; SetupBoardState -&gt; Bool
+$c== :: SetupBoardState -&gt; SetupBoardState -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679126996"><span id="local-6989586621679126998"><span id="local-6989586621679127000"><span class="annot"><span class="annottext">Int -&gt; SetupBoardState -&gt; ShowS
+[SetupBoardState] -&gt; ShowS
+SetupBoardState -&gt; String
+(Int -&gt; SetupBoardState -&gt; ShowS)
+-&gt; (SetupBoardState -&gt; String)
+-&gt; ([SetupBoardState] -&gt; ShowS)
+-&gt; Show SetupBoardState
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [SetupBoardState] -&gt; ShowS
+$cshowList :: [SetupBoardState] -&gt; ShowS
+show :: SetupBoardState -&gt; String
+$cshow :: SetupBoardState -&gt; String
+showsPrec :: Int -&gt; SetupBoardState -&gt; ShowS
+$cshowsPrec :: Int -&gt; SetupBoardState -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span>                </span><span>
+</span><span id="line-33"></span><span class="hs-comment">-- | Contains a SetupBoardState and information about how complete the board is.</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">data</span><span> </span><span id="SetupState"><span class="annot"><a href="SetupBoard.html#SetupState"><span class="hs-identifier hs-var">SetupState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Incomplete"><span class="annot"><a href="SetupBoard.html#Incomplete"><span class="hs-identifier hs-var">Incomplete</span></a></span></span><span> </span><span class="annot"><a href="SetupBoard.html#SetupBoardState"><span class="hs-identifier hs-type">SetupBoardState</span></a></span><span> </span><span class="hs-comment">-- ^ when not all countries have a owner</span><span>
+</span><span id="line-35"></span><span>                </span><span class="hs-glyph">|</span><span> </span><span id="PartiallyComplete"><span class="annot"><a href="SetupBoard.html#PartiallyComplete"><span class="hs-identifier hs-var">PartiallyComplete</span></a></span></span><span> </span><span class="annot"><a href="SetupBoard.html#SetupBoardState"><span class="hs-identifier hs-type">SetupBoardState</span></a></span><span> </span><span class="hs-comment">-- ^ when all countries have an owner but not all troops have been placed</span><span>
+</span><span id="line-36"></span><span>                </span><span class="hs-glyph">|</span><span> </span><span id="Complete"><span class="annot"><a href="SetupBoard.html#Complete"><span class="hs-identifier hs-var">Complete</span></a></span></span><span> </span><span class="annot"><a href="SetupBoard.html#SetupBoardState"><span class="hs-identifier hs-type">SetupBoardState</span></a></span><span> </span><span class="hs-comment">-- ^ when all troops have been placed</span><span>
+</span><span id="line-37"></span><span>                </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679126988"><span id="local-6989586621679126990"><span class="annot"><span class="annottext">SetupState -&gt; SetupState -&gt; Bool
+(SetupState -&gt; SetupState -&gt; Bool)
+-&gt; (SetupState -&gt; SetupState -&gt; Bool) -&gt; Eq SetupState
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: SetupState -&gt; SetupState -&gt; Bool
+$c/= :: SetupState -&gt; SetupState -&gt; Bool
+== :: SetupState -&gt; SetupState -&gt; Bool
+$c== :: SetupState -&gt; SetupState -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679126982"><span id="local-6989586621679126984"><span id="local-6989586621679126986"><span class="annot"><span class="annottext">Int -&gt; SetupState -&gt; ShowS
+[SetupState] -&gt; ShowS
+SetupState -&gt; String
+(Int -&gt; SetupState -&gt; ShowS)
+-&gt; (SetupState -&gt; String)
+-&gt; ([SetupState] -&gt; ShowS)
+-&gt; Show SetupState
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [SetupState] -&gt; ShowS
+$cshowList :: [SetupState] -&gt; ShowS
+show :: SetupState -&gt; String
+$cshow :: SetupState -&gt; String
+showsPrec :: Int -&gt; SetupState -&gt; ShowS
+$cshowsPrec :: Int -&gt; SetupState -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span>                </span><span>
+</span><span id="line-39"></span><span class="hs-comment">-- map functions --</span><span>
+</span><span id="line-40"></span><span class="hs-keyword">type</span><span> </span><span id="SbStateTransformer"><span class="annot"><a href="SetupBoard.html#SbStateTransformer"><span class="hs-identifier hs-var">SbStateTransformer</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="SetupBoard.html#SetupBoardState"><span class="hs-identifier hs-type">SetupBoardState</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SetupBoard.html#SetupBoardState"><span class="hs-identifier hs-type">SetupBoardState</span></a></span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span class="annot"><a href="SetupBoard.html#changeTroopMap"><span class="hs-identifier hs-type">changeTroopMap</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SetupBoard.html#SbStateTransformer"><span class="hs-identifier hs-type">SbStateTransformer</span></a></span><span>
+</span><span id="line-43"></span><span id="changeTroopMap"><span class="annot"><span class="annottext">changeTroopMap :: (Map Country Int -&gt; Map Country Int) -&gt; SbStateTransformer
+</span><a href="SetupBoard.html#changeTroopMap"><span class="hs-identifier hs-var hs-var">changeTroopMap</span></a></span></span><span> </span><span id="local-6989586621679126980"><span class="annot"><span class="annottext">f :: Map Country Int -&gt; Map Country Int
+</span><a href="#local-6989586621679126980"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SetupBoard.html#InternalGameState"><span class="hs-identifier hs-type">InternalGameState</span></a></span><span> </span><span id="local-6989586621679126979"><span class="annot"><span class="annottext">tm :: Map Country Int
+</span><a href="#local-6989586621679126979"><span class="hs-identifier hs-var">tm</span></a></span></span><span> </span><span id="local-6989586621679126978"><span class="annot"><span class="annottext">pm :: Map Country (Maybe Player)
+</span><a href="#local-6989586621679126978"><span class="hs-identifier hs-var">pm</span></a></span></span><span> </span><span id="local-6989586621679126977"><span class="annot"><span class="annottext">sp :: [Player]
+</span><a href="#local-6989586621679126977"><span class="hs-identifier hs-var">sp</span></a></span></span><span> </span><span id="local-6989586621679126976"><span class="annot"><span class="annottext">pr :: Map Player Int
+</span><a href="#local-6989586621679126976"><span class="hs-identifier hs-var">pr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Country Int
+-&gt; Map Country (Maybe Player)
+-&gt; [Player]
+-&gt; Map Player Int
+-&gt; SetupBoardState
+</span><a href="SetupBoard.html#InternalGameState"><span class="hs-identifier hs-var">InternalGameState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map Country Int -&gt; Map Country Int
+</span><a href="#local-6989586621679126980"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Map Country Int
+</span><a href="#local-6989586621679126979"><span class="hs-identifier hs-var">tm</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Map Country (Maybe Player)
+</span><a href="#local-6989586621679126978"><span class="hs-identifier hs-var">pm</span></a></span><span> </span><span class="annot"><span class="annottext">[Player]
+</span><a href="#local-6989586621679126977"><span class="hs-identifier hs-var">sp</span></a></span><span> </span><span class="annot"><span class="annottext">Map Player Int
+</span><a href="#local-6989586621679126976"><span class="hs-identifier hs-var">pr</span></a></span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="annot"><a href="SetupBoard.html#changePlayerMap"><span class="hs-identifier hs-type">changePlayerMap</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SetupBoard.html#SbStateTransformer"><span class="hs-identifier hs-type">SbStateTransformer</span></a></span><span>
+</span><span id="line-46"></span><span id="changePlayerMap"><span class="annot"><span class="annottext">changePlayerMap :: (Map Country (Maybe Player) -&gt; Map Country (Maybe Player))
+-&gt; SbStateTransformer
+</span><a href="SetupBoard.html#changePlayerMap"><span class="hs-identifier hs-var hs-var">changePlayerMap</span></a></span></span><span> </span><span id="local-6989586621679126974"><span class="annot"><span class="annottext">f :: Map Country (Maybe Player) -&gt; Map Country (Maybe Player)
+</span><a href="#local-6989586621679126974"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SetupBoard.html#InternalGameState"><span class="hs-identifier hs-type">InternalGameState</span></a></span><span> </span><span id="local-6989586621679126973"><span class="annot"><span class="annottext">tm :: Map Country Int
+</span><a href="#local-6989586621679126973"><span class="hs-identifier hs-var">tm</span></a></span></span><span> </span><span id="local-6989586621679126972"><span class="annot"><span class="annottext">pm :: Map Country (Maybe Player)
+</span><a href="#local-6989586621679126972"><span class="hs-identifier hs-var">pm</span></a></span></span><span> </span><span id="local-6989586621679126971"><span class="annot"><span class="annottext">sp :: [Player]
+</span><a href="#local-6989586621679126971"><span class="hs-identifier hs-var">sp</span></a></span></span><span> </span><span id="local-6989586621679126970"><span class="annot"><span class="annottext">pr :: Map Player Int
+</span><a href="#local-6989586621679126970"><span class="hs-identifier hs-var">pr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Country Int
+-&gt; Map Country (Maybe Player)
+-&gt; [Player]
+-&gt; Map Player Int
+-&gt; SetupBoardState
+</span><a href="SetupBoard.html#InternalGameState"><span class="hs-identifier hs-var">InternalGameState</span></a></span><span> </span><span class="annot"><span class="annottext">Map Country Int
+</span><a href="#local-6989586621679126973"><span class="hs-identifier hs-var">tm</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map Country (Maybe Player) -&gt; Map Country (Maybe Player)
+</span><a href="#local-6989586621679126974"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Map Country (Maybe Player)
+</span><a href="#local-6989586621679126972"><span class="hs-identifier hs-var">pm</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Player]
+</span><a href="#local-6989586621679126971"><span class="hs-identifier hs-var">sp</span></a></span><span> </span><span class="annot"><span class="annottext">Map Player Int
+</span><a href="#local-6989586621679126970"><span class="hs-identifier hs-var">pr</span></a></span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="annot"><a href="SetupBoard.html#changePlayers"><span class="hs-identifier hs-type">changePlayers</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SetupBoard.html#SbStateTransformer"><span class="hs-identifier hs-type">SbStateTransformer</span></a></span><span>
+</span><span id="line-49"></span><span id="changePlayers"><span class="annot"><span class="annottext">changePlayers :: ([Player] -&gt; [Player]) -&gt; SbStateTransformer
+</span><a href="SetupBoard.html#changePlayers"><span class="hs-identifier hs-var hs-var">changePlayers</span></a></span></span><span> </span><span id="local-6989586621679126968"><span class="annot"><span class="annottext">f :: [Player] -&gt; [Player]
+</span><a href="#local-6989586621679126968"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SetupBoard.html#InternalGameState"><span class="hs-identifier hs-type">InternalGameState</span></a></span><span> </span><span id="local-6989586621679126967"><span class="annot"><span class="annottext">tm :: Map Country Int
+</span><a href="#local-6989586621679126967"><span class="hs-identifier hs-var">tm</span></a></span></span><span> </span><span id="local-6989586621679126966"><span class="annot"><span class="annottext">pm :: Map Country (Maybe Player)
+</span><a href="#local-6989586621679126966"><span class="hs-identifier hs-var">pm</span></a></span></span><span> </span><span id="local-6989586621679126965"><span class="annot"><span class="annottext">sp :: [Player]
+</span><a href="#local-6989586621679126965"><span class="hs-identifier hs-var">sp</span></a></span></span><span> </span><span id="local-6989586621679126964"><span class="annot"><span class="annottext">pr :: Map Player Int
+</span><a href="#local-6989586621679126964"><span class="hs-identifier hs-var">pr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Country Int
+-&gt; Map Country (Maybe Player)
+-&gt; [Player]
+-&gt; Map Player Int
+-&gt; SetupBoardState
+</span><a href="SetupBoard.html#InternalGameState"><span class="hs-identifier hs-var">InternalGameState</span></a></span><span> </span><span class="annot"><span class="annottext">Map Country Int
+</span><a href="#local-6989586621679126967"><span class="hs-identifier hs-var">tm</span></a></span><span> </span><span class="annot"><span class="annottext">Map Country (Maybe Player)
+</span><a href="#local-6989586621679126966"><span class="hs-identifier hs-var">pm</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Player] -&gt; [Player]
+</span><a href="#local-6989586621679126968"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">[Player]
+</span><a href="#local-6989586621679126965"><span class="hs-identifier hs-var">sp</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Map Player Int
+</span><a href="#local-6989586621679126964"><span class="hs-identifier hs-var">pr</span></a></span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span class="annot"><a href="SetupBoard.html#changeRemaining"><span class="hs-identifier hs-type">changeRemaining</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SetupBoard.html#SbStateTransformer"><span class="hs-identifier hs-type">SbStateTransformer</span></a></span><span>
+</span><span id="line-52"></span><span id="changeRemaining"><span class="annot"><span class="annottext">changeRemaining :: (Map Player Int -&gt; Map Player Int) -&gt; SbStateTransformer
+</span><a href="SetupBoard.html#changeRemaining"><span class="hs-identifier hs-var hs-var">changeRemaining</span></a></span></span><span> </span><span id="local-6989586621679126962"><span class="annot"><span class="annottext">f :: Map Player Int -&gt; Map Player Int
+</span><a href="#local-6989586621679126962"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SetupBoard.html#InternalGameState"><span class="hs-identifier hs-type">InternalGameState</span></a></span><span> </span><span id="local-6989586621679126961"><span class="annot"><span class="annottext">tm :: Map Country Int
+</span><a href="#local-6989586621679126961"><span class="hs-identifier hs-var">tm</span></a></span></span><span> </span><span id="local-6989586621679126960"><span class="annot"><span class="annottext">pm :: Map Country (Maybe Player)
+</span><a href="#local-6989586621679126960"><span class="hs-identifier hs-var">pm</span></a></span></span><span> </span><span id="local-6989586621679126959"><span class="annot"><span class="annottext">sp :: [Player]
+</span><a href="#local-6989586621679126959"><span class="hs-identifier hs-var">sp</span></a></span></span><span> </span><span id="local-6989586621679126958"><span class="annot"><span class="annottext">pr :: Map Player Int
+</span><a href="#local-6989586621679126958"><span class="hs-identifier hs-var">pr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Country Int
+-&gt; Map Country (Maybe Player)
+-&gt; [Player]
+-&gt; Map Player Int
+-&gt; SetupBoardState
+</span><a href="SetupBoard.html#InternalGameState"><span class="hs-identifier hs-var">InternalGameState</span></a></span><span> </span><span class="annot"><span class="annottext">Map Country Int
+</span><a href="#local-6989586621679126961"><span class="hs-identifier hs-var">tm</span></a></span><span> </span><span class="annot"><span class="annottext">Map Country (Maybe Player)
+</span><a href="#local-6989586621679126960"><span class="hs-identifier hs-var">pm</span></a></span><span> </span><span class="annot"><span class="annottext">[Player]
+</span><a href="#local-6989586621679126959"><span class="hs-identifier hs-var">sp</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map Player Int -&gt; Map Player Int
+</span><a href="#local-6989586621679126962"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Map Player Int
+</span><a href="#local-6989586621679126958"><span class="hs-identifier hs-var">pr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span class="hs-comment">-- helper functions --</span><span>
+</span><span id="line-55"></span><span class="annot"><a href="SetupBoard.html#currentPlayer"><span class="hs-identifier hs-type">currentPlayer</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SetupBoard.html#SetupBoardState"><span class="hs-identifier hs-type">SetupBoardState</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span>
+</span><span id="line-56"></span><span id="currentPlayer"><span class="annot"><span class="annottext">currentPlayer :: SetupBoardState -&gt; Player
+</span><a href="SetupBoard.html#currentPlayer"><span class="hs-identifier hs-var hs-var">currentPlayer</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Player] -&gt; Player
+forall a. [a] -&gt; a
+</span><span class="hs-identifier hs-var">head</span></span><span> </span><span class="annot"><span class="annottext">([Player] -&gt; Player)
+-&gt; (SetupBoardState -&gt; [Player]) -&gt; SetupBoardState -&gt; Player
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; [Player]
+</span><a href="SetupBoard.html#statePlayers"><span class="hs-identifier hs-var hs-var">statePlayers</span></a></span><span>
+</span><span id="line-57"></span><span>
+</span><span id="line-58"></span><span class="annot"><a href="SetupBoard.html#toSetupState"><span class="hs-identifier hs-type">toSetupState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SetupBoard.html#SetupBoardState"><span class="hs-identifier hs-type">SetupBoardState</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SetupBoard.html#SetupState"><span class="hs-identifier hs-type">SetupState</span></a></span><span>
+</span><span id="line-59"></span><span id="toSetupState"><span class="annot"><span class="annottext">toSetupState :: SetupBoardState -&gt; SetupState
+</span><a href="SetupBoard.html#toSetupState"><span class="hs-identifier hs-var hs-var">toSetupState</span></a></span></span><span> </span><span id="local-6989586621679126953"><span class="annot"><span class="annottext">s :: SetupBoardState
+</span><a href="#local-6989586621679126953"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; Bool -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Map Country (Maybe Player) -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">null</span></span><span> </span><span class="annot"><span class="annottext">(Map Country (Maybe Player) -&gt; Bool)
+-&gt; Map Country (Maybe Player) -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Maybe Player -&gt; Bool)
+-&gt; Map Country (Maybe Player) -&gt; Map Country (Maybe Player)
+forall a k. (a -&gt; Bool) -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.filter</span></span><span> </span><span class="annot"><span class="annottext">Maybe Player -&gt; Bool
+forall a. Maybe a -&gt; Bool
+</span><span class="hs-identifier hs-var">isNothing</span></span><span> </span><span class="annot"><span class="annottext">(Map Country (Maybe Player) -&gt; Map Country (Maybe Player))
+-&gt; Map Country (Maybe Player) -&gt; Map Country (Maybe Player)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; Map Country (Maybe Player)
+</span><a href="SetupBoard.html#playerMap"><span class="hs-identifier hs-var hs-var">playerMap</span></a></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126953"><span class="hs-identifier hs-var">s</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; SetupState
+</span><a href="SetupBoard.html#Incomplete"><span class="hs-identifier hs-var">Incomplete</span></a></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126953"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-60"></span><span>               </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; Bool -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Map Player Int -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">null</span></span><span> </span><span class="annot"><span class="annottext">(Map Player Int -&gt; Bool) -&gt; Map Player Int -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; Map Player Int -&gt; Map Player Int
+forall a k. (a -&gt; Bool) -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.filter</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">/=</span></span><span> </span><span class="annot"><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Map Player Int -&gt; Map Player Int)
+-&gt; Map Player Int -&gt; Map Player Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; Map Player Int
+</span><a href="SetupBoard.html#playerRemaining"><span class="hs-identifier hs-var hs-var">playerRemaining</span></a></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126953"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; SetupState
+</span><a href="SetupBoard.html#PartiallyComplete"><span class="hs-identifier hs-var">PartiallyComplete</span></a></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126953"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-61"></span><span>               </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span>                                          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; SetupState
+</span><a href="SetupBoard.html#Complete"><span class="hs-identifier hs-var">Complete</span></a></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126953"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-62"></span><span>              </span><span>
+</span><span id="line-63"></span><span class="annot"><a href="SetupBoard.html#nextTurn"><span class="hs-identifier hs-type">nextTurn</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SetupBoard.html#SetupBoardState"><span class="hs-identifier hs-type">SetupBoardState</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SetupBoard.html#SetupBoardState"><span class="hs-identifier hs-type">SetupBoardState</span></a></span><span>
+</span><span id="line-64"></span><span id="nextTurn"><span class="annot"><span class="annottext">nextTurn :: SbStateTransformer
+</span><a href="SetupBoard.html#nextTurn"><span class="hs-identifier hs-var hs-var">nextTurn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([Player] -&gt; [Player]) -&gt; SbStateTransformer
+</span><a href="SetupBoard.html#changePlayers"><span class="hs-identifier hs-var">changePlayers</span></a></span><span> </span><span class="annot"><span class="annottext">[Player] -&gt; [Player]
+forall a. [a] -&gt; [a]
+</span><a href="#local-6989586621679126946"><span class="hs-identifier hs-var">rotate</span></a></span><span>
+</span><span id="line-65"></span><span>        </span><span class="hs-keyword">where</span><span>
+</span><span id="line-66"></span><span>          </span><span id="local-6989586621679126946"><span class="annot"><span class="annottext">rotate :: [a] -&gt; [a]
+</span><a href="#local-6989586621679126946"><span class="hs-identifier hs-var hs-var">rotate</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-67"></span><span>          </span><span class="annot"><a href="#local-6989586621679126946"><span class="hs-identifier hs-var">rotate</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679126945"><span class="annot"><span class="annottext">x :: a
+</span><a href="#local-6989586621679126945"><span class="hs-identifier hs-var">x</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679126944"><span class="annot"><span class="annottext">xs :: [a]
+</span><a href="#local-6989586621679126944"><span class="hs-identifier hs-var">xs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679126944"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; [a] -&gt; [a]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679126945"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-68"></span><span>
+</span><span id="line-69"></span><span id="local-6989586621679127052"><span class="annot"><a href="SetupBoard.html#distinct"><span class="hs-identifier hs-type">distinct</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679127052"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679127052"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span></span><span>
+</span><span id="line-70"></span><span id="distinct"><span class="annot"><span class="annottext">distinct :: [a] -&gt; Bool
+</span><a href="SetupBoard.html#distinct"><span class="hs-identifier hs-var hs-var">distinct</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-71"></span><span class="annot"><a href="SetupBoard.html#distinct"><span class="hs-identifier hs-var">distinct</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679126942"><span class="annot"><span class="annottext">x :: a
+</span><a href="#local-6989586621679126942"><span class="hs-identifier hs-var">x</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679126941"><span class="annot"><span class="annottext">xs :: [a]
+</span><a href="#local-6989586621679126941"><span class="hs-identifier hs-var">xs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; Bool -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679126942"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; [a] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-operator hs-var">`elem`</span></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679126941"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; Bool
+forall a. Eq a =&gt; [a] -&gt; Bool
+</span><a href="SetupBoard.html#distinct"><span class="hs-identifier hs-var">distinct</span></a></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679126941"><span class="hs-identifier hs-var">xs</span></a></span><span>
+</span><span id="line-72"></span><span>
+</span><span id="line-73"></span><span class="hs-comment">-- public --</span><span>
+</span><span id="line-74"></span><span>
+</span><span id="line-75"></span><span class="hs-comment">-- | Creates a blank board with no troops and where no countries are owned yet. Creates an 'Incomplete' 'SetupBoardState'.</span><span>
+</span><span id="line-76"></span><span class="annot"><a href="SetupBoard.html#emptyBoard"><span class="hs-identifier hs-type">emptyBoard</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SetupBoard.html#SetupState"><span class="hs-identifier hs-type">SetupState</span></a></span><span>
+</span><span id="line-77"></span><span id="emptyBoard"><span class="annot"><span class="annottext">emptyBoard :: [Player] -&gt; SetupState
+</span><a href="SetupBoard.html#emptyBoard"><span class="hs-identifier hs-var hs-var">emptyBoard</span></a></span></span><span> </span><span id="local-6989586621679126938"><span class="annot"><span class="annottext">ps :: [Player]
+</span><a href="#local-6989586621679126938"><span class="hs-identifier hs-var">ps</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">[Player] -&gt; Bool
+forall a. Eq a =&gt; [a] -&gt; Bool
+</span><a href="SetupBoard.html#distinct"><span class="hs-identifier hs-var">distinct</span></a></span><span> </span><span class="annot"><span class="annottext">[Player]
+</span><a href="#local-6989586621679126938"><span class="hs-identifier hs-var">ps</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span>
+</span><span id="line-78"></span><span>    </span><span class="annot"><span class="annottext">SetupBoardState -&gt; SetupState
+</span><a href="SetupBoard.html#Incomplete"><span class="hs-identifier hs-var">Incomplete</span></a></span><span> </span><span class="annot"><span class="annottext">(SetupBoardState -&gt; SetupState) -&gt; SetupBoardState -&gt; SetupState
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Map Country Int
+-&gt; Map Country (Maybe Player)
+-&gt; [Player]
+-&gt; Map Player Int
+-&gt; SetupBoardState
+</span><a href="SetupBoard.html#InternalGameState"><span class="hs-identifier hs-var">InternalGameState</span></a></span><span> </span><span>
+</span><span id="line-79"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[(Country, Int)] -&gt; Map Country Int
+forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.fromList</span></span><span> </span><span class="annot"><span class="annottext">([(Country, Int)] -&gt; Map Country Int)
+-&gt; [(Country, Int)] -&gt; Map Country Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Country] -&gt; [Int] -&gt; [(Country, Int)]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="annot"><span class="annottext">[Country]
+</span><a href="#local-6989586621679126936"><span class="hs-identifier hs-var">countries</span></a></span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; [(Country, Int)]) -&gt; [Int] -&gt; [(Country, Int)]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; [Int]
+forall a. a -&gt; [a]
+</span><span class="hs-identifier hs-var">repeat</span></span><span> </span><span class="annot"><span class="hs-number">0</span></span><span class="hs-special">)</span><span>
+</span><span id="line-80"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[(Country, Maybe Player)] -&gt; Map Country (Maybe Player)
+forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.fromList</span></span><span> </span><span class="annot"><span class="annottext">([(Country, Maybe Player)] -&gt; Map Country (Maybe Player))
+-&gt; [(Country, Maybe Player)] -&gt; Map Country (Maybe Player)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Country] -&gt; [Maybe Player] -&gt; [(Country, Maybe Player)]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="annot"><span class="annottext">[Country]
+</span><a href="#local-6989586621679126936"><span class="hs-identifier hs-var">countries</span></a></span><span> </span><span class="annot"><span class="annottext">([Maybe Player] -&gt; [(Country, Maybe Player)])
+-&gt; [Maybe Player] -&gt; [(Country, Maybe Player)]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Maybe Player -&gt; [Maybe Player]
+forall a. a -&gt; [a]
+</span><span class="hs-identifier hs-var">repeat</span></span><span> </span><span class="annot"><span class="annottext">Maybe Player
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">)</span><span>
+</span><span id="line-81"></span><span>    </span><span class="annot"><span class="annottext">[Player]
+</span><a href="#local-6989586621679126938"><span class="hs-identifier hs-var">ps</span></a></span><span>
+</span><span id="line-82"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[(Player, Int)] -&gt; Map Player Int
+forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.fromList</span></span><span> </span><span class="annot"><span class="annottext">([(Player, Int)] -&gt; Map Player Int)
+-&gt; [(Player, Int)] -&gt; Map Player Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Player] -&gt; [Int] -&gt; [(Player, Int)]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="annot"><span class="annottext">[Player]
+</span><a href="#local-6989586621679126938"><span class="hs-identifier hs-var">ps</span></a></span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; [(Player, Int)]) -&gt; [Int] -&gt; [(Player, Int)]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; [Int]
+forall a. a -&gt; [a]
+</span><span class="hs-identifier hs-var">repeat</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; [Int]) -&gt; Int -&gt; [Int]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int
+</span><a href="SetupBoard.html#initialTroops"><span class="hs-identifier hs-var">initialTroops</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int) -&gt; Int -&gt; Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Player] -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="annot"><span class="annottext">[Player]
+</span><a href="#local-6989586621679126938"><span class="hs-identifier hs-var">ps</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-83"></span><span>    </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">SetupState
+forall a. a
+</span><a href="#local-6989586621679126932"><span class="hs-identifier hs-var">errDup</span></a></span><span>
+</span><span id="line-84"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-85"></span><span>        </span><span id="local-6989586621679126936"><span class="annot"><span class="annottext">countries :: [Country]
+</span><a href="#local-6989586621679126936"><span class="hs-identifier hs-var hs-var">countries</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Country
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">minBound</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span class="hs-special">)</span><span class="hs-glyph">..</span><span class="hs-special">]</span><span>
+</span><span id="line-86"></span><span>        </span><span id="local-6989586621679126932"><span class="annot"><span class="annottext">errDup :: a
+</span><a href="#local-6989586621679126932"><span class="hs-identifier hs-var hs-var">errDup</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; a
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="hs-string">&quot;Duplicate players given to emptyBoard&quot;</span></span><span>
+</span><span id="line-87"></span><span>
+</span><span id="line-88"></span><span class="hs-comment">-- | Partial function, only defined for incomplete and partially complete SetupState and only when the current player owns the given country. </span><span>
+</span><span id="line-89"></span><span class="hs-comment">-- It should error if called on a Complete SetupBoardState.</span><span>
+</span><span id="line-90"></span><span class="hs-comment">-- It should return 'Nothing' if called on a 'Country' not owned by current player (or unowned).</span><span>
+</span><span id="line-91"></span><span class="annot"><a href="SetupBoard.html#placeTroop"><span class="hs-identifier hs-type">placeTroop</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SetupBoard.html#SetupState"><span class="hs-identifier hs-type">SetupState</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="SetupBoard.html#SetupState"><span class="hs-identifier hs-type">SetupState</span></a></span><span>
+</span><span id="line-92"></span><span id="placeTroop"><span class="annot"><span class="annottext">placeTroop :: Country -&gt; SetupState -&gt; Maybe SetupState
+</span><a href="SetupBoard.html#placeTroop"><span class="hs-identifier hs-var hs-var">placeTroop</span></a></span></span><span> </span><span id="local-6989586621679126929"><span class="annot"><span class="annottext">c :: Country
+</span><a href="#local-6989586621679126929"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SetupBoard.html#Incomplete"><span class="hs-identifier hs-type">Incomplete</span></a></span><span> </span><span id="local-6989586621679126928"><span class="annot"><span class="annottext">s :: SetupBoardState
+</span><a href="#local-6989586621679126928"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Country -&gt; Map Country (Maybe Player) -&gt; Maybe (Maybe Player)
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Map.lookup</span></span><span> </span><span class="annot"><span class="annottext">Country
+</span><a href="#local-6989586621679126929"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SetupBoardState -&gt; Map Country (Maybe Player)
+</span><a href="SetupBoard.html#playerMap"><span class="hs-identifier hs-var hs-var">playerMap</span></a></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126928"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-93"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679126926"><span class="hs-identifier hs-var">valid</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">SetupState -&gt; Maybe SetupState
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(SetupState -&gt; Maybe SetupState) -&gt; SetupState -&gt; Maybe SetupState
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; SetupState
+</span><a href="SetupBoard.html#toSetupState"><span class="hs-identifier hs-var">toSetupState</span></a></span><span> </span><span class="annot"><span class="annottext">(SetupBoardState -&gt; SetupState) -&gt; SetupBoardState -&gt; SetupState
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126925"><span class="hs-identifier hs-var">newBoard</span></a></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Maybe SetupState
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-94"></span><span>    </span><span class="hs-identifier">_</span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Maybe SetupState
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-95"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-96"></span><span>        </span><span id="local-6989586621679126924"><span class="annot"><span class="annottext">p :: Player
+</span><a href="#local-6989586621679126924"><span class="hs-identifier hs-var hs-var">p</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; Player
+</span><a href="SetupBoard.html#currentPlayer"><span class="hs-identifier hs-var">currentPlayer</span></a></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126928"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-97"></span><span>        </span><span id="local-6989586621679126926"><span class="annot"><span class="annottext">valid :: Bool
+</span><a href="#local-6989586621679126926"><span class="hs-identifier hs-var hs-var">valid</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; (Int -&gt; Bool) -&gt; Maybe Int -&gt; Bool
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; Bool
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Bool) -&gt; String -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="hs-string">&quot;Player '&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Player -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Player
+</span><a href="#local-6989586621679126924"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="hs-string">&quot;' not playing.&quot;</span></span><span class="hs-special">)</span><span>
+</span><span id="line-98"></span><span>                      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span class="annot"><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Player -&gt; Map Player Int -&gt; Maybe Int
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Map.lookup</span></span><span> </span><span class="annot"><span class="annottext">Player
+</span><a href="#local-6989586621679126924"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">(Map Player Int -&gt; Maybe Int) -&gt; Map Player Int -&gt; Maybe Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; Map Player Int
+</span><a href="SetupBoard.html#playerRemaining"><span class="hs-identifier hs-var hs-var">playerRemaining</span></a></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126928"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-99"></span><span>        </span><span id="local-6989586621679126920"><span class="annot"><span class="annottext">ownerAdded :: SetupBoardState
+</span><a href="#local-6989586621679126920"><span class="hs-identifier hs-var hs-var">ownerAdded</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Map Country (Maybe Player) -&gt; Map Country (Maybe Player))
+-&gt; SbStateTransformer
+</span><a href="SetupBoard.html#changePlayerMap"><span class="hs-identifier hs-var">changePlayerMap</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Country
+-&gt; Maybe Player
+-&gt; Map Country (Maybe Player)
+-&gt; Map Country (Maybe Player)
+forall k a. Ord k =&gt; k -&gt; a -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.insert</span></span><span> </span><span class="annot"><span class="annottext">Country
+</span><a href="#local-6989586621679126929"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Player -&gt; Maybe Player
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Player
+</span><a href="#local-6989586621679126924"><span class="hs-identifier hs-var">p</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126928"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-100"></span><span>        </span><span id="local-6989586621679126918"><span class="annot"><span class="annottext">decremented :: SetupBoardState
+</span><a href="#local-6989586621679126918"><span class="hs-identifier hs-var hs-var">decremented</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Map Player Int -&gt; Map Player Int) -&gt; SbStateTransformer
+</span><a href="SetupBoard.html#changeRemaining"><span class="hs-identifier hs-var">changeRemaining</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Int)
+-&gt; Player -&gt; Int -&gt; Map Player Int -&gt; Map Player Int
+forall k a. Ord k =&gt; (a -&gt; a -&gt; a) -&gt; k -&gt; a -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.insertWith</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Int) -&gt; Int -&gt; Int -&gt; Int
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">-</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Player
+</span><a href="#local-6989586621679126924"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126920"><span class="hs-identifier hs-var">ownerAdded</span></a></span><span>
+</span><span id="line-101"></span><span>        </span><span id="local-6989586621679126915"><span class="annot"><span class="annottext">troopAdded :: SetupBoardState
+</span><a href="#local-6989586621679126915"><span class="hs-identifier hs-var hs-var">troopAdded</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Map Country Int -&gt; Map Country Int) -&gt; SbStateTransformer
+</span><a href="SetupBoard.html#changeTroopMap"><span class="hs-identifier hs-var">changeTroopMap</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Int)
+-&gt; Country -&gt; Int -&gt; Map Country Int -&gt; Map Country Int
+forall k a. Ord k =&gt; (a -&gt; a -&gt; a) -&gt; k -&gt; a -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.insertWith</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">(+)</span></span><span> </span><span class="annot"><span class="annottext">Country
+</span><a href="#local-6989586621679126929"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126918"><span class="hs-identifier hs-var">decremented</span></a></span><span>
+</span><span id="line-102"></span><span>        </span><span id="local-6989586621679126925"><span class="annot"><span class="annottext">newBoard :: SetupBoardState
+</span><a href="#local-6989586621679126925"><span class="hs-identifier hs-var hs-var">newBoard</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SbStateTransformer
+</span><a href="SetupBoard.html#nextTurn"><span class="hs-identifier hs-var">nextTurn</span></a></span><span> </span><span class="annot"><span class="annottext">SbStateTransformer -&gt; SbStateTransformer
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126915"><span class="hs-identifier hs-var">troopAdded</span></a></span><span>
+</span><span id="line-103"></span><span>
+</span><span id="line-104"></span><span class="annot"><a href="SetupBoard.html#placeTroop"><span class="hs-identifier hs-var">placeTroop</span></a></span><span> </span><span id="local-6989586621679126913"><span class="annot"><span class="annottext">c :: Country
+</span><a href="#local-6989586621679126913"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SetupBoard.html#PartiallyComplete"><span class="hs-identifier hs-type">PartiallyComplete</span></a></span><span> </span><span id="local-6989586621679126912"><span class="annot"><span class="annottext">s :: SetupBoardState
+</span><a href="#local-6989586621679126912"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Country -&gt; Map Country (Maybe Player) -&gt; Maybe (Maybe Player)
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Map.lookup</span></span><span> </span><span class="annot"><span class="annottext">Country
+</span><a href="#local-6989586621679126913"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SetupBoardState -&gt; Map Country (Maybe Player)
+</span><a href="SetupBoard.html#playerMap"><span class="hs-identifier hs-var hs-var">playerMap</span></a></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126912"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-105"></span><span>     </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679126911"><span class="annot"><span class="annottext">x :: Player
+</span><a href="#local-6989586621679126911"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679126910"><span class="hs-identifier hs-var">valid</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Player
+</span><a href="#local-6989586621679126911"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Player -&gt; Player -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Player
+</span><a href="#local-6989586621679126909"><span class="hs-identifier hs-var">p</span></a></span><span>
+</span><span id="line-106"></span><span>                        </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">SetupState -&gt; Maybe SetupState
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(SetupState -&gt; Maybe SetupState) -&gt; SetupState -&gt; Maybe SetupState
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; SetupState
+</span><a href="SetupBoard.html#toSetupState"><span class="hs-identifier hs-var">toSetupState</span></a></span><span> </span><span class="annot"><span class="annottext">(SetupBoardState -&gt; SetupState) -&gt; SetupBoardState -&gt; SetupState
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126908"><span class="hs-identifier hs-var">newBoard</span></a></span><span>
+</span><span id="line-107"></span><span>                        </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Maybe SetupState
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-108"></span><span>     </span><span class="hs-identifier">_</span><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; Maybe SetupState
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="hs-string">&quot;impossible situation: Nothing in PartiallyComplete&quot;</span></span><span>
+</span><span id="line-109"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-110"></span><span>        </span><span id="local-6989586621679126909"><span class="annot"><span class="annottext">p :: Player
+</span><a href="#local-6989586621679126909"><span class="hs-identifier hs-var hs-var">p</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; Player
+</span><a href="SetupBoard.html#currentPlayer"><span class="hs-identifier hs-var">currentPlayer</span></a></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126912"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-111"></span><span>        </span><span id="local-6989586621679126910"><span class="annot"><span class="annottext">valid :: Bool
+</span><a href="#local-6989586621679126910"><span class="hs-identifier hs-var hs-var">valid</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; (Int -&gt; Bool) -&gt; Maybe Int -&gt; Bool
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; Bool
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Bool) -&gt; String -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="hs-string">&quot;Player '&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Player -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Player
+</span><a href="#local-6989586621679126909"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="hs-string">&quot;' not playing.&quot;</span></span><span class="hs-special">)</span><span>
+</span><span id="line-112"></span><span>                                    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span class="annot"><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Player -&gt; Map Player Int -&gt; Maybe Int
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Map.lookup</span></span><span> </span><span class="annot"><span class="annottext">Player
+</span><a href="#local-6989586621679126909"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">(Map Player Int -&gt; Maybe Int) -&gt; Map Player Int -&gt; Maybe Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; Map Player Int
+</span><a href="SetupBoard.html#playerRemaining"><span class="hs-identifier hs-var hs-var">playerRemaining</span></a></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126912"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-113"></span><span>        </span><span id="local-6989586621679126907"><span class="annot"><span class="annottext">decremented :: SetupBoardState
+</span><a href="#local-6989586621679126907"><span class="hs-identifier hs-var hs-var">decremented</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Map Player Int -&gt; Map Player Int) -&gt; SbStateTransformer
+</span><a href="SetupBoard.html#changeRemaining"><span class="hs-identifier hs-var">changeRemaining</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Int)
+-&gt; Player -&gt; Int -&gt; Map Player Int -&gt; Map Player Int
+forall k a. Ord k =&gt; (a -&gt; a -&gt; a) -&gt; k -&gt; a -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.insertWith</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Int) -&gt; Int -&gt; Int -&gt; Int
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">-</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Player
+</span><a href="#local-6989586621679126909"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126912"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-114"></span><span>        </span><span id="local-6989586621679126906"><span class="annot"><span class="annottext">troopAdded :: SetupBoardState
+</span><a href="#local-6989586621679126906"><span class="hs-identifier hs-var hs-var">troopAdded</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Map Country Int -&gt; Map Country Int) -&gt; SbStateTransformer
+</span><a href="SetupBoard.html#changeTroopMap"><span class="hs-identifier hs-var">changeTroopMap</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Int)
+-&gt; Country -&gt; Int -&gt; Map Country Int -&gt; Map Country Int
+forall k a. Ord k =&gt; (a -&gt; a -&gt; a) -&gt; k -&gt; a -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.insertWith</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">(+)</span></span><span> </span><span class="annot"><span class="annottext">Country
+</span><a href="#local-6989586621679126913"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126907"><span class="hs-identifier hs-var">decremented</span></a></span><span>
+</span><span id="line-115"></span><span>        </span><span id="local-6989586621679126908"><span class="annot"><span class="annottext">newBoard :: SetupBoardState
+</span><a href="#local-6989586621679126908"><span class="hs-identifier hs-var hs-var">newBoard</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SbStateTransformer
+</span><a href="SetupBoard.html#nextTurn"><span class="hs-identifier hs-var">nextTurn</span></a></span><span> </span><span class="annot"><span class="annottext">SbStateTransformer -&gt; SbStateTransformer
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126906"><span class="hs-identifier hs-var">troopAdded</span></a></span><span>
+</span><span id="line-116"></span><span>
+</span><span id="line-117"></span><span class="annot"><a href="SetupBoard.html#placeTroop"><span class="hs-identifier hs-var">placeTroop</span></a></span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Maybe SetupState
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="hs-string">&quot;invalid call to placeTroop: called on 'Complete' SetupState.&quot;</span></span><span>
+</span><span id="line-118"></span><span>
+</span><span id="line-119"></span><span class="annot"><a href="SetupBoard.html#completeBoardOwner"><span class="hs-identifier hs-type">completeBoardOwner</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SetupBoard.html#SetupState"><span class="hs-identifier hs-type">SetupState</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span>
+</span><span id="line-120"></span><span id="completeBoardOwner"><span class="annot"><span class="annottext">completeBoardOwner :: SetupState -&gt; Country -&gt; (Player, Int)
+</span><a href="SetupBoard.html#completeBoardOwner"><span class="hs-identifier hs-var hs-var">completeBoardOwner</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SetupBoard.html#Complete"><span class="hs-identifier hs-type">Complete</span></a></span><span> </span><span id="local-6989586621679126905"><span class="annot"><span class="annottext">s :: SetupBoardState
+</span><a href="#local-6989586621679126905"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679126904"><span class="annot"><span class="annottext">c :: Country
+</span><a href="#local-6989586621679126904"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Maybe (Player, Int)
+</span><a href="#local-6989586621679126903"><span class="hs-identifier hs-var">result</span></a></span><span> </span><span class="hs-keyword">of</span><span> </span><span>
+</span><span id="line-121"></span><span>                                    </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679126902"><span class="annot"><span class="annottext">r :: (Player, Int)
+</span><a href="#local-6989586621679126902"><span class="hs-identifier hs-var">r</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Player, Int)
+</span><a href="#local-6989586621679126902"><span class="hs-identifier hs-var">r</span></a></span><span>
+</span><span id="line-122"></span><span>                                    </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; (Player, Int)
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="hs-string">&quot;Shouldn't be possibe. Missing owner in CompleteBoard!&quot;</span></span><span>
+</span><span id="line-123"></span><span>        </span><span class="hs-keyword">where</span><span> </span><span>
+</span><span id="line-124"></span><span>          </span><span id="local-6989586621679126903"><span class="annot"><span class="annottext">result :: Maybe (Player, Int)
+</span><a href="#local-6989586621679126903"><span class="hs-identifier hs-var hs-var">result</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Player -&gt; Int -&gt; (Player, Int))
+-&gt; Maybe Player -&gt; Maybe (Int -&gt; (Player, Int))
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Maybe (Maybe Player) -&gt; Maybe Player
+forall (m :: * -&gt; *) a. Monad m =&gt; m (m a) -&gt; m a
+</span><span class="hs-identifier hs-var">join</span></span><span> </span><span class="annot"><span class="annottext">(Maybe (Maybe Player) -&gt; Maybe Player)
+-&gt; Maybe (Maybe Player) -&gt; Maybe Player
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Country -&gt; Map Country (Maybe Player) -&gt; Maybe (Maybe Player)
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Map.lookup</span></span><span> </span><span class="annot"><span class="annottext">Country
+</span><a href="#local-6989586621679126904"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">(Map Country (Maybe Player) -&gt; Maybe (Maybe Player))
+-&gt; Map Country (Maybe Player) -&gt; Maybe (Maybe Player)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; Map Country (Maybe Player)
+</span><a href="SetupBoard.html#playerMap"><span class="hs-identifier hs-var hs-var">playerMap</span></a></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126905"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Maybe (Int -&gt; (Player, Int)) -&gt; Maybe Int -&gt; Maybe (Player, Int)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Country -&gt; Map Country Int -&gt; Maybe Int
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Map.lookup</span></span><span> </span><span class="annot"><span class="annottext">Country
+</span><a href="#local-6989586621679126904"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">(Map Country Int -&gt; Maybe Int) -&gt; Map Country Int -&gt; Maybe Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; Map Country Int
+</span><a href="SetupBoard.html#troopMap"><span class="hs-identifier hs-var hs-var">troopMap</span></a></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126905"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-125"></span><span class="annot"><a href="SetupBoard.html#completeBoardOwner"><span class="hs-identifier hs-var">completeBoardOwner</span></a></span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; (Player, Int)
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="hs-string">&quot;completeBoardOwner only defined for Complete SetupBoardState&quot;</span></span><span>
+</span><span id="line-126"></span><span>
+</span><span id="line-127"></span><span class="hs-comment">-- | Partial function, defined for 'PartiallyComplete' 'SetupState', gives the owner and number of troops in each country.</span><span>
+</span><span id="line-128"></span><span class="hs-comment">-- It should error if called on a incomplete SetupState</span><span>
+</span><span id="line-129"></span><span class="annot"><a href="SetupBoard.html#partiallyCompleteBoardOwner"><span class="hs-identifier hs-type">partiallyCompleteBoardOwner</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SetupBoard.html#SetupState"><span class="hs-identifier hs-type">SetupState</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span>
+</span><span id="line-130"></span><span id="partiallyCompleteBoardOwner"><span class="annot"><span class="annottext">partiallyCompleteBoardOwner :: SetupState -&gt; Country -&gt; (Player, Int)
+</span><a href="SetupBoard.html#partiallyCompleteBoardOwner"><span class="hs-identifier hs-var hs-var">partiallyCompleteBoardOwner</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SetupBoard.html#PartiallyComplete"><span class="hs-identifier hs-type">PartiallyComplete</span></a></span><span> </span><span id="local-6989586621679126900"><span class="annot"><span class="annottext">s :: SetupBoardState
+</span><a href="#local-6989586621679126900"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679126899"><span class="annot"><span class="annottext">c :: Country
+</span><a href="#local-6989586621679126899"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Maybe (Player, Int)
+</span><a href="#local-6989586621679126898"><span class="hs-identifier hs-var">result</span></a></span><span> </span><span class="hs-keyword">of</span><span> </span><span>
+</span><span id="line-131"></span><span>                                    </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679126897"><span class="annot"><span class="annottext">r :: (Player, Int)
+</span><a href="#local-6989586621679126897"><span class="hs-identifier hs-var">r</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Player, Int)
+</span><a href="#local-6989586621679126897"><span class="hs-identifier hs-var">r</span></a></span><span>
+</span><span id="line-132"></span><span>                                    </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; (Player, Int)
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="hs-string">&quot;Shouldn't be possibe. Missing owner in PartiallyCompleteBoard!&quot;</span></span><span>
+</span><span id="line-133"></span><span>        </span><span class="hs-keyword">where</span><span> </span><span>
+</span><span id="line-134"></span><span>          </span><span id="local-6989586621679126898"><span class="annot"><span class="annottext">result :: Maybe (Player, Int)
+</span><a href="#local-6989586621679126898"><span class="hs-identifier hs-var hs-var">result</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Player -&gt; Int -&gt; (Player, Int))
+-&gt; Maybe Player -&gt; Maybe (Int -&gt; (Player, Int))
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Maybe (Maybe Player) -&gt; Maybe Player
+forall (m :: * -&gt; *) a. Monad m =&gt; m (m a) -&gt; m a
+</span><span class="hs-identifier hs-var">join</span></span><span> </span><span class="annot"><span class="annottext">(Maybe (Maybe Player) -&gt; Maybe Player)
+-&gt; Maybe (Maybe Player) -&gt; Maybe Player
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Country -&gt; Map Country (Maybe Player) -&gt; Maybe (Maybe Player)
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Map.lookup</span></span><span> </span><span class="annot"><span class="annottext">Country
+</span><a href="#local-6989586621679126899"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">(Map Country (Maybe Player) -&gt; Maybe (Maybe Player))
+-&gt; Map Country (Maybe Player) -&gt; Maybe (Maybe Player)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; Map Country (Maybe Player)
+</span><a href="SetupBoard.html#playerMap"><span class="hs-identifier hs-var hs-var">playerMap</span></a></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126900"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Maybe (Int -&gt; (Player, Int)) -&gt; Maybe Int -&gt; Maybe (Player, Int)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Country -&gt; Map Country Int -&gt; Maybe Int
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Map.lookup</span></span><span> </span><span class="annot"><span class="annottext">Country
+</span><a href="#local-6989586621679126899"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">(Map Country Int -&gt; Maybe Int) -&gt; Map Country Int -&gt; Maybe Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; Map Country Int
+</span><a href="SetupBoard.html#troopMap"><span class="hs-identifier hs-var hs-var">troopMap</span></a></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126900"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-135"></span><span class="annot"><a href="SetupBoard.html#partiallyCompleteBoardOwner"><span class="hs-identifier hs-var">partiallyCompleteBoardOwner</span></a></span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; (Player, Int)
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="hs-string">&quot;partiallyCompleteBoardOwner only defined for PartiallyComplete SetupBoardState&quot;</span></span><span>
+</span><span id="line-136"></span><span>
+</span><span id="line-137"></span><span class="hs-comment">-- | Partial function, only defined for any 'SetupState', gives the owner and number of troops in each country.</span><span>
+</span><span id="line-138"></span><span class="annot"><a href="SetupBoard.html#incompleteBoardOwner"><span class="hs-identifier hs-type">incompleteBoardOwner</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SetupBoard.html#SetupState"><span class="hs-identifier hs-type">SetupState</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span>
+</span><span id="line-139"></span><span id="incompleteBoardOwner"><span class="annot"><span class="annottext">incompleteBoardOwner :: SetupState -&gt; Country -&gt; (Maybe Player, Int)
+</span><a href="SetupBoard.html#incompleteBoardOwner"><span class="hs-identifier hs-var hs-var">incompleteBoardOwner</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SetupBoard.html#Incomplete"><span class="hs-identifier hs-type">Incomplete</span></a></span><span> </span><span id="local-6989586621679126896"><span class="annot"><span class="annottext">s :: SetupBoardState
+</span><a href="#local-6989586621679126896"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679126895"><span class="annot"><span class="annottext">c :: Country
+</span><a href="#local-6989586621679126895"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Maybe (Maybe Player, Int)
+</span><a href="#local-6989586621679126894"><span class="hs-identifier hs-var">result</span></a></span><span> </span><span class="hs-keyword">of</span><span> </span><span>
+</span><span id="line-140"></span><span>                                        </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679126893"><span class="annot"><span class="annottext">r :: (Maybe Player, Int)
+</span><a href="#local-6989586621679126893"><span class="hs-identifier hs-var">r</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Maybe Player, Int)
+</span><a href="#local-6989586621679126893"><span class="hs-identifier hs-var">r</span></a></span><span>
+</span><span id="line-141"></span><span>                                        </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; (Maybe Player, Int)
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="hs-string">&quot;incompleteBoardOwner: Map should be total. Shouldn't be possible.&quot;</span></span><span>
+</span><span id="line-142"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679126894"><span class="annot"><span class="annottext">result :: Maybe (Maybe Player, Int)
+</span><a href="#local-6989586621679126894"><span class="hs-identifier hs-var hs-var">result</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Maybe Player -&gt; Int -&gt; (Maybe Player, Int))
+-&gt; Maybe (Maybe Player) -&gt; Maybe (Int -&gt; (Maybe Player, Int))
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Country -&gt; Map Country (Maybe Player) -&gt; Maybe (Maybe Player)
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Map.lookup</span></span><span> </span><span class="annot"><span class="annottext">Country
+</span><a href="#local-6989586621679126895"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">(Map Country (Maybe Player) -&gt; Maybe (Maybe Player))
+-&gt; Map Country (Maybe Player) -&gt; Maybe (Maybe Player)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; Map Country (Maybe Player)
+</span><a href="SetupBoard.html#playerMap"><span class="hs-identifier hs-var hs-var">playerMap</span></a></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126896"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Maybe (Int -&gt; (Maybe Player, Int))
+-&gt; Maybe Int -&gt; Maybe (Maybe Player, Int)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Country -&gt; Map Country Int -&gt; Maybe Int
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Map.lookup</span></span><span> </span><span class="annot"><span class="annottext">Country
+</span><a href="#local-6989586621679126895"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">(Map Country Int -&gt; Maybe Int) -&gt; Map Country Int -&gt; Maybe Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; Map Country Int
+</span><a href="SetupBoard.html#troopMap"><span class="hs-identifier hs-var hs-var">troopMap</span></a></span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126896"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-143"></span><span class="annot"><a href="SetupBoard.html#incompleteBoardOwner"><span class="hs-identifier hs-var">incompleteBoardOwner</span></a></span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; (Maybe Player, Int)
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="hs-string">&quot;incompleteBoardOwner only defined for Incomplete SetupBoardState&quot;</span></span><span>
+</span><span id="line-144"></span><span>
+</span><span id="line-145"></span><span class="hs-comment">-- | Gives the turnOrder for a 'SetupState', with the player's whose turn it currently is at the head of the list.</span><span>
+</span><span id="line-146"></span><span class="annot"><a href="SetupBoard.html#setUpTurnOrder"><span class="hs-identifier hs-type">setUpTurnOrder</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SetupBoard.html#SetupState"><span class="hs-identifier hs-type">SetupState</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-147"></span><span id="setUpTurnOrder"><span class="annot"><span class="annottext">setUpTurnOrder :: SetupState -&gt; [Player]
+</span><a href="SetupBoard.html#setUpTurnOrder"><span class="hs-identifier hs-var hs-var">setUpTurnOrder</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SetupBoardState -&gt; [Player]
+</span><a href="SetupBoard.html#statePlayers"><span class="hs-identifier hs-var hs-var">statePlayers</span></a></span><span> </span><span class="annot"><span class="annottext">(SetupBoardState -&gt; [Player])
+-&gt; (SetupState -&gt; SetupBoardState) -&gt; SetupState -&gt; [Player]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">SetupState -&gt; SetupBoardState
+</span><a href="SetupBoard.html#internalBoard"><span class="hs-identifier hs-var">internalBoard</span></a></span><span> </span><span>
+</span><span id="line-148"></span><span>
+</span><span id="line-149"></span><span class="hs-comment">-- private --</span><span>
+</span><span id="line-150"></span><span class="annot"><a href="SetupBoard.html#initialTroops"><span class="hs-identifier hs-type">initialTroops</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-151"></span><span id="initialTroops"><span class="annot"><span class="annottext">initialTroops :: Int -&gt; Int
+</span><a href="SetupBoard.html#initialTroops"><span class="hs-identifier hs-var hs-var">initialTroops</span></a></span></span><span> </span><span class="hs-number">6</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-number">20</span></span><span>
+</span><span id="line-152"></span><span class="annot"><a href="SetupBoard.html#initialTroops"><span class="hs-identifier hs-var">initialTroops</span></a></span><span> </span><span class="hs-number">5</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-number">25</span></span><span>
+</span><span id="line-153"></span><span class="annot"><a href="SetupBoard.html#initialTroops"><span class="hs-identifier hs-var">initialTroops</span></a></span><span> </span><span class="hs-number">4</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-number">30</span></span><span>
+</span><span id="line-154"></span><span class="annot"><a href="SetupBoard.html#initialTroops"><span class="hs-identifier hs-var">initialTroops</span></a></span><span> </span><span class="hs-number">3</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-number">35</span></span><span>
+</span><span id="line-155"></span><span class="annot"><a href="SetupBoard.html#initialTroops"><span class="hs-identifier hs-var">initialTroops</span></a></span><span> </span><span class="hs-number">2</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-number">40</span></span><span>
+</span><span id="line-156"></span><span class="annot"><a href="SetupBoard.html#initialTroops"><span class="hs-identifier hs-var">initialTroops</span></a></span><span> </span><span id="local-6989586621679126891"><span class="annot"><span class="annottext">n :: Int
+</span><a href="#local-6989586621679126891"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Int
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Int) -&gt; String -&gt; Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="hs-string">&quot;Game rules only specified for 2-6 players. Not sure what to do for &quot;</span></span><span>
+</span><span id="line-157"></span><span>                        </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679126891"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="hs-string">&quot; players.&quot;</span></span><span>
+</span><span id="line-158"></span><span>                        </span><span>
+</span><span id="line-159"></span><span class="annot"><a href="SetupBoard.html#internalBoard"><span class="hs-identifier hs-type">internalBoard</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SetupBoard.html#SetupState"><span class="hs-identifier hs-type">SetupState</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SetupBoard.html#SetupBoardState"><span class="hs-identifier hs-type">SetupBoardState</span></a></span><span>
+</span><span id="line-160"></span><span id="internalBoard"><span class="annot"><span class="annottext">internalBoard :: SetupState -&gt; SetupBoardState
+</span><a href="SetupBoard.html#internalBoard"><span class="hs-identifier hs-var hs-var">internalBoard</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SetupBoard.html#Incomplete"><span class="hs-identifier hs-type">Incomplete</span></a></span><span> </span><span id="local-6989586621679126890"><span class="annot"><span class="annottext">s :: SetupBoardState
+</span><a href="#local-6989586621679126890"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126890"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-161"></span><span class="annot"><a href="SetupBoard.html#internalBoard"><span class="hs-identifier hs-var">internalBoard</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SetupBoard.html#PartiallyComplete"><span class="hs-identifier hs-type">PartiallyComplete</span></a></span><span> </span><span id="local-6989586621679126889"><span class="annot"><span class="annottext">s :: SetupBoardState
+</span><a href="#local-6989586621679126889"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126889"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-162"></span><span class="annot"><a href="SetupBoard.html#internalBoard"><span class="hs-identifier hs-var">internalBoard</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SetupBoard.html#Complete"><span class="hs-identifier hs-type">Complete</span></a></span><span> </span><span id="local-6989586621679126888"><span class="annot"><span class="annottext">s :: SetupBoardState
+</span><a href="#local-6989586621679126888"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SetupBoardState
+</span><a href="#local-6989586621679126888"><span class="hs-identifier hs-var">s</span></a></span></pre></body></html>

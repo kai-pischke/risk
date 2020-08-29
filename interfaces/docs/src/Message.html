@@ -1,0 +1,242 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-|
+Module      : Message
+Description : Haskell requests and responses.
+Maintainer  : Alex
+
+This module defines the messages we make use of in 'Interface'.
+-}</span><span>
+</span><span id="line-8"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Message</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-9"></span><span>  </span><span class="annot"><a href="Message.html#Response"><span class="hs-identifier">Response</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-10"></span><span>  </span><span class="annot"><a href="Message.html#Update"><span class="hs-identifier">Update</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-11"></span><span>  </span><span class="annot"><a href="Message.html#Question"><span class="hs-identifier">Question</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-12"></span><span>  </span><span class="annot"><a href="Message.html#Error"><span class="hs-identifier">Error</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-13"></span><span>  </span><span class="annot"><a href="Message.html#Request"><span class="hs-identifier">Request</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-14"></span><span>  </span><span class="annot"><a href="Message.html#RequestType"><span class="hs-identifier">RequestType</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-comment">---- Imports -------------------</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="GameElements.html"><span class="hs-identifier">GameElements</span></a></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SetupBoard.html"><span class="hs-identifier">SetupBoard</span></a></span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="RiskBoard.html"><span class="hs-identifier">RiskBoard</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="State.html"><span class="hs-identifier">State</span></a></span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Battle.html"><span class="hs-identifier">Battle</span></a></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-comment">--------------------------------</span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-comment">---- Types ---------------------</span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-keyword">data</span><span> </span><span id="Response"><span class="annot"><a href="Message.html#Response"><span class="hs-identifier hs-var">Response</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="General"><span class="annot"><a href="Message.html#General"><span class="hs-identifier hs-var">General</span></a></span></span><span> </span><span class="annot"><a href="Message.html#Update"><span class="hs-identifier hs-type">Update</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Special"><span class="annot"><a href="Message.html#Special"><span class="hs-identifier hs-var">Special</span></a></span></span><span> </span><span class="annot"><a href="Message.html#Question"><span class="hs-identifier hs-type">Question</span></a></span><span> </span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Invalid"><span class="annot"><a href="Message.html#Invalid"><span class="hs-identifier hs-var">Invalid</span></a></span></span><span> </span><span class="annot"><a href="Message.html#Error"><span class="hs-identifier hs-type">Error</span></a></span><span> </span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="GameWon"><span class="annot"><a href="Message.html#GameWon"><span class="hs-identifier hs-var">GameWon</span></a></span></span><span> </span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span>
+</span><span id="line-28"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679127769"><span id="local-6989586621679127771"><span class="annot"><span class="annottext">Response -&gt; Response -&gt; Bool
+(Response -&gt; Response -&gt; Bool)
+-&gt; (Response -&gt; Response -&gt; Bool) -&gt; Eq Response
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Response -&gt; Response -&gt; Bool
+$c/= :: Response -&gt; Response -&gt; Bool
+== :: Response -&gt; Response -&gt; Bool
+$c== :: Response -&gt; Response -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127762"><span id="local-6989586621679127764"><span id="local-6989586621679127766"><span class="annot"><span class="annottext">Int -&gt; Response -&gt; ShowS
+[Response] -&gt; ShowS
+Response -&gt; String
+(Int -&gt; Response -&gt; ShowS)
+-&gt; (Response -&gt; String) -&gt; ([Response] -&gt; ShowS) -&gt; Show Response
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Response] -&gt; ShowS
+$cshowList :: [Response] -&gt; ShowS
+show :: Response -&gt; String
+$cshow :: Response -&gt; String
+showsPrec :: Int -&gt; Response -&gt; ShowS
+$cshowsPrec :: Int -&gt; Response -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span>  </span><span class="hs-keyword">data</span><span> </span><span id="Update"><span class="annot"><a href="Message.html#Update"><span class="hs-identifier hs-var">Update</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="WaitingRoom"><span class="annot"><a href="Message.html#WaitingRoom"><span class="hs-identifier hs-var">WaitingRoom</span></a></span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Setup"><span class="annot"><a href="Message.html#Setup"><span class="hs-identifier hs-var">Setup</span></a></span></span><span> </span><span class="annot"><a href="SetupBoard.html#SetupState"><span class="hs-identifier hs-type">SetupState</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Play"><span class="annot"><a href="Message.html#Play"><span class="hs-identifier hs-var">Play</span></a></span></span><span> </span><span class="annot"><a href="State.html#GameState"><span class="hs-identifier hs-type">GameState</span></a></span><span>
+</span><span id="line-31"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679127752"><span id="local-6989586621679127754"><span id="local-6989586621679127756"><span class="annot"><span class="annottext">Int -&gt; Update -&gt; ShowS
+[Update] -&gt; ShowS
+Update -&gt; String
+(Int -&gt; Update -&gt; ShowS)
+-&gt; (Update -&gt; String) -&gt; ([Update] -&gt; ShowS) -&gt; Show Update
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Update] -&gt; ShowS
+$cshowList :: [Update] -&gt; ShowS
+show :: Update -&gt; String
+$cshow :: Update -&gt; String
+showsPrec :: Int -&gt; Update -&gt; ShowS
+$cshowsPrec :: Int -&gt; Update -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679127749"><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="Message.html#Update"><span class="hs-identifier hs-type">Update</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-34"></span><span>    </span><span class="annot"><a href="Message.html#WaitingRoom"><span class="hs-identifier hs-type">WaitingRoom</span></a></span><span> </span><span id="local-6989586621679127748"><span class="annot"><span class="annottext">xs :: [Player]
+</span><a href="#local-6989586621679127748"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span id="local-6989586621679127747"><span class="annot"><span class="annottext">== :: Update -&gt; Update -&gt; Bool
+</span><span class="hs-operator hs-var hs-var hs-var hs-var">==</span></span></span><span> </span><span class="annot"><a href="Message.html#WaitingRoom"><span class="hs-identifier hs-type">WaitingRoom</span></a></span><span> </span><span id="local-6989586621679127746"><span class="annot"><span class="annottext">ys :: [Player]
+</span><a href="#local-6989586621679127746"><span class="hs-identifier hs-var">ys</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Player]
+</span><a href="#local-6989586621679127748"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="annot"><span class="annottext">[Player] -&gt; [Player] -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">[Player]
+</span><a href="#local-6989586621679127746"><span class="hs-identifier hs-var">ys</span></a></span><span>
+</span><span id="line-35"></span><span>    </span><span class="annot"><a href="Message.html#Setup"><span class="hs-identifier hs-type">Setup</span></a></span><span> </span><span id="local-6989586621679127745"><span class="annot"><span class="annottext">s1 :: SetupState
+</span><a href="#local-6989586621679127745"><span class="hs-identifier hs-var">s1</span></a></span></span><span> </span><span class="annot"><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><a href="Message.html#Setup"><span class="hs-identifier hs-type">Setup</span></a></span><span> </span><span id="local-6989586621679127744"><span class="annot"><span class="annottext">s2 :: SetupState
+</span><a href="#local-6989586621679127744"><span class="hs-identifier hs-var">s2</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SetupState
+</span><a href="#local-6989586621679127745"><span class="hs-identifier hs-var">s1</span></a></span><span> </span><span class="annot"><span class="annottext">SetupState -&gt; SetupState -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">SetupState
+</span><a href="#local-6989586621679127744"><span class="hs-identifier hs-var">s2</span></a></span><span>
+</span><span id="line-36"></span><span>    </span><span class="annot"><a href="Message.html#Play"><span class="hs-identifier hs-type">Play</span></a></span><span> </span><span id="local-6989586621679127743"><span class="annot"><span class="annottext">gs1 :: GameState
+</span><a href="#local-6989586621679127743"><span class="hs-identifier hs-var">gs1</span></a></span></span><span> </span><span class="annot"><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><a href="Message.html#Play"><span class="hs-identifier hs-type">Play</span></a></span><span> </span><span id="local-6989586621679127742"><span class="annot"><span class="annottext">gs2 :: GameState
+</span><a href="#local-6989586621679127742"><span class="hs-identifier hs-var">gs2</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-37"></span><span>      </span><span class="annot"><span class="annottext">GameState -&gt; Phase
+</span><a href="State.html#phase"><span class="hs-identifier hs-var">phase</span></a></span><span> </span><span class="annot"><span class="annottext">GameState
+</span><a href="#local-6989586621679127743"><span class="hs-identifier hs-var">gs1</span></a></span><span> </span><span class="annot"><span class="annottext">Phase -&gt; Phase -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">GameState -&gt; Phase
+</span><a href="State.html#phase"><span class="hs-identifier hs-var">phase</span></a></span><span> </span><span class="annot"><span class="annottext">GameState
+</span><a href="#local-6989586621679127742"><span class="hs-identifier hs-var">gs2</span></a></span><span>
+</span><span id="line-38"></span><span>      </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">GameState -&gt; [Player]
+</span><a href="State.html#turnOrder"><span class="hs-identifier hs-var">turnOrder</span></a></span><span> </span><span class="annot"><span class="annottext">GameState
+</span><a href="#local-6989586621679127743"><span class="hs-identifier hs-var">gs1</span></a></span><span> </span><span class="annot"><span class="annottext">[Player] -&gt; [Player] -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">GameState -&gt; [Player]
+</span><a href="State.html#turnOrder"><span class="hs-identifier hs-var">turnOrder</span></a></span><span> </span><span class="annot"><span class="annottext">GameState
+</span><a href="#local-6989586621679127742"><span class="hs-identifier hs-var">gs2</span></a></span><span>
+</span><span id="line-39"></span><span>      </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">(Country -&gt; Player) -&gt; [Country] -&gt; [Player]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">GameState -&gt; Country -&gt; Player
+</span><a href="State.html#owner"><span class="hs-identifier hs-var">owner</span></a></span><span> </span><span class="annot"><span class="annottext">GameState
+</span><a href="#local-6989586621679127743"><span class="hs-identifier hs-var">gs1</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Country]
+</span><a href="#local-6989586621679127737"><span class="hs-identifier hs-var">countries</span></a></span><span> </span><span class="annot"><span class="annottext">[Player] -&gt; [Player] -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">(Country -&gt; Player) -&gt; [Country] -&gt; [Player]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">GameState -&gt; Country -&gt; Player
+</span><a href="State.html#owner"><span class="hs-identifier hs-var">owner</span></a></span><span> </span><span class="annot"><span class="annottext">GameState
+</span><a href="#local-6989586621679127742"><span class="hs-identifier hs-var">gs2</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Country]
+</span><a href="#local-6989586621679127737"><span class="hs-identifier hs-var">countries</span></a></span><span>
+</span><span id="line-40"></span><span>      </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">(Country -&gt; Int) -&gt; [Country] -&gt; [Int]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">GameState -&gt; Country -&gt; Int
+</span><a href="State.html#troops"><span class="hs-identifier hs-var">troops</span></a></span><span> </span><span class="annot"><span class="annottext">GameState
+</span><a href="#local-6989586621679127743"><span class="hs-identifier hs-var">gs1</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Country]
+</span><a href="#local-6989586621679127737"><span class="hs-identifier hs-var">countries</span></a></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; [Int] -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">(Country -&gt; Int) -&gt; [Country] -&gt; [Int]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">GameState -&gt; Country -&gt; Int
+</span><a href="State.html#troops"><span class="hs-identifier hs-var">troops</span></a></span><span> </span><span class="annot"><span class="annottext">GameState
+</span><a href="#local-6989586621679127742"><span class="hs-identifier hs-var">gs2</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Country]
+</span><a href="#local-6989586621679127737"><span class="hs-identifier hs-var">countries</span></a></span><span>
+</span><span id="line-41"></span><span>      </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679127737"><span class="annot"><span class="annottext">countries :: [Country]
+</span><a href="#local-6989586621679127737"><span class="hs-identifier hs-var hs-var">countries</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Country
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">minBound</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span> </span><span class="hs-glyph">..</span><span> </span><span class="annot"><span class="annottext">Country
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">maxBound</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-keyword">data</span><span> </span><span id="Question"><span class="annot"><a href="Message.html#Question"><span class="hs-identifier hs-var">Question</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="NumDefenders"><span class="annot"><a href="Message.html#NumDefenders"><span class="hs-identifier hs-var">NumDefenders</span></a></span></span><span>
+</span><span id="line-44"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679127729"><span id="local-6989586621679127731"><span class="annot"><span class="annottext">Question -&gt; Question -&gt; Bool
+(Question -&gt; Question -&gt; Bool)
+-&gt; (Question -&gt; Question -&gt; Bool) -&gt; Eq Question
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Question -&gt; Question -&gt; Bool
+$c/= :: Question -&gt; Question -&gt; Bool
+== :: Question -&gt; Question -&gt; Bool
+$c== :: Question -&gt; Question -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127723"><span id="local-6989586621679127725"><span id="local-6989586621679127727"><span class="annot"><span class="annottext">Int -&gt; Question -&gt; ShowS
+[Question] -&gt; ShowS
+Question -&gt; String
+(Int -&gt; Question -&gt; ShowS)
+-&gt; (Question -&gt; String) -&gt; ([Question] -&gt; ShowS) -&gt; Show Question
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Question] -&gt; ShowS
+$cshowList :: [Question] -&gt; ShowS
+show :: Question -&gt; String
+$cshow :: Question -&gt; String
+showsPrec :: Int -&gt; Question -&gt; ShowS
+$cshowsPrec :: Int -&gt; Question -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span>  </span><span class="hs-keyword">data</span><span> </span><span id="Error"><span class="annot"><a href="Message.html#Error"><span class="hs-identifier hs-var">Error</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="InvalidMove"><span class="annot"><a href="Message.html#InvalidMove"><span class="hs-identifier hs-var">InvalidMove</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="NotYourTurn"><span class="annot"><a href="Message.html#NotYourTurn"><span class="hs-identifier hs-var">NotYourTurn</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="NotEnoughPlayers"><span class="annot"><a href="Message.html#NotEnoughPlayers"><span class="hs-identifier hs-var">NotEnoughPlayers</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="NotInWaitingRoom"><span class="annot"><a href="Message.html#NotInWaitingRoom"><span class="hs-identifier hs-var">NotInWaitingRoom</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="SetupComplete"><span class="annot"><a href="Message.html#SetupComplete"><span class="hs-identifier hs-var">SetupComplete</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="NotInSetup"><span class="annot"><a href="Message.html#NotInSetup"><span class="hs-identifier hs-var">NotInSetup</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="NotInPlay"><span class="annot"><a href="Message.html#NotInPlay"><span class="hs-identifier hs-var">NotInPlay</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="NotRequestingDefenders"><span class="annot"><a href="Message.html#NotRequestingDefenders"><span class="hs-identifier hs-var">NotRequestingDefenders</span></a></span></span><span>
+</span><span id="line-47"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679127711"><span id="local-6989586621679127713"><span class="annot"><span class="annottext">Error -&gt; Error -&gt; Bool
+(Error -&gt; Error -&gt; Bool) -&gt; (Error -&gt; Error -&gt; Bool) -&gt; Eq Error
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Error -&gt; Error -&gt; Bool
+$c/= :: Error -&gt; Error -&gt; Bool
+== :: Error -&gt; Error -&gt; Bool
+$c== :: Error -&gt; Error -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127705"><span id="local-6989586621679127707"><span id="local-6989586621679127709"><span class="annot"><span class="annottext">Int -&gt; Error -&gt; ShowS
+[Error] -&gt; ShowS
+Error -&gt; String
+(Int -&gt; Error -&gt; ShowS)
+-&gt; (Error -&gt; String) -&gt; ([Error] -&gt; ShowS) -&gt; Show Error
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Error] -&gt; ShowS
+$cshowList :: [Error] -&gt; ShowS
+show :: Error -&gt; String
+$cshow :: Error -&gt; String
+showsPrec :: Int -&gt; Error -&gt; ShowS
+$cshowsPrec :: Int -&gt; Error -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span>  </span><span class="hs-keyword">data</span><span> </span><span id="Request"><span class="annot"><a href="Message.html#Request"><span class="hs-identifier hs-var">Request</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Request"><span class="annot"><a href="Message.html#Request"><span class="hs-identifier hs-var">Request</span></a></span></span><span> </span><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span> </span><span class="annot"><a href="Message.html#RequestType"><span class="hs-identifier hs-type">RequestType</span></a></span><span>
+</span><span id="line-50"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679127700"><span id="local-6989586621679127702"><span class="annot"><span class="annottext">Request -&gt; Request -&gt; Bool
+(Request -&gt; Request -&gt; Bool)
+-&gt; (Request -&gt; Request -&gt; Bool) -&gt; Eq Request
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Request -&gt; Request -&gt; Bool
+$c/= :: Request -&gt; Request -&gt; Bool
+== :: Request -&gt; Request -&gt; Bool
+$c== :: Request -&gt; Request -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127694"><span id="local-6989586621679127696"><span id="local-6989586621679127698"><span class="annot"><span class="annottext">Int -&gt; Request -&gt; ShowS
+[Request] -&gt; ShowS
+Request -&gt; String
+(Int -&gt; Request -&gt; ShowS)
+-&gt; (Request -&gt; String) -&gt; ([Request] -&gt; ShowS) -&gt; Show Request
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Request] -&gt; ShowS
+$cshowList :: [Request] -&gt; ShowS
+show :: Request -&gt; String
+$cshow :: Request -&gt; String
+showsPrec :: Int -&gt; Request -&gt; ShowS
+$cshowsPrec :: Int -&gt; Request -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span>  </span><span class="hs-keyword">data</span><span> </span><span id="RequestType"><span class="annot"><a href="Message.html#RequestType"><span class="hs-identifier hs-var">RequestType</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-53"></span><span>    </span><span id="StartGame"><span class="annot"><a href="Message.html#StartGame"><span class="hs-identifier hs-var">StartGame</span></a></span></span><span>
+</span><span id="line-54"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="PlaceTroop"><span class="annot"><a href="Message.html#PlaceTroop"><span class="hs-identifier hs-var">PlaceTroop</span></a></span></span><span> </span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span>
+</span><span id="line-55"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="Attack"><span class="annot"><a href="Message.html#Attack"><span class="hs-identifier hs-var">Attack</span></a></span></span><span> </span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span> </span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span> </span><span class="annot"><a href="Battle.html#Attackers"><span class="hs-identifier hs-type">Attackers</span></a></span><span>
+</span><span id="line-56"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="Reinforce"><span class="annot"><a href="Message.html#Reinforce"><span class="hs-identifier hs-var">Reinforce</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-57"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="Fortify"><span class="annot"><a href="Message.html#Fortify"><span class="hs-identifier hs-var">Fortify</span></a></span></span><span> </span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span> </span><span class="annot"><a href="RiskBoard.html#Country"><span class="hs-identifier hs-type">Country</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-58"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="Invade"><span class="annot"><a href="Message.html#Invade"><span class="hs-identifier hs-var">Invade</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-59"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="ChooseDefenders"><span class="annot"><a href="Message.html#ChooseDefenders"><span class="hs-identifier hs-var">ChooseDefenders</span></a></span></span><span> </span><span class="annot"><a href="Battle.html#Defenders"><span class="hs-identifier hs-type">Defenders</span></a></span><span>
+</span><span id="line-60"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="EndAttack"><span class="annot"><a href="Message.html#EndAttack"><span class="hs-identifier hs-var">EndAttack</span></a></span></span><span>
+</span><span id="line-61"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="SkipFortify"><span class="annot"><a href="Message.html#SkipFortify"><span class="hs-identifier hs-var">SkipFortify</span></a></span></span><span>
+</span><span id="line-62"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679127679"><span id="local-6989586621679127681"><span class="annot"><span class="annottext">RequestType -&gt; RequestType -&gt; Bool
+(RequestType -&gt; RequestType -&gt; Bool)
+-&gt; (RequestType -&gt; RequestType -&gt; Bool) -&gt; Eq RequestType
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: RequestType -&gt; RequestType -&gt; Bool
+$c/= :: RequestType -&gt; RequestType -&gt; Bool
+== :: RequestType -&gt; RequestType -&gt; Bool
+$c== :: RequestType -&gt; RequestType -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127673"><span id="local-6989586621679127675"><span id="local-6989586621679127677"><span class="annot"><span class="annottext">Int -&gt; RequestType -&gt; ShowS
+[RequestType] -&gt; ShowS
+RequestType -&gt; String
+(Int -&gt; RequestType -&gt; ShowS)
+-&gt; (RequestType -&gt; String)
+-&gt; ([RequestType] -&gt; ShowS)
+-&gt; Show RequestType
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [RequestType] -&gt; ShowS
+$cshowList :: [RequestType] -&gt; ShowS
+show :: RequestType -&gt; String
+$cshow :: RequestType -&gt; String
+showsPrec :: Int -&gt; RequestType -&gt; ShowS
+$cshowsPrec :: Int -&gt; RequestType -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-comment">-----------------------------------</span><span>
+</span><span id="line-64"></span></pre></body></html>
