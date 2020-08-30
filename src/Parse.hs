@@ -214,6 +214,5 @@ instance ToJSON Response where
 
 ---- Game Won -------------------------------
     toJSON (GameWon p) =
-        object [pack "kind" .= pack "State",
-                pack "state" .= pack "Won",
+        object [pack "kind" .= pack "Won",
                 pack "winner" .= (pack $ show p)]
