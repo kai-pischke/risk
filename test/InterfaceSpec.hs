@@ -52,7 +52,8 @@ instance Arbitrary NewGame where
 
 instance Show NewPartial where 
     show (NewPartial g ps cs sg) = "NewPartial " ++ show ps ++ " " ++ show cs ++ " " ++ show sg
-
+    show (NewPartialError) = "NewPartialError"
+    
 instance Show NewGame where 
     show (NewGame g ps sg) = "NewGame " ++ show ps ++ " " ++ show sg
             
