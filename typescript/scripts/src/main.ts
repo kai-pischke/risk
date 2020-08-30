@@ -5,7 +5,8 @@ import {Connection} from "./sock";
 let ui = new Draw();
 let board = new Board();
 let conn = new Connection();
-
+let colour = await conn.start();
+console.log(colour);
 board.changeOwner("Siam", "Green");
 board.changeTroops("Siam", 3);
 

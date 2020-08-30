@@ -4,16 +4,34 @@ import {Board} from "./board";
 
 export class Connection {
     private _socket: WebSocket;
-
-    constructor() {
-        this._socket = new WebSocket("ws://localhost:9600");
-        this._socket.onmessage = this.receive
-    } 
     
+    constructor() {
+        
+    } 
+    async start() {
+        this._socket = new WebSocket("ws://localhost:9600");
+        this._socket.onmessage = this.receive;
+        return new Promise((resolve,reject) => 
+            this._socket.addEventListener('message', function(event) {
+                const msg = JSON.parse(event.data);
+                console.log(msg);
+                if ("kind" in msg && msg.kind === "colour") {
+                    const colour = msg.colour;
+                    resolve(msg.colour);
+                } else {
+                    reject();
+                }
+            })
+        );
+    }
     private receive(event) {
         const msg = JSON.parse(event.data);
         console.log(msg);
-        if ("state" in msg) {
+        if ("kind" in msg) {
+            if (msg.kind === "colour") {
+                const colour = msg.colour;
+                console.log("I am " + colour);
+            }
             if (msg.state === "Setup") {
                 const temp = new Board();
                 ALL_COUNTRIES.forEach((country, c_index) => {
