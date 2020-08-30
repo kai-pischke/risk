@@ -77,7 +77,7 @@ reqInfo p SkipFortify = show p ++ " skipped the fortify phase."
 play :: WS.Connection -> Player -> MVar State -> IO ()
 play conn player state = do
     -- send "joining" msg
-    WS.sendTextData conn $ BLU.fromString ("{\"colour\":\"" ++ show player ++ "\"}")
+    WS.sendTextData conn $ BLU.fromString ("{\"kind\": \"colour\", \"colour\":\"" ++ show player ++ "\"}")
     
     -- log the new player
     putStrLn $ "A new player joined and was assigned " ++ show player ++ "."
