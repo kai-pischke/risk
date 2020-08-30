@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "module": "esnext",
+        "module": "amd",
         "target": "es2019",
         "outDir": "compiled",
         "rootDir": "src"
