@@ -41,7 +41,7 @@ module Message (
       where countries = [minBound :: Country .. maxBound :: Country]
     _ == _ = False
 
-  data Question = NumDefenders
+  data Question = NumDefenders | GetTrade
     deriving (Eq, Show)
 
   data Error = InvalidMove | NotYourTurn | NotEnoughPlayers | NotInWaitingRoom | SetupComplete | NotInSetup | NotInPlay | NotRequestingDefenders
@@ -54,11 +54,12 @@ module Message (
     StartGame
     | PlaceTroop Country
     | Attack Country Country Attackers
-    | Reinforce [(Country, Int)]
+    | Reinforce TradeIn [(Country, Int)]
     | Fortify Country Country Int
     | Invade Int
     | ChooseDefenders Defenders
     | EndAttack
     | SkipFortify
+    | Trade TradeIn [(Country, Int)]
     deriving (Eq, Show)
   -----------------------------------
