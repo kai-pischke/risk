@@ -71,6 +71,15 @@ module Interface  (
 
   receive (Request s (PlaceTroop _)) g = (Invalid NotInSetup s, g)
 
+  -- Reinforce
+  receive (Request s (M.Reinforce tradein troopMap)) g@(GamePlay gstate)
+    | s == currentPlayer gstate =
+      case reinforce tradein troopMap gstate of
+        Nothing -> (Invalid InvalidMove s, g)
+        Just gstate' -> (General (Play gstate'), GamePlay gstate')
+    | otherwise = (Invalid NotYourTurn s, g)
+
+  receive (Request s (M.Reinforce _ _)) g = (Invalid NotInPlay s, g)
 
   -- Attack
   receive (Request s (M.Attack cAtt cDef att)) g@(GamePlay gstate)
@@ -80,17 +89,8 @@ module Interface  (
         Just gstate' -> (Special NumDefenders defender, GamePlay gstate')
     | otherwise = (Invalid NotYourTurn s, g)
     where defender = owner gstate cDef
+
   receive (Request s (M.Attack _ _ _)) g = (Invalid NotInPlay s, g)
-
-  -- Reinforce
-  receive (Request s (M.Reinforce troopMap)) g@(GamePlay gstate)
-    | s == currentPlayer gstate =
-      case reinforce None troopMap gstate of
-        Nothing -> (Invalid InvalidMove s, g)
-        Just gstate' -> (General (Play gstate'), GamePlay gstate')
-    | otherwise = (Invalid NotYourTurn s, g)
-
-  receive (Request s (M.Reinforce _)) g = (Invalid NotInPlay s, g)
 
   -- Fortify
   receive (Request s (M.Fortify cFrom cTo nTroops)) g@(GamePlay gstate)
@@ -108,7 +108,9 @@ module Interface  (
       case invade nTroops gstate of
         Nothing -> (Invalid InvalidMove s, g)
         Just gstate' -> if (length (turnOrder gstate') > 1)
-                          then (General(Play gstate'), GamePlay gstate')
+                          then if (phase gstate' == State.Attack TimeToTrade)
+                                  then (Special GetTrade s, GamePlay gstate')
+                                  else (General(Play gstate'), GamePlay gstate')
                           else (GameWon (head $ turnOrder gstate'), GamePlay gstate')
     | otherwise = (Invalid NotYourTurn s, g)
   receive (Request s (Invade _)) g = (Invalid NotInPlay s, g)
@@ -145,6 +147,15 @@ module Interface  (
     | otherwise = (Invalid NotYourTurn s, g)
   receive (Request s SkipFortify) g = (Invalid InvalidMove s, g)
 
+  -- Trade
+  receive (Request s (M.Trade tradein troopMap)) g@(GamePlay gstate)
+    | s == currentPlayer gstate =
+      case trade tradein troopMap gstate of
+        Nothing -> (Invalid InvalidMove s, g)
+        Just gstate' -> (General (Play gstate'), GamePlay gstate')
+    | otherwise = (Invalid NotYourTurn s, g)
+
+  receive (Request s (M.Trade _ _)) g = (Invalid NotInPlay s, g)
   --------------------------------------
 
   ---- Private helper functions --------
