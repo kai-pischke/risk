@@ -18,7 +18,7 @@ data Player = Black | Blue | Green | Red | Yellow
 
 -- | We ignore the country shown on the card.
 data Card = Infantry | Cavalry | Artillery | Wild
-            deriving (Eq, Show, Ord)
+            deriving (Eq, Show, Ord, Read)
 
 -- | Cards always come in sets of 3 when being traded in.
 type CardSet = (Card, Card, Card)

@@ -27,9 +27,9 @@ import Data.Typeable (typeOf)
 import Data.Map(assocs)
 
 import SetupBoard
-import qualified State as S (MiniPhase(..), Phase(..), turnOrder, phase, troops, owner)
+import qualified State as S (MiniPhase(..), Phase(..), turnOrder, phase, troops, owner, cards)
 import RiskBoard (Country)
-import GameElements (Player)
+import GameElements (Player, TradeIn(..), Card)
 ---------------------------------------------
 
 
@@ -68,15 +68,6 @@ phaseToJson (S.Attack (S.Normal)) =
 phaseToJson p = object [pack "kind" .= pack "Simple",
                         pack "phase" .= (pack $ show p)]
 
----- Public Functions -----------------------
--- | Reads in a received 'ByteString' and returns a 'Left' 'Request' or a 'Right' 'ParseError'.
-decodeRequest :: ByteString -> Either Request ParseError
-decodeRequest = maybe (Right parseError) Left . decode
-
--- | Encodes a 'Response' to a 'ByteString'.
-encodeResponse :: Response -> ByteString
-encodeResponse = encode
-
 setupBoardOwner:: SetupState -> Country -> (Maybe Player, Int)
 setupBoardOwner (Incomplete s) c = incompleteBoardOwner (Incomplete s) c
 setupBoardOwner (PartiallyComplete s)  c = (Just p, n)
@@ -87,12 +78,48 @@ setupBoardOwner s c = (Just p, n)
     where
         (p,n) = (completeBoardOwner s c)
 
+        
+tradeInFromJson:: [String] -> Maybe (Card,Card,Card)
+tradeInFromJson (c1:c2:c3:[])
+    | (any (==Nothing) [c1R,c2R,c3R]) = Nothing
+    | otherwise = Just (fromJust c1R, fromJust c2R, fromJust c3R)
+    where 
+        c1R = readMaybe c1
+        c2R = readMaybe c2
+        c3R = readMaybe c3
+
+tradeInFromJson _ = Nothing
+
+cardsListToTradeIn:: [Maybe (Card,Card,Card)] -> Maybe TradeIn
+cardsListToTradeIn [] = Just None
+cardsListToTradeIn (s1:[]) 
+    | s1 == Nothing = Nothing
+    | otherwise = Just $ OneSet $ fromJust s1
+cardsListToTradeIn (s1:s2:[]) 
+    | s1 == Nothing || s2 == Nothing = Nothing
+    | otherwise = Just $ TwoSet (fromJust s1) (fromJust s2)
+cardsListToTradeIn _ = Nothing
+    
+ 
+
+
+---- Public Functions -----------------------
+-- | Reads in a received 'ByteString' and returns a 'Left' 'Request' or a 'Right' 'ParseError'.
+decodeRequest :: ByteString -> Either Request ParseError
+decodeRequest = maybe (Right parseError) Left . decode
+
+-- | Encodes a 'Response' to a 'ByteString'.
+encodeResponse :: Response -> ByteString
+encodeResponse = encode
+
+
 type ParseError = ByteString
 
 -- | This is the 'ByteString' holding the JSON-encoded response to a parse error.
 parseError :: ParseError
 parseError = fromString "{\"Invalid JSON\"}"
 
+---- Instances For To/From JSON -------------
 
 instance FromJSON Request where
     parseJSON (Object v) = do
@@ -125,14 +152,26 @@ instance FromJSON Request where
                 then do
                     troops <- v.: pack "troops"
                     t <- parseJSON troops
-
-                    {-let troopsR = map (\x -> (readMaybe $ fst x, snd x)) t
-
-                    -}
+                    
+                    cards <- v.: pack "tradein"
+                    let tradeInR = cardsListToTradeIn $ map tradeInFromJson cards 
                     let troopsR = map (\p -> (readMaybe $ fst p, snd p)) $ assocs t
-                    if (any (\p -> fst p == Nothing) troopsR)-- (any (\p -> (typeOf $ snd p) /= typeOf (1 :: Int)) troopsR)
+                    
+                    if (tradeInR == Nothing || any (\p -> fst p == Nothing) troopsR)-- (any (\p -> (typeOf $ snd p) /= typeOf (1 :: Int)) troopsR)
                         then do mempty
-                        else do return (Request (fromJust senderR) (Reinforce $ map (\p -> (fromJust $ fst p, snd p)) troopsR))
+                        else do return (Request (fromJust senderR) (Reinforce (fromJust tradeInR) (map (\p -> (fromJust $ fst p, snd p)) troopsR)))
+            else if (requestType == ("Trade" :: String))
+                then do
+                    troops <- v.: pack "troops"
+                    t <- parseJSON troops
+                    
+                    cards <- v.: pack "tradein"
+                    let tradeInR = cardsListToTradeIn $ map tradeInFromJson cards 
+                    let troopsR = map (\p -> (readMaybe $ fst p, snd p)) $ assocs t
+                    
+                    if (tradeInR == Nothing || any (\p -> fst p == Nothing) troopsR)-- (any (\p -> (typeOf $ snd p) /= typeOf (1 :: Int)) troopsR)
+                        then do mempty
+                        else do return (Request (fromJust senderR) (Trade (fromJust tradeInR) (map (\p -> (fromJust $ fst p, snd p)) troopsR)))
             else if (requestType == ("Fortify" :: String))
                 then do
                     fc <- v .: pack "from_country"
@@ -159,6 +198,7 @@ instance FromJSON Request where
                 then return (Request (fromJust senderR) EndAttack)
             else if (requestType == ("SkipFortify" :: String))
                 then return (Request (fromJust senderR) SkipFortify)
+        
             else do mempty
     parseJSON _ = mempty
 
@@ -191,20 +231,23 @@ instance ToJSON Response where
     toJSON (General (Play g)) =
         object [pack "kind" .= pack "State",
                 pack "state" .= pack "Play",
-                pack "players" .= map (pack.show) (S.turnOrder g),
+                pack "players" .= map (pack.show) (ps),
                 pack "board" .= ((fromList.zip (map show countries)) $ map getOwnerTroopMap countries),
-                pack "phase" .= (phaseToJson $ S.phase g)]
+                pack "phase" .= (phaseToJson $ S.phase g),
+                pack "cards" .= cardmap]
         where
             countries = [(minBound :: Country)..]
+            ps = S.turnOrder g
+            cardmap = fromList $ zip (show ps) (map (map (show) .S.cards g) ps)
             getOwnerTroopMap:: Country -> Map String (Switch Int String)
             getOwnerTroopMap c = fromList [("number_of_troops", LSwitch $ S.troops g c), ("owner", RSwitch $ show $ S.owner g c)]
 
 ---- Special Questions ----------------------
 
-    toJSON (Special NumDefenders p) =
+    toJSON (Special q p) =
         object [pack "kind" .= pack "Question",
                 pack "player" .= (pack $ show p),
-                pack "question" .= pack "ChooseDefenders"]
+                pack "question" .= (pack $ show q)]
 
 ---- Invalid Errors -------------------------
     toJSON (Invalid e p) =
