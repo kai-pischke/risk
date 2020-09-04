@@ -9,9 +9,9 @@ import {Connection} from "./sock";
   let ui = new Draw();
   let board = new Board();
   let conn = new Connection();
-  let colour = await conn.start();
-  
-  document.getElementById("startGame").onclick(conn.start_game);
+  let colour : string = await conn.start();
+  conn.me = colour;
+  document.getElementById("startGame").onclick = conn.start_game;
   
   console.log(colour);
   board.changeOwner("Siam", "Green");

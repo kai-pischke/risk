@@ -4,11 +4,12 @@ import {Board} from "./board";
 
 export class Connection {
     private _socket: WebSocket;
+    public me : string;
     
     constructor() {
         
     } 
-    async start() {
+    async start() : Promise<string> {
         this._socket = new WebSocket("ws://localhost:9600");
         this._socket.onmessage = this.receive;
         return new Promise((resolve,reject) => 
@@ -25,8 +26,8 @@ export class Connection {
         );
     }
     
-    async start_game(me) {
-        this._socket.send("{\"action\": \"StartGame\", \"sender\": \""+me+"\"}");
+    async start_game(event : MouseEvent) {
+        this._socket.send("{\"action\": \"StartGame\", \"sender\": \""+this.me+"\"}");
     }
     
     private receive(event) {

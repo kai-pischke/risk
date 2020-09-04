@@ -20,8 +20,8 @@ define(["require", "exports", "./elements", "./board"], function (require, expor
                 }
             }));
         }
-        async start_game(me) {
-            this._socket.send("{\"action\": \"StartGame\", \"sender\": \"" + me + "\"}");
+        async start_game(event) {
+            this._socket.send("{\"action\": \"StartGame\", \"sender\": \"" + this.me + "\"}");
         }
         receive(event) {
             const msg = JSON.parse(event.data);

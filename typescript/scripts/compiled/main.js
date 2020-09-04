@@ -7,7 +7,8 @@ define(["require", "exports", "./draw", "./board", "./sock"], function (require,
         let board = new board_1.Board();
         let conn = new sock_1.Connection();
         let colour = await conn.start();
-        document.getElementById("startGame").onclick(conn.start_game);
+        conn.me = colour;
+        document.getElementById("startGame").onclick = conn.start_game;
         console.log(colour);
         board.changeOwner("Siam", "Green");
         board.changeTroops("Siam", 3);
