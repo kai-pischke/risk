@@ -57,7 +57,7 @@ module ParseSpec where
   attackValid = [
     "{\"action\": \"Attack\",\"sender\": \"Blue\",\"attacking_country\": \"Yakutsk\",\"defending_country\": \"Ontario\",\"number_of_attackers\": 3}",
     "{\"action\": \"Attack\",\"sender\": \"Green\",\"attacking_country\": \"Japan\",\"defending_country\": \"Japan\",\"number_of_attackers\": 1}",
-    "{\"action\": \"Attack\",\"sender\": \"Black\",\"attacking_country\": \"Brazil\",\"defending_country\": \"Peru\",\"number_of_attackers\": 2}"
+    "{\"action\": \"Attack\",\"sender\": \"Black\",\"defending_country\": \"Peru\",\"attacking_country\": \"Brazil\",\"number_of_attackers\": 2}"
     ]
 
   attackValidDecoded = [
@@ -78,23 +78,31 @@ module ParseSpec where
     ]
 
   reinforceValid = [
-    "{\"action\": \"Reinforce\", \"sender\": \"Yellow\", \"troops\": {}}",
-    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Alaska\": 3}}",
-    "{\"action\": \"Reinforce\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"Congo\":0, \"East Africa\" : 7}}"
+    "{\"action\": \"Reinforce\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": {\"\"}}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Alaska\": 3}, \"trade_in\": {}}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"Congo\":0, \"East Africa\" : 7}, \"trade_in\": {}}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": {{\"Artillery\", \"Artillery\", \"Wild\"}}}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Alaska\": 3}, \"trade_in\": {{\"Infantry\", \"Infantry\", \"Artillery\"}}}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"Congo\":0, \"East Africa\" : 7}, \"trade_in\": {{\"Infantry\", \"Infantry\", \"Artillery\"}, {\"Artillery\", \"Artillery\", \"Wild\"}}}"
     ]
 
   reinforceValidDecoded = [
-    Request Yellow (M.Reinforce []),
-    Request Blue (M.Reinforce [(Alaska, 3)]),
-    Request Green (M.Reinforce [(Alaska, 3), (Congo,0), (EastAfrica, 7)])
+    Request Yellow (M.Reinforce None []),
+    Request Blue (M.Reinforce None [(Alaska, 3)]),
+    Request Green (M.Reinforce None [(Alaska, 3), (Congo,0), (EastAfrica, 7)]),
+    Request Yellow (M.Reinforce (OneSet (Artillery, Artillery, Wild)) []),
+    Request Blue (M.Reinforce (OneSet (Infantry, Infantry, Artillery)) [(Alaska, 3)]),
+    Request Green (M.Reinforce (TwoSet (Infantry, Infantry, Artillery) (Artillery, Artillery, Wild)) [(Alaska, 3), (Congo,0), (EastAfrica, 7)])
     ]
 
   reinforceInvalid = [
-    "{\"action\": \"Reiorce\", \"sender\": \"Yellow\", \"troops\": {}}",
-    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Aska\": 3}}",
-    "{\"action\": \"Reinforce\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"East Africa\" : \"20\", \"Congo\":0}}",
-    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Ontario\"}}",
-    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"tros\": { \"Western Australia\": 3}}"
+    "{\"action\": \"Reiorce\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": {}}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Aska\": 3}, \"trade_in\": {}}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"East Africa\" : \"20\", \"Congo\":0}, \"trade_in\": {}}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Ontario\"}, \"trade_in\": {}}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"tros\": { \"Western Australia\": 3}, \"trade_in\": {}}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Western Australia\": 3}, \"tradin\": {}}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Western Australia\": 3}, \"trade_in\": {\"Artillery\", \"Artillery\"}}"
     ]
 
   fortifyValid = [
@@ -199,6 +207,36 @@ module ParseSpec where
     "{\"on\": \"SkipFortify\", \"sender\": \"Yellow\"}"
     ]
 
+  tradeValid = [
+    "{\"action\": \"Trade\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": {}}",
+    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"troops\": { \"Alaska\": 3}, \"trade_in\": {}}",
+    "{\"action\": \"Trade\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"Congo\":0, \"East Africa\" : 7}, \"trade_in\": {}}",
+    "{\"action\": \"Trade\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": {{\"Artillery\", \"Artillery\", \"Wild\"}}}",
+    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"troops\": { \"Alaska\": 3}, \"trade_in\": {{\"Infantry\", \"Infantry\", \"Artillery\"}}}",
+    "{\"action\": \"Trade\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"Congo\":0, \"East Africa\" : 7}, \"trade_in\": {{\"Infantry\", \"Infantry\", \"Artillery\"}, {\"Artillery\", \"Artillery\", \"Wild\"}}}"
+    ]
+
+  tradeValidDecoded = [
+    Request Yellow (M.Trade None []),
+    Request Blue (M.Trade None [(Alaska, 3)]),
+    Request Green (M.Trade None [(Alaska, 3), (Congo,0), (EastAfrica, 7)]),
+    Request Yellow (M.Trade (OneSet (Artillery, Artillery, Wild)) []),
+    Request Blue (M.Trade (OneSet (Infantry, Infantry, Artillery)) [(Alaska, 3)]),
+    Request Green (M.Trade (TwoSet (Infantry, Infantry, Artillery) (Artillery, Artillery, Wild)) [(Alaska, 3), (Congo,0), (EastAfrica, 7)])
+    ]
+
+  tradeInvalid = [
+    "{\"action\": \"Trde\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": {}}",
+    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"troops\": { \"Aska\": 3}, \"trade_in\": {}}",
+    "{\"action\": \"Trade\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"East Africa\" : \"20\", \"Congo\":0}, \"trade_in\": {}}",
+    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"troops\": { \"Ontario\"}, \"trade_in\": {}}",
+    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"tros\": { \"Western Australia\": 3}, \"trade_in\": {}}",
+    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"troops\": { \"Western Australia\": 3}, \"tradin\": {}}",
+    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"troops\": { \"Western Australia\": 3}, \"trade_in\": {{\"Artillery\", \"Artillery\"}}}"
+    ]
+
+
+
   spec :: Spec
   spec = do
     -- Request -------------------------------------
@@ -256,6 +294,13 @@ module ParseSpec where
           map (decodeRequest.fromString) skipFortifyValid `shouldBe` map Left skipFortifyValidDecoded
         it "Correctly deals with invalid requests" $ do
           map (decodeRequest.fromString) skipFortifyInvalid `shouldBe` map (Right . fromString) (replicate (length skipFortifyInvalid) "{\"Invalid JSON\"}")
+
+      context "Trade" $ do
+        it "Correctly deals with valid requests" $ do
+          map (decodeRequest.fromString) tradeValid `shouldBe` map Left tradeValidDecoded
+        it "Correctly deals with invalid requests" $ do
+          map (decodeRequest.fromString) tradeInvalid `shouldBe` map (Right . fromString) (replicate (length tradeInvalid) "{\"Invalid JSON\"}")
+
     ---------------------------------------------------------
 
     -- Response ---------------------------------------------
@@ -292,6 +337,8 @@ module ParseSpec where
         it "Correctly encodes in Attack WonBattle" $ do
           let game' = changeMiniPhase (WonBattle NorthAfrica SouthAfrica OneAtt) $ nextPhase game
           (encodeResponse (General (Play game'))) `shouldSatisfy` wellFormedGame game'
+        it "Correctly encodes in Attack TimeToTrade" $ do
+          pending
         it "Correctly encodes in Fortify" $ do
           let game' = nextPhase $ nextPhase game
           (encodeResponse (General (Play game'))) `shouldSatisfy` wellFormedGame game'
