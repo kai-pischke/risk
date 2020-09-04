@@ -66,7 +66,7 @@ reqInfo :: Player -> RequestType -> String
 reqInfo p StartGame = show p ++ " started the game."
 reqInfo p (PlaceTroop c) = show p ++ " placed a troop in " ++ show c ++ "."
 reqInfo p (Attack c1 c2 _) = show p ++ " attacked " ++ show c2 ++ " from " ++ show c1 ++ "."
-reqInfo p (Reinforce ts) = show p ++ " placed " ++ show (sum $ map snd ts) ++ " reinforcements."
+reqInfo p (Reinforce ti ts) = show p ++ " placed " ++ show (sum $ map snd ts) ++ " reinforcements using trade in:" ++ show ti ++ "."
 reqInfo p (Fortify c1 c2 n) = show p ++ " fortified their position, moving " ++ show n ++ " troops."
 reqInfo p (Invade c) = show p ++ " invaded " ++ show c ++ "."
 reqInfo p (ChooseDefenders d) = show p ++ " chose to roll " ++ show (fromEnum d) ++ " dice."

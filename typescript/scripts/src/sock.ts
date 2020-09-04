@@ -24,6 +24,11 @@ export class Connection {
             })
         );
     }
+    
+    async start_game(me) {
+        this._socket.send("{\"action\": \"StartGame\", \"sender\": \""+me+"\"}");
+    }
+    
     private receive(event) {
         const msg = JSON.parse(event.data);
         console.log(msg);
