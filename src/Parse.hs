@@ -20,10 +20,10 @@ import Data.Aeson
 import Data.Map (Map, fromList)
 import Data.ByteString.Lazy (ByteString)
 import Data.ByteString.Lazy.UTF8 (fromString)
+
 import Data.Text (pack)
 import Data.Maybe (fromJust)
 import Text.Read (readMaybe)
-import Data.Typeable (typeOf)
 import Data.Map(assocs)
 
 import SetupBoard
@@ -31,7 +31,6 @@ import qualified State as S (MiniPhase(..), Phase(..), turnOrder, phase, troops,
 import RiskBoard (Country)
 import GameElements (Player, TradeIn(..), Card)
 ---------------------------------------------
-
 
 ---- Helper DataType ------------------------
 data Switch a b = LSwitch a | RSwitch b
@@ -78,12 +77,12 @@ setupBoardOwner s c = (Just p, n)
     where
         (p,n) = (completeBoardOwner s c)
 
-        
+
 tradeInFromJson:: [String] -> Maybe (Card,Card,Card)
 tradeInFromJson (c1:c2:c3:[])
     | (any (==Nothing) [c1R,c2R,c3R]) = Nothing
     | otherwise = Just (fromJust c1R, fromJust c2R, fromJust c3R)
-    where 
+    where
         c1R = readMaybe c1
         c2R = readMaybe c2
         c3R = readMaybe c3
@@ -92,15 +91,15 @@ tradeInFromJson _ = Nothing
 
 cardsListToTradeIn:: [Maybe (Card,Card,Card)] -> Maybe TradeIn
 cardsListToTradeIn [] = Just None
-cardsListToTradeIn (s1:[]) 
+cardsListToTradeIn (s1:[])
     | s1 == Nothing = Nothing
     | otherwise = Just $ OneSet $ fromJust s1
-cardsListToTradeIn (s1:s2:[]) 
+cardsListToTradeIn (s1:s2:[])
     | s1 == Nothing || s2 == Nothing = Nothing
     | otherwise = Just $ TwoSet (fromJust s1) (fromJust s2)
 cardsListToTradeIn _ = Nothing
-    
- 
+
+
 
 
 ---- Public Functions -----------------------
@@ -145,30 +144,32 @@ instance FromJSON Request where
                     dc <- v .: pack "defending_country"
                     let dcR = readMaybe dc
                     na <- v .: pack "number_of_attackers"
-                    if (acR == Nothing || dcR == Nothing || not (typeOf na == typeOf (1 :: Int)) || na <1 || na>3)
+                    if (acR == Nothing || dcR == Nothing || na <1 || na>3)
                         then do mempty
                         else do return (Request (fromJust senderR) (Attack (fromJust acR) (fromJust dcR) (toEnum na)))
             else if (requestType == ("Reinforce" :: String))
                 then do
-                    troops <- v.: pack "troops"
-                    t <- parseJSON troops
-                    
-                    cards <- v.: pack "tradein"
-                    let tradeInR = cardsListToTradeIn $ map tradeInFromJson cards 
+                    troops <- (v.: pack "troops")
+
+                    cards  <- (v.: pack "trade_in")
+
+                    t <- (parseJSON troops)
+
+                    let tradeInR = cardsListToTradeIn $ map tradeInFromJson cards
                     let troopsR = map (\p -> (readMaybe $ fst p, snd p)) $ assocs t
-                    
-                    if (tradeInR == Nothing || any (\p -> fst p == Nothing) troopsR)-- (any (\p -> (typeOf $ snd p) /= typeOf (1 :: Int)) troopsR)
+
+                    if (tradeInR == Nothing || any (\p -> fst p == Nothing) troopsR)
                         then do mempty
                         else do return (Request (fromJust senderR) (Reinforce (fromJust tradeInR) (map (\p -> (fromJust $ fst p, snd p)) troopsR)))
             else if (requestType == ("Trade" :: String))
                 then do
                     troops <- v.: pack "troops"
                     t <- parseJSON troops
-                    
-                    cards <- v.: pack "tradein"
-                    let tradeInR = cardsListToTradeIn $ map tradeInFromJson cards 
+
+                    cards <- v.: pack "trade_in"
+                    let tradeInR = cardsListToTradeIn $ map tradeInFromJson cards
                     let troopsR = map (\p -> (readMaybe $ fst p, snd p)) $ assocs t
-                    
+
                     if (tradeInR == Nothing || any (\p -> fst p == Nothing) troopsR)-- (any (\p -> (typeOf $ snd p) /= typeOf (1 :: Int)) troopsR)
                         then do mempty
                         else do return (Request (fromJust senderR) (Trade (fromJust tradeInR) (map (\p -> (fromJust $ fst p, snd p)) troopsR)))
@@ -179,26 +180,24 @@ instance FromJSON Request where
                     tc <- v .: pack "to_country"
                     let tcR = readMaybe tc
                     nt <- v .: pack "number_of_troops"
-                    if (fcR == Nothing || tcR == Nothing || not (typeOf nt == typeOf (1 :: Int)))
+                    if (fcR == Nothing || tcR == Nothing)
                         then do mempty
                         else do return (Request (fromJust senderR) (Fortify (fromJust fcR) (fromJust tcR) nt))
             else if (requestType == ("Invade" :: String))
                 then do
                     nt <- v .: pack "number_of_troops"
-                    if (not (typeOf nt == typeOf (1 :: Int)))
-                        then do mempty
-                        else do return (Request (fromJust senderR) (Invade nt))
+                    return (Request (fromJust senderR) (Invade nt))
             else if (requestType == ("ChooseDefenders" :: String))
                 then do
                     nd <- v .: pack "number_of_defenders"
-                    if (not (typeOf nd == typeOf (1 :: Int)) || nd < 1 || nd > 2)
+                    if (nd < 1 || nd > 2)
                         then do mempty
                         else do return (Request (fromJust senderR) (ChooseDefenders $ toEnum nd))
             else if (requestType == ("EndAttack" :: String))
                 then return (Request (fromJust senderR) EndAttack)
             else if (requestType == ("SkipFortify" :: String))
                 then return (Request (fromJust senderR) SkipFortify)
-        
+
             else do mempty
     parseJSON _ = mempty
 

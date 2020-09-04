@@ -78,12 +78,12 @@ module ParseSpec where
     ]
 
   reinforceValid = [
-    "{\"action\": \"Reinforce\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": {}}",
-    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Alaska\": 3}, \"trade_in\": {}}",
-    "{\"action\": \"Reinforce\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"Congo\":0, \"East Africa\" : 7}, \"trade_in\": {}}",
-    "{\"action\": \"Reinforce\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": {{\"Artillery\", \"Artillery\", \"Wild\"}}}",
-    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Alaska\": 3}, \"trade_in\": {{\"Infantry\", \"Infantry\", \"Artillery\"}}}",
-    "{\"action\": \"Reinforce\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"Congo\":0, \"East Africa\" : 7}, \"trade_in\": {{\"Infantry\", \"Infantry\", \"Artillery\"}, {\"Artillery\", \"Artillery\", \"Wild\"}}}"
+    "{\"action\": \"Reinforce\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": []}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Alaska\": 3}, \"trade_in\": []}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"Congo\":0, \"East Africa\" : 7}, \"trade_in\": []}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": [[\"Artillery\", \"Artillery\", \"Wild\"]]}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Alaska\": 3}, \"trade_in\": [[\"Infantry\", \"Infantry\", \"Artillery\"]]}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"Congo\":0, \"East Africa\" : 7}, \"trade_in\": [[\"Infantry\", \"Infantry\", \"Artillery\"], [\"Artillery\", \"Artillery\", \"Wild\"]]}"
     ]
 
   reinforceValidDecoded = [
@@ -96,13 +96,13 @@ module ParseSpec where
     ]
 
   reinforceInvalid = [
-    "{\"action\": \"Reiorce\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": {}}",
-    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Aska\": 3}, \"trade_in\": {}}",
-    "{\"action\": \"Reinforce\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"East Africa\" : \"20\", \"Congo\":0}, \"trade_in\": {}}",
-    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Ontario\"}, \"trade_in\": {}}",
-    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"tros\": { \"Western Australia\": 3}, \"trade_in\": {}}",
-    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Western Australia\": 3}, \"tradin\": {}}",
-    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Western Australia\": 3}, \"trade_in\": {\"Artillery\", \"Artillery\"}}"
+    "{\"action\": \"Reiorce\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": []}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Aska\": 3}, \"trade_in\": []}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"East Africa\" : \"20\", \"Congo\":0}, \"trade_in\": []}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Ontario\"}, \"trade_in\": []}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"tros\": { \"Western Australia\": 3}, \"trade_in\": []}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Western Australia\": 3}, \"tradin\": []}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Western Australia\": 3}, \"trade_in\": [\"Artillery\", \"Artillery\"]}"
     ]
 
   fortifyValid = [
@@ -208,12 +208,12 @@ module ParseSpec where
     ]
 
   tradeValid = [
-    "{\"action\": \"Trade\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": {}}",
-    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"troops\": { \"Alaska\": 3}, \"trade_in\": {}}",
-    "{\"action\": \"Trade\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"Congo\":0, \"East Africa\" : 7}, \"trade_in\": {}}",
-    "{\"action\": \"Trade\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": {{\"Artillery\", \"Artillery\", \"Wild\"}}}",
-    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"troops\": { \"Alaska\": 3}, \"trade_in\": {{\"Infantry\", \"Infantry\", \"Artillery\"}}}",
-    "{\"action\": \"Trade\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"Congo\":0, \"East Africa\" : 7}, \"trade_in\": {{\"Infantry\", \"Infantry\", \"Artillery\"}, {\"Artillery\", \"Artillery\", \"Wild\"}}}"
+    "{\"action\": \"Trade\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": []}",
+    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"troops\": { \"Alaska\": 3}, \"trade_in\": []}",
+    "{\"action\": \"Trade\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"Congo\":0, \"East Africa\" : 7}, \"trade_in\": []}",
+    "{\"action\": \"Trade\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": [[\"Artillery\", \"Artillery\", \"Wild\"]]}",
+    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"troops\": { \"Alaska\": 3}, \"trade_in\": [[\"Infantry\", \"Infantry\", \"Artillery\"]]}",
+    "{\"action\": \"Trade\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"Congo\":0, \"East Africa\" : 7}, \"trade_in\": [[\"Infantry\", \"Infantry\", \"Artillery\"], [\"Artillery\", \"Artillery\", \"Wild\"]]}"
     ]
 
   tradeValidDecoded = [
@@ -226,13 +226,13 @@ module ParseSpec where
     ]
 
   tradeInvalid = [
-    "{\"action\": \"Trde\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": {}}",
-    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"troops\": { \"Aska\": 3}, \"trade_in\": {}}",
-    "{\"action\": \"Trade\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"East Africa\" : \"20\", \"Congo\":0}, \"trade_in\": {}}",
-    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"troops\": { \"Ontario\"}, \"trade_in\": {}}",
-    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"tros\": { \"Western Australia\": 3}, \"trade_in\": {}}",
-    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"troops\": { \"Western Australia\": 3}, \"tradin\": {}}",
-    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"troops\": { \"Western Australia\": 3}, \"trade_in\": {{\"Artillery\", \"Artillery\"}}}"
+    "{\"action\": \"Trde\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": []}",
+    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"troops\": { \"Aska\": 3}, \"trade_in\": []}",
+    "{\"action\": \"Trade\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"East Africa\" : \"20\", \"Congo\":0}, \"trade_in\": []}",
+    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"troops\": { \"Ontario\"}, \"trade_in\": []}",
+    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"tros\": { \"Western Australia\": 3}, \"trade_in\": []}",
+    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"troops\": { \"Western Australia\": 3}, \"tradin\": []}",
+    "{\"action\": \"Trade\", \"sender\": \"Blue\", \"troops\": { \"Western Australia\": 3}, \"trade_in\": [[\"Artillery\", \"Artillery\"]]}"
     ]
 
 
