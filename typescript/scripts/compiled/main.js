@@ -8,11 +8,11 @@ define(["require", "exports", "./draw", "./board", "./sock"], function (require,
         let conn = new sock_1.Connection();
         let colour = await conn.start();
         conn.me = colour;
-        document.getElementById("startGame").onclick = conn.start_game;
-        console.log(colour);
+        document.getElementById("startGame").onclick = conn.start_game.bind(conn);
         board.changeOwner("Siam", "Green");
         board.changeTroops("Siam", 3);
         ui.draw(board);
+        addEventListener('Setup', function (e) { console.log(e.detail); ui.draw(e.detail); }, false);
         console.log('after start');
     })();
 });

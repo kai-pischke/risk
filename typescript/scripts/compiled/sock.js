@@ -4,6 +4,7 @@ define(["require", "exports", "./elements", "./board"], function (require, expor
     exports.Connection = void 0;
     class Connection {
         constructor() {
+            this.a = 10;
         }
         async start() {
             this._socket = new WebSocket("ws://localhost:9600");
@@ -21,6 +22,9 @@ define(["require", "exports", "./elements", "./board"], function (require, expor
             }));
         }
         async start_game(event) {
+            console.log(this);
+            console.log(this.a);
+            console.log("{\"action\": \"StartGame\", \"sender\": \"" + this.me + "\"}");
             this._socket.send("{\"action\": \"StartGame\", \"sender\": \"" + this.me + "\"}");
         }
         receive(event) {
@@ -36,8 +40,12 @@ define(["require", "exports", "./elements", "./board"], function (require, expor
                     elements_1.ALL_COUNTRIES.forEach((country, c_index) => {
                         const c = msg.board[country];
                         temp.changeTroops(country, c.number_of_troops);
-                        temp.changeOwner(country, c.owner);
+                        if (c.owner in elements_1.ALL_PLAYERS) {
+                            temp.changeOwner(country, c.owner);
+                        }
                     });
+                    let c_event = new CustomEvent("Setup", { detail: temp });
+                    dispatchEvent(c_event);
                     // new board temp
                 }
             }

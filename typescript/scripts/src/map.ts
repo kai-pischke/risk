@@ -31,7 +31,7 @@ export const COUNTRY_LOC: Record<Country,{x; y;}> = {
     "Ontario": {x: 200, y: 200},
     "Peru": {x: 131, y: 625},
     "Quebec": {x: 300, y: 200},
-    "Scandenavia": {x: 600, y: 100},
+    "Scandinavia": {x: 600, y: 100},
     "Siam": {x: 1000, y: 400},
     "Siberia": {x: 900, y: 200},
     "South Africa": {x: 500, y: 700},
