@@ -78,7 +78,7 @@ module ParseSpec where
     ]
 
   reinforceValid = [
-    "{\"action\": \"Reinforce\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": {\"\"}}",
+    "{\"action\": \"Reinforce\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": {}}",
     "{\"action\": \"Reinforce\", \"sender\": \"Blue\", \"troops\": { \"Alaska\": 3}, \"trade_in\": {}}",
     "{\"action\": \"Reinforce\", \"sender\": \"Green\", \"troops\": { \"Alaska\": 3, \"Congo\":0, \"East Africa\" : 7}, \"trade_in\": {}}",
     "{\"action\": \"Reinforce\", \"sender\": \"Yellow\", \"troops\": {}, \"trade_in\": {{\"Artillery\", \"Artillery\", \"Wild\"}}}",
