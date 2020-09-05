@@ -29,7 +29,6 @@ export class Board {
     }
 
     changeOwner(c: Country, p: Player) {
-        console.log(p);
         this._board[c].player = p;
     }
 }

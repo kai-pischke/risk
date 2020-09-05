@@ -27,16 +27,18 @@ export class Connection {
         );
     }
 
+    async send(info : string){
+        this._socket.send(info);
+    }
+
+
     async start_game(event : MouseEvent) {
-        console.log(this);
-        console.log(this.a);
-        console.log("{\"action\": \"StartGame\", \"sender\": \""+this.me+"\"}");
         this._socket.send("{\"action\": \"StartGame\", \"sender\": \""+this.me+"\"}");
     }
 
     private receive(event) {
         const msg = JSON.parse(event.data);
-        console.log(msg);
+        //console.log("Recieved : " + msg);
         if ("kind" in msg) {
             if (msg.kind === "colour") {
                 const colour = msg.colour;
@@ -47,12 +49,12 @@ export class Connection {
                 ALL_COUNTRIES.forEach((country, c_index) => {
                     const c = msg.board[country];
                     temp.changeTroops(country, c.number_of_troops);
-                    if (c.owner in ALL_PLAYERS) {
+                    if (ALL_PLAYERS.includes(c.owner)) {
                         temp.changeOwner(country, c.owner);
                     }
                 });
-                let c_event = new CustomEvent("Setup",{detail: temp});
-                dispatchEvent(c_event);
+                console.log("sent")
+                document.dispatchEvent(new CustomEvent("Setup",{detail: {board :temp, players : msg.players}}));
                 // new board temp
             }
         }

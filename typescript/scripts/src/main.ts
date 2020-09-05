@@ -1,6 +1,7 @@
 import {Draw} from "./draw";
 import {Board} from "./board";
 import {Connection} from "./sock";
+import {Moves} from "./moves";
 import {countryClickedOn} from "./map";
 
 //-- Global Variables -----------------------
@@ -8,27 +9,30 @@ import {countryClickedOn} from "./map";
 function countryClicked(e : MouseEvent, r : number, canvas : HTMLElement){
     let country = countryClickedOn(e, r, canvas);
     if (country != null){
-        dispatchEvent(new CustomEvent("CountryClickedOn",{detail: country}));
+        document.dispatchEvent(new CustomEvent("CountryClickedOn",{detail: country}));
     }
 }
 
 (async() => {
-    console.log('before start');
-
-
-
     let ui = new Draw();
     let board = new Board();
     let conn = new Connection();
     let colour : string = await conn.start();
-    conn.me = colour;
+    let moves = new Moves(colour, ui)
 
+    conn.me = colour;
     const canvas=document.getElementById("canvas");
-    //-- Listeners --------------------------
+
+//-- Listeners ------------------------------
     document.getElementById("startGame").onclick = conn.start_game.bind(conn);
 
+    //-- That Pass Information In -----------
     canvas.onmousedown = function(e : MouseEvent){countryClicked(e, ui.outerRadius, canvas);};
-    addEventListener('Setup', function (e : CustomEvent) {console.log(e.detail); ui.draw(e.detail);}, false);
+    document.addEventListener('Setup', function (e : CustomEvent) {moves.setup(e.detail.board, e.detail.players[0])});
+
+    //-- That Pass Information Out ----------
+    document.addEventListener('Send', function (e : CustomEvent) {conn.send(e.detail)});
+
     //---------------------------------------
 
     board.changeOwner("Siam", "Green");
@@ -36,5 +40,4 @@ function countryClicked(e : MouseEvent, r : number, canvas : HTMLElement){
 
     ui.draw(board);
 
-    console.log('after start');
 })();

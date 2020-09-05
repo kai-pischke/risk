@@ -52,13 +52,11 @@ define(["require", "exports", "./elements"], function (require, exports, element
         const rect = canvas.getBoundingClientRect();
         var mouseX = e.clientX - rect.left;
         var mouseY = e.clientY - rect.top;
-        console.log(mouseX, mouseY);
         // iterate each shape in the shapes array
         for (var i = 0; i < elements_1.ALL_COUNTRIES.length; i++) {
             let country = elements_1.ALL_COUNTRIES[i];
             let loc = exports.COUNTRY_LOC[country];
             if ((mouseX - loc.x) ** 2 + (mouseY - loc.y) ** 2 < r ** 2) {
-                console.log("yay");
                 return country;
             }
             ;

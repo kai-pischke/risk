@@ -17,7 +17,6 @@ define(["require", "exports", "./elements"], function (require, exports, element
             this._board[c].troops = t;
         }
         changeOwner(c, p) {
-            console.log(p);
             this._board[c].player = p;
         }
     }

@@ -53,7 +53,6 @@ export function countryClickedOn(e : MouseEvent, r : number, canvas : HTMLElemen
 
     var mouseX=e.clientX-rect.left;
     var mouseY=e.clientY-rect.top;
-    console.log(mouseX, mouseY)
 
     // iterate each shape in the shapes array
     for(var i = 0;i<ALL_COUNTRIES.length;i++) {
@@ -61,7 +60,6 @@ export function countryClickedOn(e : MouseEvent, r : number, canvas : HTMLElemen
         let loc = COUNTRY_LOC[country];
 
         if ((mouseX - loc.x)**2 + (mouseY - loc.y)**2 < r**2){
-            console.log("yay")
             return country;
         };
     };

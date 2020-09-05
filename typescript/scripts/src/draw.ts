@@ -95,7 +95,7 @@ export class Draw{
             this._ctx.fillStyle = "black";
             this._ctx.font = "14px 'Helvetica'";
             this._ctx.fillText(state.troops(country)+'', myloc.x, myloc.y);
-            this._ctx.closePath()
+            this._ctx.closePath();
         });
 
 
