@@ -1,7 +1,7 @@
-define(["require", "exports"], function (require, exports) {
+define(["require", "exports", "./elements"], function (require, exports, elements_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.COUNTRY_LOC = void 0;
+    exports.countryClickedOn = exports.COUNTRY_LOC = void 0;
     exports.COUNTRY_LOC = {
         "Afghanistan": { x: 800, y: 300 },
         "Alaska": { x: 100, y: 100 },
@@ -46,4 +46,26 @@ define(["require", "exports"], function (require, exports) {
         "Western United States": { x: 151, y: 300 },
         "Yakutsk": { x: 1000, y: 100 },
     };
+    function countryClickedOn(e, r, canvas) {
+        e.preventDefault();
+        // get the mouse position
+        const rect = canvas.getBoundingClientRect();
+        var mouseX = e.clientX - rect.left;
+        var mouseY = e.clientY - rect.top;
+        console.log(mouseX, mouseY);
+        // iterate each shape in the shapes array
+        for (var i = 0; i < elements_1.ALL_COUNTRIES.length; i++) {
+            let country = elements_1.ALL_COUNTRIES[i];
+            let loc = exports.COUNTRY_LOC[country];
+            if ((mouseX - loc.x) ** 2 + (mouseY - loc.y) ** 2 < r ** 2) {
+                console.log("yay");
+                return country;
+            }
+            ;
+        }
+        ;
+        return null;
+    }
+    exports.countryClickedOn = countryClickedOn;
+    ;
 });

@@ -4,6 +4,8 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
     exports.Draw = void 0;
     class Draw {
         constructor() {
+            this.outerRadius = 35;
+            this.innerRadius = 25;
             const canvas = document.getElementById("canvas");
             if (!(canvas instanceof HTMLCanvasElement)) {
                 throw new Error("The element of is not an HTMLCanvasElement.");
@@ -42,7 +44,7 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
                 const myloc = map_1.COUNTRY_LOC[country];
                 // draw outer circle
                 this._ctx.beginPath();
-                this._ctx.arc(myloc.x, myloc.y, 35, 0, Math.PI * 2, false);
+                this._ctx.arc(myloc.x, myloc.y, this.outerRadius, 0, Math.PI * 2, false);
                 // get fill
                 let fill;
                 const owner = state.owner(country);
@@ -72,7 +74,7 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
                 this._ctx.fill();
                 this._ctx.closePath();
                 this._ctx.beginPath();
-                this._ctx.arc(myloc.x, myloc.y, 25, 0, Math.PI * 2, false);
+                this._ctx.arc(myloc.x, myloc.y, this.innerRadius, 0, Math.PI * 2, false);
                 this._ctx.fillStyle = "white";
                 this._ctx.fill();
                 this._ctx.fillStyle = "black";

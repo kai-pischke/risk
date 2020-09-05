@@ -1,4 +1,4 @@
-import {Country} from "./elements";
+import {Country, ALL_COUNTRIES} from "./elements";
 
 export const COUNTRY_LOC: Record<Country,{x; y;}> = {
     "Afghanistan": {x: 800, y: 300},
@@ -43,4 +43,27 @@ export const COUNTRY_LOC: Record<Country,{x; y;}> = {
     "Western Europe": {x: 500, y: 300},
     "Western United States": {x: 151, y: 300},
     "Yakutsk": {x: 1000, y: 100},
+};
+
+export function countryClickedOn(e : MouseEvent, r : number, canvas : HTMLElement) : (Country | null){
+    e.preventDefault();
+
+    // get the mouse position
+    const rect = canvas.getBoundingClientRect()
+
+    var mouseX=e.clientX-rect.left;
+    var mouseY=e.clientY-rect.top;
+    console.log(mouseX, mouseY)
+
+    // iterate each shape in the shapes array
+    for(var i = 0;i<ALL_COUNTRIES.length;i++) {
+        let country = ALL_COUNTRIES[i]
+        let loc = COUNTRY_LOC[country];
+
+        if ((mouseX - loc.x)**2 + (mouseY - loc.y)**2 < r**2){
+            console.log("yay")
+            return country;
+        };
+    };
+    return null;
 };
