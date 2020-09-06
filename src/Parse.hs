@@ -237,7 +237,7 @@ instance ToJSON Response where
         where
             countries = [(minBound :: Country)..]
             ps = S.turnOrder g
-            cardmap = fromList $ zip (show ps) (map (map (show) .S.cards g) ps)
+            cardmap = fromList $ zip (map (show) ps) (map (map (show) .S.cards g) ps)
             getOwnerTroopMap:: Country -> Map String (Switch Int String)
             getOwnerTroopMap c = fromList [("number_of_troops", LSwitch $ S.troops g c), ("owner", RSwitch $ show $ S.owner g c)]
 
