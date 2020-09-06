@@ -113,6 +113,11 @@ doRequests = foldl nextReq (\g -> Left (error "no request", g))
         format req (resp@(Invalid _ _), _) = Right (req, resp)
         format _ anythingelse = Left anythingelse
 
+ownerFromLists :: [Country] -> [Player] -> Country -> Player
+ownerFromLists [] _ _ = error "country not in list"
+ownerFromLists (c:cs) (p:ps) country = if country == c then p else ownerFromLists cs (ps ++ [p]) country
+
+
 spec :: Spec
 spec = do
         describe "addPlayer" $ do
@@ -189,8 +194,8 @@ spec = do
                                          $ fst (receive (Request wrong (PlaceTroop (cs !! turns))) g') === Invalid NotYourTurn wrong
                             Right _ -> return $ counterexample "Failed before we even got to the test case (fix other tests first)" False
                 context "during the PartiallyComplete subphase" $ do
-                    it "places troops correctly for valid input" $ property $ do
-                       pendingWith "test not implemented yet"
+                    it "places troops correctly for valid input" $ property $ 
+                        pendingWith "test not implemented yet"
                     it "does not allow players to place troops in foreign countries" $ do
                         pendingWith "test not implemented yet"
                     it "enforces troop limits" $ do
