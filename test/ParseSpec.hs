@@ -345,6 +345,16 @@ module ParseSpec where
         it "Correctly encodes on next turn" $ do
           let game' = nextTurn game
           (encodeResponse (General (Play game'))) `shouldSatisfy` wellFormedGame game'
+        it "Correctly encodes when Red has 1 card" $ do
+          let game' = drawCard Red game
+          (encodeResponse (General (Play game'))) `shouldSatisfy` wellFormedGame game'
+        it "Correctly encodes when Red has more than 1 card" $ do
+          let game' = drawCard Red (drawCard Red (drawCard Red game))
+          (encodeResponse (General (Play game'))) `shouldSatisfy` wellFormedGame game'
+        it "Correctly encodes when multiple players have cards has more than 1 card" $ do
+          let game' = drawCard Blue (drawCard Green (drawCard Green (drawCard Red (drawCard Red game))))
+          (encodeResponse (General (Play game'))) `shouldSatisfy` wellFormedGame game'
+
 
       context "Error" $ do
         it "Correctly encodes InvalidMove" $ do
@@ -391,6 +401,7 @@ module ParseSpec where
                          && "\"state\":\"Play\"" `elem` fields
                          && extractPlayerList s == jsonPlayerList ps
                          && validPhase (phase g) (extractPhase s)
+                         && validCardList (extractCardList s) g
                         where s = unpack b
                               ps = turnOrder g
                               fields = splitOn ',' (drop 1 (init s))
@@ -483,6 +494,24 @@ module ParseSpec where
                                    (Nothing, k) -> '\"' : show c ++ "\":{\"owner\":\"Unowned\",\"number_of_troops\":0}"
                                    (Just p, k) -> '\"' : show c ++ "\":{\"owner\":\"" ++ show p ++ "\",\"number_of_troops\":" ++ show k ++ "}"
 
+  extractCardList :: String -> String
+  extractCardList s = take (snd poss + 1) s'
+    where s' = drop (grep "\"cards\":" s) s
+          poss = head $ filter ((== 0) . fst) (parenPairs s')
+
+  extractPlayerCards :: Player -> String -> String
+  extractPlayerCards p s = take (snd poss + 1) s'
+    where s' = drop (grep ("\"" ++ show p ++ "\":") s) s
+          xs = filter ((== 0) . fst) (parenPairs' s')
+          poss = if (null xs) then error "Couldn't find player in cardlist" else head xs
+
+
+  validCardList :: String -> GameState -> Bool
+  validCardList s g = head s == '{'
+                   && last s == '}'
+                   && all f (turnOrder g)
+                   where f p = (extractPlayerCards p s == show (map show (cards g p)))
+
   c :: Country -> (Player, Int)
   c WesternAustralia  = (Red, 3)
   c EasternAustralia = (Blue, 3)
@@ -502,3 +531,11 @@ module ParseSpec where
                  go j []       ('}' : cs) =          go (j + 1) []        cs -- unbalanced parentheses!
                  go j (i : is) ('}' : cs) = (i, j) : go (j + 1) is        cs
                  go j acc      (c   : cs) =          go (j + 1) acc       cs
+
+  parenPairs' = go 0 []
+                where
+                  go _ _        []         = []
+                  go j acc      ('[' : cs) =          go (j + 1) (j : acc) cs
+                  go j []       (']' : cs) =          go (j + 1) []        cs -- unbalanced parentheses!
+                  go j (i : is) (']' : cs) = (i, j) : go (j + 1) is        cs
+                  go j acc      (c   : cs) =          go (j + 1) acc       cs
