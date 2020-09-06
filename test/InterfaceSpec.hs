@@ -7,13 +7,14 @@ import Test.QuickCheck.Monadic
 import Control.Monad (foldM)
 import Control.Exception (evaluate, try, Exception, SomeException)
 import System.Random (mkStdGen, StdGen)
-import Data.Either (isLeft)
+import Data.Either (isLeft, isRight, either)
+import Data.Maybe (isJust, fromJust, isNothing)
 import Interface (Game, empty, addPlayer, receive)
 import Message
 import RiskBoard
 import GameElements
 import SetupBoard
-
+import Debug.Trace (trace)
 
 data ShowableGen = ShowableGen StdGen Int deriving Eq
 
@@ -21,7 +22,7 @@ newtype Permutation a = Permutation [a]
 
 data NewGame = NewGame Game [Player] ShowableGen deriving Eq
 
-data NewPartial = NewPartial Game [Player] [Country] ShowableGen | NewPartialError deriving Eq
+data NewPartial = NewPartial Game [Player] [Country] ShowableGen | NewPartialError (Request, Response) deriving Eq
 
 instance Arbitrary ShowableGen where 
     arbitrary = do
@@ -37,10 +38,10 @@ instance Arbitrary NewPartial where
     arbitrary = do
         NewGame g ps sg <- (arbitrary :: Gen NewGame)
         Permutation cs <- (arbitrary :: Gen (Permutation Country))
-        let result = maybeRequests (zipWith (flip Request . PlaceTroop) cs (cycle ps)) g
+        let result = doRequests (zipWith (flip Request . PlaceTroop) cs (cycle ps)) g
         case result of
-            Just (General (Setup (PartiallyComplete s)), g') -> return $ NewPartial g' ps cs sg
-            _ -> return NewPartialError
+            Left (General _, g') -> return $ NewPartial g' ps cs sg
+            Right r -> return $ NewPartialError r
         
 instance Arbitrary NewGame where 
     arbitrary = do
@@ -52,7 +53,7 @@ instance Arbitrary NewGame where
 
 instance Show NewPartial where 
     show (NewPartial g ps cs sg) = "NewPartial " ++ show ps ++ " " ++ show cs ++ " " ++ show sg
-    show (NewPartialError) = "NewPartialError"
+    show (NewPartialError (req,resp)) = "sent request: " ++ show req ++ " but received error: " ++ show resp
     
 instance Show NewGame where 
     show (NewGame g ps sg) = "NewGame " ++ show ps ++ " " ++ show sg
@@ -79,28 +80,39 @@ countries = [(minBound :: Country)..]
 
 nPlayerGame :: StdGen -> Int -> ([Player], Game)
 nPlayerGame g 0 = ([], empty g)
-nPlayerGame g n = (p:ps, g'')
+nPlayerGame g n = (ps++[p], g'')
     where
     (ps, g') = nPlayerGame g (n-1)
     (p, g'') = addPlayer g'
 
+find :: Eq a => a -> [a] -> Maybe Int 
+find _ [] = Nothing
+find x (y:ys) = if x == y then Just 0 else fmap (1+) $ find x ys
+
+firstdup :: Eq a => [a] -> Maybe Int
+firstdup [] = Nothing
+firstdup (x:xs) =  fmap (1+) (find x xs `combine` firstdup xs)
+    where combine Nothing Nothing = Nothing
+          combine (Just n) Nothing = Just n
+          combine Nothing (Just n) = Just n
+          combine (Just n) (Just m) = Just $ min n m
 distinct :: Eq a => [a] -> Bool
-distinct [] = True
-distinct (x:xs) = not (x `elem` xs) && distinct xs
+distinct = isNothing . firstdup
 
 isEmptyBoard :: SetupState -> Bool
 isEmptyBoard s = all (==(Nothing, 0)) $ map (incompleteBoardOwner s) countries
-
-maybeRequests :: [Request] -> Game -> Maybe (Response, Game)
-maybeRequests rs g = foldM modRec (error "no request", g) rs
- 
-modRec :: (Response, Game) -> Request -> Maybe (Response, Game)
-modRec (_ , g') r = let (resp, g'') = receive r g' 
-                     in case resp of 
-                        (Invalid _ _) -> Nothing
-                        _ -> Just (resp, g'')
     
-                        
+
+doRequests :: [Request] -> Game -> Either (Response, Game) (Request, Response)
+doRequests = foldl nextReq (\g -> Left (error "no request", g))             
+    where 
+        nextReq ::  (Game -> Either (Response, Game) (Request, Response)) -> Request -> Game -> Either (Response, Game) (Request, Response)
+        nextReq f r = either (format r . receive r . snd) Right . f
+
+        format :: Request -> (Response, Game) -> Either (Response, Game) (Request, Response)
+        format req (resp@(Invalid _ _), _) = Right (req, resp)
+        format _ anythingelse = Left anythingelse
+
 spec :: Spec
 spec = do
         describe "addPlayer" $ do
@@ -132,7 +144,7 @@ spec = do
                                 let (players@(p:_), game) = nPlayerGame g n
                                 in let resp = fst $ receive (Request p StartGame) game
                                 in case resp of 
-                                    General (Setup s@(Incomplete _)) -> isEmptyBoard s
+                                    General (Setup s@(Incomplete _)) -> isEmptyBoard s -- BAD
                                     _ -> False
                 context "using invalid inputs" $ do
                     it "should throw an error in other phases" $ do
@@ -143,25 +155,42 @@ spec = do
             describe "PlaceTroop" $ do     
                 context "during the Incomplete subphase" $ do
                     it "places troops correctly for valid input" $ property $ \game ->
-                        game /= NewPartialError
+                        case game of 
+                             NewPartialError r -> False
+                             _ -> True
                     it "does not allow players to place troops in occupied countries" $ property $ do
                         NewGame g ps sg <- (arbitrary :: Gen NewGame)
                         cs <- (arbitrary :: Gen [Country])
-                        let result = maybeRequests (zipWith (flip Request . PlaceTroop) cs (cycle ps)) g
-                        return $ (not $ distinct cs) ==> (result === Nothing)
+                        let n = length ps
+                        let reqs = zipWith (flip Request . PlaceTroop) cs (cycle ps)
+                        let result = doRequests reqs g
+                        let maybebadpos = fmap (`mod` n) (firstdup cs) 
+                        return $ (not $ distinct cs) ==> let badcolour = ps !! (fromJust maybebadpos) in counterexample 
+                            ("--- In a game with " ++ show ps ++ " made using " ++ show sg ++ " ---\n"
+                            ++ "\nhere is a list of all the requests I sent:\n" ++ show reqs 
+                            ++ "\n\nThere should be an Invalid InvalidMove since " ++ show badcolour 
+                            ++ " tried to place a troop in an already occupied country. Here is some more info:\n"
+                            ++ "\nthis is the bad (request, response) pair: " ++ show result 
+                            ++ "\nexpected something like: Right (blah blah..., Invalid InvalidMove " ++ show badcolour ++ ")")  
+                            $ case result of
+                                 Right (_, Invalid InvalidMove b) -> b == badcolour
+                                 _ -> False
                     it "enforces the turn order" $ property $ do
                         NewGame g ps sg <- (arbitrary :: Gen NewGame)
                         let n = length ps
                         Permutation cs <- (arbitrary :: Gen (Permutation Country))
                         turns <- chooseInt(1, length cs - 1)
                         wrong <- elements (take (n-1) $ drop (turns+1) (cycle ps))
-                        let result = maybeRequests (zipWith (flip Request . PlaceTroop) cs (take turns (cycle ps))) g
+                        let result = doRequests (zipWith (flip Request . PlaceTroop) cs (take turns (cycle ps))) g
                         case result of
-                            Just (_, g') -> return $ counterexample ("It was actually meant to be " ++ show (cycle ps !! turns) ++ "'s turn, so I was expecting \"Invalid NotYourTurn " ++ show wrong ++ "\" when " ++ show wrong  ++ " tries to place troops.\n") $ fst (receive (Request wrong (PlaceTroop (cs !! turns))) g') === Invalid NotYourTurn wrong
-                            Nothing -> return $ counterexample "Failed before we even got to the test case" False
+                            Left (_, g') -> return $ counterexample ("It was actually meant to be " 
+                                         ++ show (cycle ps !! turns) ++ "'s turn, so I was expecting \"Invalid NotYourTurn " 
+                                         ++ show wrong ++ "\" when " ++ show wrong  ++ " tries to place troops.\n") 
+                                         $ fst (receive (Request wrong (PlaceTroop (cs !! turns))) g') === Invalid NotYourTurn wrong
+                            Right _ -> return $ counterexample "Failed before we even got to the test case (fix other tests first)" False
                 context "during the PartiallyComplete subphase" $ do
-                    it "places troops correctly for valid input" $ do
-                        pendingWith "test not implemented yet"
+                    it "places troops correctly for valid input" $ property $ do
+                       pendingWith "test not implemented yet"
                     it "does not allow players to place troops in foreign countries" $ do
                         pendingWith "test not implemented yet"
                     it "enforces troop limits" $ do
