@@ -1,4 +1,4 @@
-import {Country, Player, ALL_COUNTRIES} from "./elements";
+import {Country, Player, Card, ALL_COUNTRIES} from "./elements";
 
 interface BoardCell {
     player: Player | "Empty";
@@ -10,9 +10,13 @@ type State = Record<Country, BoardCell>;
 export class Board {
 
     private _board: State;
+    private _players: Array<Player>;
+    private _myCards: Array<Card>;
 
-    constructor() {
+    constructor(ps : Array<Player>, cs : Array<Card>) {
         this._board = {} as State;
+        this._players = ps
+        this._myCards = cs
         ALL_COUNTRIES.forEach((key, index) => {this._board[key] = {player: "Empty", troops: 0}});
     }
 
@@ -30,5 +34,20 @@ export class Board {
 
     changeOwner(c: Country, p: Player) {
         this._board[c].player = p;
+    }
+
+    removeCard(c : Card) {
+        const i = this._myCards.indexOf(c)
+        if (i != -1){
+            this._myCards = this._myCards.splice(i,1)
+        }
+    }
+
+    get cards() {
+        return this._myCards;
+    }
+
+    get players() {
+        return this._players;
     }
 }

@@ -1,4 +1,4 @@
-import {Country, Player, ALL_COUNTRIES, ALL_PLAYERS} from "./elements";
+import {Country, Player, Card, ALL_COUNTRIES, ALL_PLAYERS} from "./elements";
 import {Board} from "./board";
 
 
@@ -33,7 +33,7 @@ export class Connection {
 
 
     async start_game(event : MouseEvent) {
-        this._socket.send("{\"action\": \"StartGame\", \"sender\": \""+this.me+"\"}");
+        this.send("{\"action\": \"StartGame\", \"sender\": \""+this.me+"\"}");
     }
 
     private receive(event) {
@@ -43,9 +43,15 @@ export class Connection {
             if (msg.kind === "colour") {
                 const colour = msg.colour;
                 console.log("I am " + colour);
-            }
-            if (msg.state === "Setup") {
-                const temp = new Board();
+            } else if (msg.kind === "State"){
+                var cards : Array<Card> = []
+                if (msg.state === "WaitingRoom"){
+                    return;
+                } else if (msg.state === "Play"){
+                    cards = msg.cards[this.me].sort;
+                }
+
+                const temp = new Board(msg.players, cards);
                 ALL_COUNTRIES.forEach((country, c_index) => {
                     const c = msg.board[country];
                     temp.changeTroops(country, c.number_of_troops);
@@ -53,9 +59,33 @@ export class Connection {
                         temp.changeOwner(country, c.owner);
                     }
                 });
-                console.log("sent")
-                document.dispatchEvent(new CustomEvent("Setup",{detail: {board :temp, players : msg.players}}));
-                // new board temp
+                if (msg.state === "Setup"){
+                    console.log("sent")
+                    document.dispatchEvent(new CustomEvent("Setup",{detail: temp}));
+
+                } else if (msg.state === "Play"){
+                    switch (msg.phase.kind) {
+                        case "Simple":
+                            document.dispatchEvent(new CustomEvent(msg.phase.phase,
+                                                  {detail: temp}));
+                        case "BattleEnd":
+                            document.dispatchEvent(new CustomEvent("BattleEnd",
+                                                  {detail: {board :temp,
+                                                            ac: msg.phase.attacking_country,
+                                                            dc: msg.phase.defending_country,
+                                                            attrem: msg.phase.attackers_remaining}}));
+                        case "MidBattle":
+                            document.dispatchEvent(new CustomEvent("BattleEnd",
+                                                  {detail: {board :temp,
+                                                            ac: msg.phase.attacking_country,
+                                                            dc: msg.phase.defending_country,
+                                                            att: msg.phase.attackers}}));
+                    }
+                }
+            } else if (msg.kind === "Won") {
+                document.dispatchEvent(new CustomEvent("Won", {detail: msg.winner}));
+            } else if (msg.kind === "Question") {
+                document.dispatchEvent(new CustomEvent("Question", {detail: msg.question}));
             }
         }
     }

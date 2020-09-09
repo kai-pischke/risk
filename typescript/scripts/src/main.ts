@@ -15,7 +15,7 @@ function countryClicked(e : MouseEvent, r : number, canvas : HTMLElement){
 
 (async() => {
     let ui = new Draw();
-    let board = new Board();
+    let board = new Board([],[]);
     let conn = new Connection();
     let colour : string = await conn.start();
     let moves = new Moves(colour, ui)
@@ -28,8 +28,8 @@ function countryClicked(e : MouseEvent, r : number, canvas : HTMLElement){
 
     //-- That Pass Information In -----------
     canvas.onmousedown = function(e : MouseEvent){countryClicked(e, ui.outerRadius, canvas);};
-    document.addEventListener('Setup', function (e : CustomEvent) {moves.setup(e.detail.board, e.detail.players[0])});
-
+    document.addEventListener('Setup', function (e : CustomEvent) {moves.setup(e.detail)});
+    document.addEventListener('Reinforce', function (e : CustomEvent) {moves.setup(e.detail)});
     //-- That Pass Information Out ----------
     document.addEventListener('Send', function (e : CustomEvent) {conn.send(e.detail)});
 

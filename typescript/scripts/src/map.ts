@@ -45,6 +45,8 @@ export const COUNTRY_LOC: Record<Country,{x; y;}> = {
     "Yakutsk": {x: 1000, y: 100},
 };
 
+
+
 export function countryClickedOn(e : MouseEvent, r : number, canvas : HTMLElement) : (Country | null){
     e.preventDefault();
 
