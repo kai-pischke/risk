@@ -86,9 +86,8 @@ module Interface  (
     | s == currentPlayer gstate =
       case attack cAtt cDef att gstate of
         Nothing -> (Invalid InvalidMove s, g)
-        Just gstate' -> (Special NumDefenders defender, GamePlay gstate')
+        Just gstate' -> (General $ Play gstate', GamePlay gstate')
     | otherwise = (Invalid NotYourTurn s, g)
-    where defender = owner gstate cDef
 
   receive (Request s (M.Attack _ _ _)) g = (Invalid NotInPlay s, g)
 
