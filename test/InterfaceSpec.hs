@@ -3,6 +3,7 @@ module InterfaceSpec where
 import Test.Hspec
 import Test.QuickCheck
 import Test.QuickCheck.Gen
+import Test.QuickCheck.Gen.Unsafe (promote)
 import Test.QuickCheck.Monadic
 import Control.Monad (foldM)
 import Control.Exception (evaluate, try, Exception, SomeException)
@@ -15,6 +16,8 @@ import RiskBoard
 import GameElements
 import SetupBoard
 import Debug.Trace (trace)
+import Data.Map (Map)
+import qualified Data.Map as M
 
 data ShowableGen = ShowableGen StdGen Int deriving Eq
 
@@ -24,6 +27,17 @@ data NewGame = NewGame Game [Player] ShowableGen deriving Eq
 
 data NewPartial = NewPartial Game [Player] [Country] ShowableGen | NewPartialError (Request, Response) deriving Eq
 
+data NewComplete = NewComplete Game [Player] [Country] ShowableGen | NewCompleteError (Request, Response) deriving Eq
+
+initialTroops :: Int -> Int
+initialTroops 6 = 20
+initialTroops 5 = 25
+initialTroops 4 = 30
+initialTroops 3 = 35
+initialTroops 2 = 40
+initialTroops n = error $ "Game rules only specified for 2-6 players. Not sure what to do for "
+      ++ show n ++ " players."
+      
 instance Arbitrary ShowableGen where 
     arbitrary = do
         s <- (arbitrary :: Gen Int)
@@ -42,6 +56,22 @@ instance Arbitrary NewPartial where
         case result of
             Left (General _, g') -> return $ NewPartial g' ps cs sg
             Right r -> return $ NewPartialError r
+
+instance Arbitrary NewComplete where 
+  arbitrary = do
+    p <- (arbitrary :: Gen NewPartial)
+    case p of 
+        NewPartialError r -> return $ NewCompleteError r
+        NewPartial g ps cs sg -> do
+          let n = length ps 
+          let owned = M.fromListWith (++) $ zip (cycle ps) (map (:[]) cs)
+          let rounds = initialTroops n * n - length cs
+          let order = take rounds $ drop (length cs) (cycle ps)
+          choices <- promote $ map (elements . (owned M.!)) order
+          case doRequests (zipWith (flip Request . PlaceTroop) choices order) g of 
+            Left (_, g') -> return $ NewComplete g' ps (cs++choices) sg
+            Right r -> return $ NewCompleteError r
+
         
 instance Arbitrary NewGame where 
     arbitrary = do
@@ -57,7 +87,11 @@ instance Show NewPartial where
     
 instance Show NewGame where 
     show (NewGame g ps sg) = "NewGame " ++ show ps ++ " " ++ show sg
-            
+
+instance Show NewComplete where 
+  show (NewComplete g ps cs sg) = "NewPartial " ++ show ps ++ " " ++ show cs ++ " " ++ show sg
+  show (NewCompleteError (req,resp)) = "sent request: " ++ show req ++ " but received error: " ++ show resp
+      
 instance Show a => Show (Permutation a) where
     show (Permutation s) = show s
     
@@ -137,9 +171,12 @@ spec = do
                              throwsException $ snd $ nPlayerGame g n
         
             context "using a non-WaitingRoom" $ do
-                it "should throw an error" $
-                    pendingWith "test not implemented yet"
-
+                it "should throw an error for Incomplete" $ property $ \(NewGame g ps sg) ->
+                    label ("using " ++ show (length ps) ++ " players") $ throwsException $ addPlayer g
+                it "should throw an error for PartiallyComplete" $ property $ \(NewPartial g ps cs sg) ->
+                  label ("using " ++ show (length ps) ++ " players") $ throwsException $ addPlayer g
+                it "should throw an error for Complete" $ property $ \(NewComplete g ps cs sg) ->
+                  label ("using " ++ show (length ps) ++ " players") $ throwsException $ addPlayer g
         describe "Receive" $ do
             describe "StartGame" $ do
                 context "using valid inputs" $ do
@@ -152,10 +189,16 @@ spec = do
                                     General (Setup s@(Incomplete _)) -> isEmptyBoard s -- BAD
                                     _ -> False
                 context "using invalid inputs" $ do
-                    it "should throw an error in other phases" $ do
-                        pendingWith "test not implemented yet"
-                    it "should throw an error if called with only 0-1 players" $ do
-                        pendingWith "test not implemented yet"
+                    it "should throw an error for Incomplete" $ property $ \(NewGame g ps@(p:_) sg) ->
+                        label ("using " ++ show (length ps) ++ " players") ((fst $ receive (Request p StartGame) g) === Invalid NotInWaitingRoom p)
+                    it "should throw an error for PartiallyComplete" $ property $ \(NewPartial g ps@(p:_) cs sg) ->
+                      label ("using " ++ show (length ps) ++ " players") ((fst $ receive (Request p StartGame) g) === Invalid NotInWaitingRoom p)
+                    it "should throw an error for Complete" $ property $ \(NewComplete g ps@(p:_) cs sg) ->
+                      label ("using " ++ show (length ps) ++ " players") ((fst $ receive (Request p StartGame) g) === Invalid NotInWaitingRoom p)
+                    it "should throw an error if called with only 1 player" $ property $ \sg@(ShowableGen g _) -> 
+                      let (players@(p:_), game) = nPlayerGame g 1
+                      in let resp = fst $ receive (Request p StartGame) game
+                      in resp === Invalid NotEnoughPlayers p
 
             describe "PlaceTroop" $ do     
                 context "during the Incomplete subphase" $ do
@@ -194,14 +237,18 @@ spec = do
                                          $ fst (receive (Request wrong (PlaceTroop (cs !! turns))) g') === Invalid NotYourTurn wrong
                             Right _ -> return $ counterexample "Failed before we even got to the test case (fix other tests first)" False
                 context "during the PartiallyComplete subphase" $ do
-                    it "places troops correctly for valid input" $ property $ 
-                        pendingWith "test not implemented yet"
+                    it "places troops correctly for valid input" $ property $ \game ->
+                          case game of 
+                               NewCompleteError r -> property False
+                               NewComplete _ ps _ _ -> label ("using " ++ show (length ps) ++ " players") True
                     it "does not allow players to place troops in foreign countries" $ do
                         pendingWith "test not implemented yet"
                     it "enforces troop limits" $ do
                         pendingWith "test not implemented yet"
                     it "enforces the turn order" $ do
                         pendingWith "test not implemented yet"
+                        
+                
         {-
         describe "Attack" $ do
             context "Valid Inputs" $ do
@@ -209,12 +256,12 @@ spec = do
             context "Invalid Inputs" $ do
                 pendingWith ("Needs to work")
                 
+
         describe "Reinforce" $ do
-            context "Valid Inputs" $ do
-                pendingWith ("Needs to work")
-            context "Invalid Inputs" $ do
-                pendingWith ("Needs to work")
-                
+          context "Valid Inputs" $ do
+            pendingWith ("Needs to work")
+          context "Invalid Inputs" $ do
+            pendingWith ("Needs to work")
         describe "Fortify" $ do
             context "Valid Inputs" $ do
                 pendingWith "Needs to work"

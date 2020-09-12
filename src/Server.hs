@@ -55,24 +55,31 @@ respond _ state req = do
     let (response, game') = receive req game
     modifyMVar_ state (return . updateGame game')
     let bytesResp = encodeResponse response
+    putStrLn $ debugMsg req response
     case response of
         General _ -> broadcast state bytesResp
         Special _ toPlayer -> send state toPlayer bytesResp
         Invalid _ toPlayer -> send state toPlayer bytesResp
         GameWon _ -> undefined
-        
+
+debugMsg :: Request -> Response -> String
+debugMsg (Request p r) (General _) = "VALID REQUEST   >> " ++ reqInfo p r
+debugMsg (Request p r) (Special _ _) = "VALID REQUEST   >> " ++ reqInfo p r
+debugMsg _ (Invalid i _) = "INVALID REQUEST >> " ++ show i
+debugMsg _ (GameWon _) = "GAME WON (not really implemented yet)"
+
 -- prints information about a request
 reqInfo :: Player -> RequestType -> String 
 reqInfo p StartGame = show p ++ " started the game."
 reqInfo p (PlaceTroop c) = show p ++ " placed a troop in " ++ show c ++ "."
 reqInfo p (Attack c1 c2 _) = show p ++ " attacked " ++ show c2 ++ " from " ++ show c1 ++ "."
 reqInfo p (Reinforce ti ts) = show p ++ " placed " ++ show (sum $ map snd ts) ++ " reinforcements using trade in:" ++ show ti ++ "."
-reqInfo p (Fortify c1 c2 n) = show p ++ " fortified their position, moving " ++ show n ++ " troops."
+reqInfo p (Fortify c1 c2 n) = show p ++ " fortified their position, moving " ++ show n ++ " troops from " ++ show c1 ++ " to " ++ show c2 ++ "."
 reqInfo p (Invade c) = show p ++ " invaded " ++ show c ++ "."
 reqInfo p (ChooseDefenders d) = show p ++ " chose to roll " ++ show (fromEnum d) ++ " dice."
 reqInfo p EndAttack = show p ++ " ended the attack phase."
 reqInfo p SkipFortify = show p ++ " skipped the fortify phase."
-
+reqInfo p (Trade _ _) = show p ++ " did a trade."
 -- deals with one cycle of receiving and then sending responses    
 play :: WS.Connection -> Player -> MVar State -> IO ()
 play conn player state = do
@@ -87,8 +94,6 @@ play conn player state = do
         bytesReq <- WS.receiveData conn
         case decodeRequest bytesReq of 
             Left req -> do 
-                let (Request p r) = req
-                putStrLn $ reqInfo p r
                 respond conn state req
             Right err -> 
                 WS.sendTextData conn err
