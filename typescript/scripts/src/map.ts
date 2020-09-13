@@ -47,7 +47,7 @@ export const COUNTRY_LOC: Record<Country,{x; y;}> = {
 
 
 
-export function countryClickedOn(e : MouseEvent, r : number, canvas : HTMLElement) : (Country | null){
+export function countryOn(e : MouseEvent, r : number, canvas : HTMLElement) : (Country | null){
     e.preventDefault();
 
     // get the mouse position

@@ -2,12 +2,12 @@ import {Draw} from "./draw";
 import {Board} from "./board";
 import {Connection} from "./sock";
 import {Moves} from "./moves";
-import {countryClickedOn} from "./map";
+import {countryOn} from "./map";
 
 //-- Global Variables -----------------------
 
-function countryClicked(e : MouseEvent, r : number, canvas : HTMLElement){
-    let country = countryClickedOn(e, r, canvas);
+function countryClickedOn(e : MouseEvent, r : number, canvas : HTMLElement){
+    const country = countryOn(e, r, canvas);
     if (country != null){
         document.dispatchEvent(new CustomEvent("CountryClickedOn",{detail: country}));
     }
@@ -19,6 +19,7 @@ function countryClicked(e : MouseEvent, r : number, canvas : HTMLElement){
     let conn = new Connection();
     let colour : string = await conn.start();
     let moves = new Moves(colour, ui)
+
 
     conn.me = colour;
     const canvas=document.getElementById("canvas");
@@ -38,7 +39,21 @@ function countryClicked(e : MouseEvent, r : number, canvas : HTMLElement){
 
 
     //-- That Pass Information In -----------
-    canvas.onmouseup = function(e : MouseEvent){countryClicked(e, ui.outerRadius, canvas);};
+    canvas.onmouseup = function(e : MouseEvent){countryClickedOn(e, ui.outerRadius, canvas);};
+
+    canvas.onmousemove = function(e : MouseEvent){
+        const country = countryOn(e, ui.outerRadius, canvas);
+        let hover = false;
+        let hoverID = "";
+        if (country == null){
+            hover = false;
+        } else {
+            hover = true;
+            hoverID = country;
+        }
+        document.getElementById("countryNameBadge").innerHTML = hover ? hoverID : "";
+    }
+
     document.addEventListener('Setup', function (e : CustomEvent) {moves.setup(e.detail)});
     document.addEventListener('Reinforce', function (e : CustomEvent) {moves.reinforce(e.detail)});
     document.addEventListener('Attack', function (e : CustomEvent) {moves.attack(e.detail)});

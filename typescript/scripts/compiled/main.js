@@ -2,8 +2,8 @@ define(["require", "exports", "./draw", "./board", "./sock", "./moves", "./map"]
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     //-- Global Variables -----------------------
-    function countryClicked(e, r, canvas) {
-        let country = map_1.countryClickedOn(e, r, canvas);
+    function countryClickedOn(e, r, canvas) {
+        const country = map_1.countryOn(e, r, canvas);
         if (country != null) {
             document.dispatchEvent(new CustomEvent("CountryClickedOn", { detail: country }));
         }
@@ -26,7 +26,20 @@ define(["require", "exports", "./draw", "./board", "./sock", "./moves", "./map"]
         document.getElementById("submitNumberInv").onclick = (() => { document.dispatchEvent(new CustomEvent("SubmitNumberInv")); });
         document.getElementById("submitNumberFort").onclick = (() => { document.dispatchEvent(new CustomEvent("SubmitNumberFort")); });
         //-- That Pass Information In -----------
-        canvas.onmouseup = function (e) { countryClicked(e, ui.outerRadius, canvas); };
+        canvas.onmouseup = function (e) { countryClickedOn(e, ui.outerRadius, canvas); };
+        canvas.onmousemove = function (e) {
+            const country = map_1.countryOn(e, ui.outerRadius, canvas);
+            let hover = false;
+            let hoverID = "";
+            if (country == null) {
+                hover = false;
+            }
+            else {
+                hover = true;
+                hoverID = country;
+            }
+            document.getElementById("countryNameBadge").innerHTML = hover ? hoverID : "";
+        };
         document.addEventListener('Setup', function (e) { moves.setup(e.detail); });
         document.addEventListener('Reinforce', function (e) { moves.reinforce(e.detail); });
         document.addEventListener('Attack', function (e) { moves.attack(e.detail); });

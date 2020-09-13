@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html>
-<style>
+    <style>
       * {
         box-sizing: border-box;
+      }
+      .cNB {
+        position: relative;
+        height:20px;
+        text-align:center;
       }
       .numberTroopsPopup {
         position: relative;
@@ -138,6 +143,9 @@
         <button id="startGame">Start</button>
         <button id="endAttack">End Attack</button>
         <button id="skipFortify">Skip Fortify</button>
+        <div class = "cNB">
+            <h2 id = "countryNameBadge"></h2>
+        </div>
         <canvas id="canvas" width="1200" height="800">Well... RIP you I guess</canvas>
 
         <div class="numberTroopsPopup">
