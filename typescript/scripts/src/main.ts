@@ -3,6 +3,7 @@ import {Board} from "./board";
 import {Connection} from "./sock";
 import {Moves} from "./moves";
 import {countryOn} from "./map";
+import {Player} from "./elements";
 
 //-- Global Variables -----------------------
 
@@ -17,7 +18,7 @@ function countryClickedOn(e : MouseEvent, r : number, canvas : HTMLElement){
     let ui = new Draw();
     let board = new Board([],[]);
     let conn = new Connection();
-    let colour : string = await conn.start();
+    let colour : Player = await conn.start();
     let moves = new Moves(colour, ui)
 
 

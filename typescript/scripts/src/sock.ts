@@ -11,7 +11,7 @@ export class Connection {
     constructor() {
 
     }
-    async start() : Promise<string> {
+    async start() : Promise<Player> {
         this._socket = new WebSocket("ws://localhost:9600");
         this._socket.onmessage = this.receive.bind(this);
         return new Promise((resolve,reject) =>
