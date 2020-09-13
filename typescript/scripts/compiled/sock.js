@@ -5,10 +5,11 @@ define(["require", "exports", "./elements", "./board"], function (require, expor
     class Connection {
         constructor() {
             this.a = 10;
+            this.previousMessage = null;
         }
         async start() {
             this._socket = new WebSocket("ws://localhost:9600");
-            this._socket.onmessage = this.receive;
+            this._socket.onmessage = this.receive.bind(this);
             return new Promise((resolve, reject) => this._socket.addEventListener('message', function (event) {
                 const msg = JSON.parse(event.data);
                 console.log(msg);
@@ -22,14 +23,15 @@ define(["require", "exports", "./elements", "./board"], function (require, expor
             }));
         }
         async send(info) {
+            //console.log(info)
             this._socket.send(info);
         }
         async start_game(event) {
             this.send("{\"action\": \"StartGame\", \"sender\": \"" + this.me + "\"}");
         }
         receive(event) {
+            //console.log(event.data)
             const msg = JSON.parse(event.data);
-            //console.log("Recieved : " + msg);
             if ("kind" in msg) {
                 if (msg.kind === "colour") {
                     const colour = msg.colour;
@@ -41,7 +43,7 @@ define(["require", "exports", "./elements", "./board"], function (require, expor
                         return;
                     }
                     else if (msg.state === "Play") {
-                        cards = msg.cards[this.me].sort;
+                        cards = msg.cards[this.me];
                     }
                     const temp = new board_1.Board(msg.players, cards);
                     elements_1.ALL_COUNTRIES.forEach((country, c_index) => {
@@ -52,31 +54,41 @@ define(["require", "exports", "./elements", "./board"], function (require, expor
                         }
                     });
                     if (msg.state === "Setup") {
-                        console.log("sent");
+                        this.previousMessage = event;
                         document.dispatchEvent(new CustomEvent("Setup", { detail: temp }));
                     }
                     else if (msg.state === "Play") {
-                        switch (msg.phase.kind) {
-                            case "Simple":
-                                document.dispatchEvent(new CustomEvent(msg.phase.phase, { detail: temp }));
-                            case "BattleEnd":
-                                document.dispatchEvent(new CustomEvent("BattleEnd", { detail: { board: temp,
-                                        ac: msg.phase.attacking_country,
-                                        dc: msg.phase.defending_country,
-                                        attrem: msg.phase.attackers_remaining } }));
-                            case "MidBattle":
-                                document.dispatchEvent(new CustomEvent("BattleEnd", { detail: { board: temp,
-                                        ac: msg.phase.attacking_country,
-                                        dc: msg.phase.defending_country,
-                                        att: msg.phase.attackers } }));
+                        if (msg.phase.kind === "Simple") {
+                            this.previousMessage = event;
+                            document.dispatchEvent(new CustomEvent(msg.phase.phase, { detail: temp }));
+                        }
+                        else if (msg.phase.kind === "BattleEnd") {
+                            this.previousMessage = event;
+                            console.log(temp);
+                            document.dispatchEvent(new CustomEvent("BattleEnd", { detail: { board: temp,
+                                    ac: msg.phase.attacking_country,
+                                    dc: msg.phase.defending_country,
+                                    attrem: msg.phase.attackers_remaining } }));
+                        }
+                        else if (msg.phase.kind === "MidBattle") {
+                            this.previousMessage = event;
+                            document.dispatchEvent(new CustomEvent("MidBattle", { detail: { board: temp,
+                                    ac: msg.phase.attacking_country,
+                                    dc: msg.phase.defending_country,
+                                    att: msg.phase.attackers } }));
                         }
                     }
                 }
                 else if (msg.kind === "Won") {
+                    this.previousMessage = event;
                     document.dispatchEvent(new CustomEvent("Won", { detail: msg.winner }));
                 }
                 else if (msg.kind === "Question") {
-                    document.dispatchEvent(new CustomEvent("Question", { detail: msg.question }));
+                    this.previousMessage = event;
+                    document.dispatchEvent(new CustomEvent(msg.question, { detail: msg.player }));
+                }
+                else if (msg.kind === "Error") {
+                    this.receive(this.previousMessage);
                 }
             }
         }

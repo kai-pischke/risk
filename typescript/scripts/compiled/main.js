@@ -18,12 +18,35 @@ define(["require", "exports", "./draw", "./board", "./sock", "./moves", "./map"]
         const canvas = document.getElementById("canvas");
         //-- Listeners ------------------------------
         document.getElementById("startGame").onclick = conn.start_game.bind(conn);
+        document.getElementById("endAttack").onclick = (() => { document.dispatchEvent(new CustomEvent("EndAttack")); });
+        document.getElementById("skipFortify").onclick = (() => { document.dispatchEvent(new CustomEvent("SkipFortify")); });
+        document.getElementById("submitNumberTroops").onclick = (() => { document.dispatchEvent(new CustomEvent("SubmitNumberTroops")); });
+        document.getElementById("cancelNumberTroops").onclick = (() => { document.getElementById("popupNumberTroops").style.display = "none"; });
+        document.getElementById("submitNumberDef").onclick = (() => { document.dispatchEvent(new CustomEvent("SubmitNumberDef")); });
+        document.getElementById("submitNumberInv").onclick = (() => { document.dispatchEvent(new CustomEvent("SubmitNumberInv")); });
+        document.getElementById("submitNumberFort").onclick = (() => { document.dispatchEvent(new CustomEvent("SubmitNumberFort")); });
         //-- That Pass Information In -----------
-        canvas.onmousedown = function (e) { countryClicked(e, ui.outerRadius, canvas); };
+        canvas.onmouseup = function (e) { countryClicked(e, ui.outerRadius, canvas); };
         document.addEventListener('Setup', function (e) { moves.setup(e.detail); });
-        document.addEventListener('Reinforce', function (e) { moves.setup(e.detail); });
+        document.addEventListener('Reinforce', function (e) { moves.reinforce(e.detail); });
+        document.addEventListener('Attack', function (e) { moves.attack(e.detail); });
+        document.addEventListener('Fortify', function (e) { moves.fortify(e.detail); });
+        document.addEventListener('MidBattle', function (e) { moves.chooseDefenders(e.detail.board, e.detail.ac, e.detail.dc, e.detail.att); });
+        document.addEventListener('BattleEnd', function (e) { moves.invade(e.detail.board, e.detail.ac, e.detail.dc, e.detail.attrem); });
         //-- That Pass Information Out ----------
         document.addEventListener('Send', function (e) { conn.send(e.detail); });
+        document.addEventListener('EndAttack', function (e) {
+            conn.send(JSON.stringify({
+                action: "EndAttack",
+                sender: colour
+            }));
+        });
+        document.addEventListener('SkipFortify', function (e) {
+            conn.send(JSON.stringify({
+                action: "SkipFortify",
+                sender: colour
+            }));
+        });
         //---------------------------------------
         board.changeOwner("Siam", "Green");
         board.changeTroops("Siam", 3);

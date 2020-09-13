@@ -8,6 +8,8 @@ export class Draw{
     private _ctx: CanvasRenderingContext2D;
     public outerRadius = 35;
     public innerRadius = 25;
+    private _countryColour = {} as Record<Country, string>;
+
     constructor() {
         const canvas = document.getElementById("canvas");
 
@@ -19,6 +21,16 @@ export class Draw{
         this._ctx.textBaseline = "middle";
         this._ctx.textAlign = "center";
 
+        ALL_COUNTRIES.forEach((key, index) => {this._countryColour[key] = "white"});
+
+    }
+
+    public setColour(c : Country, s: string){
+        this._countryColour[c] = s;
+    }
+
+    public clearColour(){
+        ALL_COUNTRIES.forEach((key, index) => {this._countryColour[key] = "white"});
     }
 
     public draw(state: Board) {
@@ -90,7 +102,7 @@ export class Draw{
 
             this._ctx.beginPath();
             this._ctx.arc(myloc.x, myloc.y, this.innerRadius, 0, Math.PI*2, false);
-            this._ctx.fillStyle = "white";
+            this._ctx.fillStyle = this._countryColour[country];
             this._ctx.fill();
             this._ctx.fillStyle = "black";
             this._ctx.font = "14px 'Helvetica'";

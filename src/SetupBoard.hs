@@ -29,13 +29,13 @@ data SetupBoardState = InternalGameState
                     statePlayers :: [Player],
                     playerRemaining ::  Map Player Int
                 } deriving (Eq, Show)
-                
+
 -- | Contains a SetupBoardState and information about how complete the board is.
 data SetupState = Incomplete SetupBoardState -- ^ when not all countries have a owner
                 | PartiallyComplete SetupBoardState -- ^ when all countries have an owner but not all troops have been placed
                 | Complete SetupBoardState -- ^ when all troops have been placed
                 deriving (Eq, Show)
-                
+
 -- map functions --
 type SbStateTransformer = SetupBoardState -> SetupBoardState
 
@@ -59,7 +59,7 @@ toSetupState :: SetupBoardState -> SetupState
 toSetupState s | not $ null $ Map.filter isNothing $ playerMap s    = Incomplete s
                | not $ null $ Map.filter (/= 0) $ playerRemaining s = PartiallyComplete s
                | otherwise                                          = Complete s
-              
+
 nextTurn :: SetupBoardState -> SetupBoardState
 nextTurn = changePlayers rotate
         where
@@ -74,8 +74,8 @@ distinct (x:xs) = (not $ x `elem` xs) && distinct xs
 
 -- | Creates a blank board with no troops and where no countries are owned yet. Creates an 'Incomplete' 'SetupBoardState'.
 emptyBoard :: [Player] -> SetupState
-emptyBoard ps = if distinct ps then 
-    Incomplete $ InternalGameState 
+emptyBoard ps = if distinct ps then
+    Incomplete $ InternalGameState
     (Map.fromList $ zip countries $ repeat 0)
     (Map.fromList $ zip countries $ repeat Nothing)
     ps
@@ -85,7 +85,7 @@ emptyBoard ps = if distinct ps then
         countries = [(minBound :: Country)..]
         errDup = error "Duplicate players given to emptyBoard"
 
--- | Partial function, only defined for incomplete and partially complete SetupState and only when the current player owns the given country. 
+-- | Partial function, only defined for incomplete and partially complete SetupState and only when the current player owns the given country.
 -- It should error if called on a Complete SetupBoardState.
 -- It should return 'Nothing' if called on a 'Country' not owned by current player (or unowned).
 placeTroop :: Country -> SetupState -> Maybe SetupState
@@ -117,26 +117,26 @@ placeTroop c (PartiallyComplete s) = case Map.lookup c (playerMap s) of
 placeTroop _ _ = error "invalid call to placeTroop: called on 'Complete' SetupState."
 
 completeBoardOwner :: SetupState -> Country -> (Player, Int)
-completeBoardOwner (Complete s) c = case result of 
+completeBoardOwner (Complete s) c = case result of
                                     (Just r) -> r
                                     Nothing  -> error "Shouldn't be possibe. Missing owner in CompleteBoard!"
-        where 
+        where
           result = (,) <$> (join $ Map.lookup c $ playerMap s) <*> (Map.lookup c $ troopMap s)
 completeBoardOwner _ _ = error "completeBoardOwner only defined for Complete SetupBoardState"
 
 -- | Partial function, defined for 'PartiallyComplete' 'SetupState', gives the owner and number of troops in each country.
 -- It should error if called on a incomplete SetupState
 partiallyCompleteBoardOwner :: SetupState -> Country -> (Player, Int)
-partiallyCompleteBoardOwner (PartiallyComplete s) c = case result of 
+partiallyCompleteBoardOwner (PartiallyComplete s) c = case result of
                                     (Just r) -> r
                                     Nothing  -> error "Shouldn't be possibe. Missing owner in PartiallyCompleteBoard!"
-        where 
+        where
           result = (,) <$> (join $ Map.lookup c $ playerMap s) <*> (Map.lookup c $ troopMap s)
 partiallyCompleteBoardOwner _ _ = error "partiallyCompleteBoardOwner only defined for PartiallyComplete SetupBoardState"
 
 -- | Partial function, only defined for any 'SetupState', gives the owner and number of troops in each country.
 incompleteBoardOwner :: SetupState -> Country -> (Maybe Player, Int)
-incompleteBoardOwner (Incomplete s) c = case result of 
+incompleteBoardOwner (Incomplete s) c = case result of
                                         (Just r) -> r
                                         Nothing  -> error "incompleteBoardOwner: Map should be total. Shouldn't be possible."
   where result = (,) <$> (Map.lookup c $ playerMap s) <*> (Map.lookup c $ troopMap s)
@@ -144,18 +144,18 @@ incompleteBoardOwner _ _ = error "incompleteBoardOwner only defined for Incomple
 
 -- | Gives the turnOrder for a 'SetupState', with the player's whose turn it currently is at the head of the list.
 setUpTurnOrder :: SetupState -> [Player]
-setUpTurnOrder = statePlayers . internalBoard 
+setUpTurnOrder = statePlayers . internalBoard
 
 -- private --
 initialTroops :: Int -> Int
 initialTroops 6 = 20
 initialTroops 5 = 25
 initialTroops 4 = 30
-initialTroops 3 = 35
+initialTroops 3 = 14
 initialTroops 2 = 40
 initialTroops n = error $ "Game rules only specified for 2-6 players. Not sure what to do for "
                         ++ show n ++ " players."
-                        
+
 internalBoard :: SetupState -> SetupBoardState
 internalBoard (Incomplete s) = s
 internalBoard (PartiallyComplete s) = s

@@ -1,5 +1,133 @@
 <!DOCTYPE html>
 <html>
+<style>
+      * {
+        box-sizing: border-box;
+      }
+      .numberTroopsPopup {
+        position: relative;
+        text-align: center;
+        width: 100%;
+      }
+      .popupNumberTroops {
+        display: none;
+        position: fixed;
+        left: 45%;
+        top: 5%;
+        transform: translate(-50%, 5%);
+        border: 3px solid #999999;
+        z-index: 9;
+      }
+      .formNT {
+        max-width: 300px;
+        padding: 20px;
+        background-color: #fff;
+      }
+      .formNT .btn {
+        padding: 12px 20px;
+        border: none;
+        background-color: #8ebf42;
+        color: #fff;
+        cursor: pointer;
+        width: 100%;
+        margin-bottom: 15px;
+        opacity: 0.8;
+      }
+      .formNT .cancel {
+        background-color: #cc0000;
+      }
+
+
+      .numberDefPopup {
+        position: relative;
+        text-align: center;
+        width: 100%;
+      }
+      .popupNumberDef {
+        display: none;
+        position: fixed;
+        left: 45%;
+        top: 5%;
+        transform: translate(-50%, 5%);
+        border: 3px solid #999999;
+        z-index: 9;
+      }
+      .popupNumberDef {
+        max-width: 300px;
+        padding: 20px;
+        background-color: #fff;
+      }
+      .popupNumberDef .btn {
+        padding: 12px 20px;
+        border: none;
+        background-color: #8ebf42;
+        color: #fff;
+        cursor: pointer;
+        width: 100%;
+        margin-bottom: 15px;
+        opacity: 0.8;
+      }
+
+      .numberInvPopup {
+        position: relative;
+        text-align: center;
+        width: 100%;
+      }
+      .popupNumberInv {
+        display: none;
+        position: fixed;
+        left: 45%;
+        top: 5%;
+        transform: translate(-50%, 5%);
+        border: 3px solid #999999;
+        z-index: 9;
+      }
+      .popupNumberInv {
+        max-width: 300px;
+        padding: 20px;
+        background-color: #fff;
+      }
+      .popupNumberInv .btn {
+        padding: 12px 20px;
+        border: none;
+        background-color: #8ebf42;
+        color: #fff;
+        cursor: pointer;
+        width: 100%;
+        margin-bottom: 15px;
+        opacity: 0.8;
+      }
+
+      .numberFortPopup {
+        position: relative;
+        text-align: center;
+        width: 100%;
+      }
+      .popupNumberFort {
+        display: none;
+        position: fixed;
+        left: 45%;
+        top: 5%;
+        transform: translate(-50%, 5%);
+        border: 3px solid #999999;
+        z-index: 9;
+      }
+      .popupNumberFort {
+        max-width: 300px;
+        padding: 20px;
+        background-color: #fff;
+      }
+      .popupNumberFort .btn {
+        padding: 12px 20px;
+        border: none;
+        background-color: #8ebf42;
+        color: #fff;
+        cursor: pointer;
+        width: 100%;
+        margin-bottom: 15px;
+        opacity: 0.8;
+      }
+    </style>
     <head>
         <meta charset="UTF-8">
         <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap" rel="stylesheet">
@@ -7,8 +135,58 @@
         <title></title>
     </head>
     <body>
-        <button id="startGame">start</button>
-        <canvas id="canvas" width="1200" height="800"></canvas>
+        <button id="startGame">Start</button>
+        <button id="endAttack">End Attack</button>
+        <button id="skipFortify">Skip Fortify</button>
+        <canvas id="canvas" width="1200" height="800">Well... RIP you I guess</canvas>
+
+        <div class="numberTroopsPopup">
+            <div class="popupNumberTroops" id="popupNumberTroops">
+                    <h2>Please Select Number Of Attackers</h2>
+                    <label for="numberTroops">
+                    <strong id = "labelForTroopsToAttack">Number of Troops</strong>
+                    </label>
+                    <input type="number" id="numberTroops" name="numberTroops" min="1" max="3">
+                    <button id = "submitNumberTroops" type="button" class="btn">Send</button>
+                    <button id = "cancelNumberTroops" type="button" class="btn cancel">Close</button>
+            </div>
+        </div>
+
+        <div class="numberDefPopup">
+            <div class="popupNumberDef" id="popupNumberDef">
+                    <h2>Please Select Number Of Defenders</h2>
+                    <label for="numberDef">
+                    <strong id = "labelForTroopsToDefend">Number of Troops</strong>
+                    </label>
+                    <input type="number" id="numberDef" name="numberDef" min="1" max="2">
+                    <button id = "submitNumberDef" type="button" class="btn">Send</button>
+            </div>
+        </div>
+
+        <div class="numberInvPopup">
+            <div class="popupNumberInv" id="popupNumberInv">
+                    <h2>Please Select Number Of Troops To Invade With</h2>
+                    <label for="numberInv">
+                    <strong id = "labelForTroopsToInvade">Number of Troops</strong>
+                    </label>
+                    <input type="number" id="numberInv" name="numberInv" min="1" max="1000">
+                    <button id = "submitNumberInv" type="button" class="btn">Send</button>
+
+            </div>
+        </div>
+
+        <div class="numberFortPopup">
+            <div class="popupNumberFort" id="popupNumberFort">
+                    <h2>Please Select Number Of Troops To Invade With</h2>
+                    <label for="numberFort">
+                    <strong id = "labelForTroopsToInvade">Number of Troops</strong>
+                    </label>
+                    <input type="number" id="numberFort" name="numberFort" min="1" max="1000">
+                    <button id = "submitNumberFort" type="button" class="btn">Send</button>
+
+            </div>
+        </div>
+
         <script data-main="scripts/compiled/main" type="text/javascript" src="scripts/require.js" charset="utf-8"></script>
     </body>
 </html>

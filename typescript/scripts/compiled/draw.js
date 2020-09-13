@@ -6,6 +6,7 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
         constructor() {
             this.outerRadius = 35;
             this.innerRadius = 25;
+            this._countryColour = {};
             const canvas = document.getElementById("canvas");
             if (!(canvas instanceof HTMLCanvasElement)) {
                 throw new Error("The element of is not an HTMLCanvasElement.");
@@ -13,6 +14,13 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
             this._ctx = canvas.getContext("2d");
             this._ctx.textBaseline = "middle";
             this._ctx.textAlign = "center";
+            elements_1.ALL_COUNTRIES.forEach((key, index) => { this._countryColour[key] = "white"; });
+        }
+        setColour(c, s) {
+            this._countryColour[c] = s;
+        }
+        clearColour() {
+            elements_1.ALL_COUNTRIES.forEach((key, index) => { this._countryColour[key] = "white"; });
         }
         draw(state) {
             // draw lines
@@ -75,7 +83,7 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
                 this._ctx.closePath();
                 this._ctx.beginPath();
                 this._ctx.arc(myloc.x, myloc.y, this.innerRadius, 0, Math.PI * 2, false);
-                this._ctx.fillStyle = "white";
+                this._ctx.fillStyle = this._countryColour[country];
                 this._ctx.fill();
                 this._ctx.fillStyle = "black";
                 this._ctx.font = "14px 'Helvetica'";

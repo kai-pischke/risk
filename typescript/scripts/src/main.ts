@@ -25,13 +25,41 @@ function countryClicked(e : MouseEvent, r : number, canvas : HTMLElement){
 
 //-- Listeners ------------------------------
     document.getElementById("startGame").onclick = conn.start_game.bind(conn);
+    document.getElementById("endAttack").onclick = (() => {document.dispatchEvent(new CustomEvent("EndAttack"))});
+    document.getElementById("skipFortify").onclick = (() => {document.dispatchEvent(new CustomEvent("SkipFortify"))});
+
+    document.getElementById("submitNumberTroops").onclick = (() => {document.dispatchEvent(new CustomEvent("SubmitNumberTroops"))});
+    document.getElementById("cancelNumberTroops").onclick = (() => {document.getElementById("popupNumberTroops").style.display = "none";});
+    document.getElementById("submitNumberDef").onclick    = (() => {document.dispatchEvent(new CustomEvent("SubmitNumberDef"))});
+    document.getElementById("submitNumberInv").onclick    = (() => {document.dispatchEvent(new CustomEvent("SubmitNumberInv"))});
+    document.getElementById("submitNumberFort").onclick   = (() => {document.dispatchEvent(new CustomEvent("SubmitNumberFort"))});
+
+
+
 
     //-- That Pass Information In -----------
-    canvas.onmousedown = function(e : MouseEvent){countryClicked(e, ui.outerRadius, canvas);};
+    canvas.onmouseup = function(e : MouseEvent){countryClicked(e, ui.outerRadius, canvas);};
     document.addEventListener('Setup', function (e : CustomEvent) {moves.setup(e.detail)});
-    document.addEventListener('Reinforce', function (e : CustomEvent) {moves.setup(e.detail)});
+    document.addEventListener('Reinforce', function (e : CustomEvent) {moves.reinforce(e.detail)});
+    document.addEventListener('Attack', function (e : CustomEvent) {moves.attack(e.detail)});
+    document.addEventListener('Fortify', function (e : CustomEvent) {moves.fortify(e.detail)});
+    document.addEventListener('MidBattle', function (e : CustomEvent) {moves.chooseDefenders(e.detail.board, e.detail.ac, e.detail.dc, e.detail.att)});
+    document.addEventListener('BattleEnd', function (e : CustomEvent) {moves.invade(e.detail.board, e.detail.ac, e.detail.dc, e.detail.attrem)});
+
     //-- That Pass Information Out ----------
     document.addEventListener('Send', function (e : CustomEvent) {conn.send(e.detail)});
+    document.addEventListener('EndAttack', function (e : CustomEvent) {
+        conn.send(JSON.stringify({
+            action: "EndAttack",
+            sender: colour
+        }));
+    });
+    document.addEventListener('SkipFortify', function (e : CustomEvent) {
+        conn.send(JSON.stringify({
+            action: "SkipFortify",
+            sender: colour
+        }));
+    });
 
     //---------------------------------------
 
