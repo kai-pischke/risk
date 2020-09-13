@@ -10,12 +10,14 @@ export class Draw{
     public innerRadius = 25;
     private _countryColour = {} as Record<Country, string>;
 
-    constructor() {
+    constructor(player:Player) {
         const canvas = document.getElementById("canvas");
 
         if (!(canvas instanceof HTMLCanvasElement)) {
             throw new Error("The element of is not an HTMLCanvasElement.");
         }
+        canvas.style.border = "3px solid " + this.playerToColour(player);
+        console.log(player);
 
         this._ctx = canvas.getContext("2d");
         this._ctx.textBaseline = "middle";
@@ -111,6 +113,33 @@ export class Draw{
         });
 
 
+    }
+
+    private playerToColour(p : Player | "Empty") : string {
+      let fill;
+      switch (p) {
+          case "Black":
+              fill = "black";
+              break;
+          case "Blue":
+              fill = "#63ace5";
+              break;
+          case "Green":
+              fill = "#7fbf7f";
+              break;
+          case "Red":
+              fill = "#ff6f69";
+              break;
+          case "Yellow":
+              fill = "#ffcc5c";
+              break;
+          case "Empty":
+              fill = "#b266b2";
+              break;
+          default:
+              const _exhaustiveCheck: never = p;
+      }
+      return fill;
     }
 
 }

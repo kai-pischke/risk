@@ -15,10 +15,10 @@ function countryClickedOn(e : MouseEvent, r : number, canvas : HTMLElement){
 }
 
 (async() => {
-    let ui = new Draw();
     let board = new Board([],[]);
     let conn = new Connection();
     let colour : Player = await conn.start();
+    let ui = new Draw(colour);
     let moves = new Moves(colour, ui)
 
 

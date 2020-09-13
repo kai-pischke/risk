@@ -3,7 +3,7 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Draw = void 0;
     class Draw {
-        constructor() {
+        constructor(player) {
             this.outerRadius = 35;
             this.innerRadius = 25;
             this._countryColour = {};
@@ -11,6 +11,8 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
             if (!(canvas instanceof HTMLCanvasElement)) {
                 throw new Error("The element of is not an HTMLCanvasElement.");
             }
+            canvas.style.border = "3px solid " + this.playerToColour(player);
+            console.log(player);
             this._ctx = canvas.getContext("2d");
             this._ctx.textBaseline = "middle";
             this._ctx.textAlign = "center";
@@ -90,6 +92,32 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
                 this._ctx.fillText(state.troops(country) + '', myloc.x, myloc.y);
                 this._ctx.closePath();
             });
+        }
+        playerToColour(p) {
+            let fill;
+            switch (p) {
+                case "Black":
+                    fill = "black";
+                    break;
+                case "Blue":
+                    fill = "#63ace5";
+                    break;
+                case "Green":
+                    fill = "#7fbf7f";
+                    break;
+                case "Red":
+                    fill = "#ff6f69";
+                    break;
+                case "Yellow":
+                    fill = "#ffcc5c";
+                    break;
+                case "Empty":
+                    fill = "#b266b2";
+                    break;
+                default:
+                    const _exhaustiveCheck = p;
+            }
+            return fill;
         }
     }
     exports.Draw = Draw;

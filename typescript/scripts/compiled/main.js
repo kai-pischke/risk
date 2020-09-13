@@ -9,10 +9,10 @@ define(["require", "exports", "./draw", "./board", "./sock", "./moves", "./map"]
         }
     }
     (async () => {
-        let ui = new draw_1.Draw();
         let board = new board_1.Board([], []);
         let conn = new sock_1.Connection();
         let colour = await conn.start();
+        let ui = new draw_1.Draw(colour);
         let moves = new moves_1.Moves(colour, ui);
         conn.me = colour;
         const canvas = document.getElementById("canvas");
