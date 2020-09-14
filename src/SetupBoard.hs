@@ -151,7 +151,7 @@ initialTroops :: Int -> Int
 initialTroops 6 = 20
 initialTroops 5 = 25
 initialTroops 4 = 30
-initialTroops 3 = 14
+initialTroops 3 = 35
 initialTroops 2 = 40
 initialTroops n = error $ "Game rules only specified for 2-6 players. Not sure what to do for "
                         ++ show n ++ " players."
