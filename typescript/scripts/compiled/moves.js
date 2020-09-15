@@ -200,7 +200,8 @@ define(["require", "exports", "./elements"], function (require, exports, element
                         action: "Invade",
                         sender: me,
                         number_of_troops: parseInt(document.getElementById("numberInv").value)
-                    }) }));
+                    })
+                }));
                 document.getElementById("popupNumberInv").style.display = "none";
                 document.removeEventListener("SubmitNumberInv", listenForNumberInvaders);
             }
@@ -241,7 +242,7 @@ define(["require", "exports", "./elements"], function (require, exports, element
                     tc = null;
                 }
                 if (fc != null && tc != null) {
-                    document.getElementById("numberTroops").max = (board.troops(country) - 1).toString();
+                    document.getElementById("numberFort").max = (board.troops(country) - 1).toString();
                     document.getElementById("popupNumberFort").style.display = "block";
                 }
             }
@@ -260,13 +261,13 @@ define(["require", "exports", "./elements"], function (require, exports, element
             function skipFortify(e) {
                 document.removeEventListener("SkipFortify", skipFortify);
                 document.removeEventListener("CountryClickedOn", listenForFortify);
-                document.removeEventListener("submitNumberFort", listenForFortifySubmit);
+                document.removeEventListener("SubmitNumberFort", listenForFortifySubmit);
                 document.getElementById("popupNumberFort").style.display = "none";
                 ui.clearColour();
             }
             document.addEventListener("SkipFortify", skipFortify);
             document.addEventListener("CountryClickedOn", listenForFortify);
-            document.addEventListener("submitNumberFort", listenForFortifySubmit);
+            document.addEventListener("SubmitNumberFort", listenForFortifySubmit);
         }
     }
     exports.Moves = Moves;
