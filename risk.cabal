@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e78e5bc1beadfce55e044f4c43d2c6ea7b5dc758a4d18384febe02f3e6ea7aed
+-- hash: 02151696254d750b2f811aeb9bd9189aa2c1f35e67c0c179956efc2f458cc2d1
 
 name:           risk
 version:        0.1.0.0
@@ -35,6 +35,7 @@ library
       Message
       Moves
       Parse
+      ParsePart
       RiskBoard
       Server
       SetupBoard
@@ -54,6 +55,7 @@ library
     , text
     , utf8-string
     , websockets
+    , splitmix
   default-language: Haskell2010
 
 executable risk-exe
