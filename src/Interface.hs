@@ -16,12 +16,17 @@ module Interface  (
 ) where
 
   ---- Imports -------------------------
+  import System.Random
+  import Data.Aeson
+  import Data.Text (pack)
+
+  import ParsePart
   import Message as M
   import Moves
   import GameElements
   import SetupBoard
   import State
-  import System.Random
+
   --------------------------------------
 
   ---- Types ---------------------------
@@ -30,6 +35,45 @@ module Interface  (
     | GameSetup SetupState [Player] StdGen
     | GamePlay GameState
     deriving (Show, Eq)
+
+  instance ToJSON Game where
+    toJSON (GameWR ps gen) =
+          object[pack "kind" .= pack "WaitingRoom",
+                 pack "players" .= ps,
+                 pack "stdGen" .= gen]
+    toJSON (GameSetup ss ps gen) =
+          object[pack "kind" .= pack "Setup",
+                 pack "originalOrder" .= ps,
+                 pack "stdGen" .= gen,
+                 pack "game" .= ss]
+    toJSON (GamePlay gs) =
+         object[pack "kind" .= pack "State", pack "game" .= gs]
+
+  instance FromJSON Game where
+     parseJSON (Object v) = do
+         kind <- (v.: pack "kind")
+         if (kind == "GamePlay")
+             then do
+                 gs <- (v.: pack "game")
+                 return (GamePlay gs)
+         else if (kind == "Setup")
+             then do
+                 originalOrder <- (v.: pack "originalOrder")
+                 gen <- (v.: pack "stdGen")
+                 ss <- (v.: pack "game")
+                 return (GameSetup ss originalOrder gen)
+
+         else if (kind == "WaitingRoom")
+             then do
+                 players <- (v.: pack "players")
+                 gen <- (v.: pack "stdGen")
+                 return (GameWR players gen)
+
+         else do mempty
+     parseJSON _ = mempty
+
+
+
   --------------------------------------
 
   ---- Public Functions ----------------
