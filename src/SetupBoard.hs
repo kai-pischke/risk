@@ -15,12 +15,13 @@ module SetupBoard
           setUpTurnOrder
         ) where
 
-import Data.Map (Map)
-import Data.Maybe
+import Data.Map (Map, fromList, assocs, (!))
+import Data.Maybe (fromJust, isNothing)
 import Control.Monad (join)
 import qualified Data.Map as Map
 import RiskBoard
 import GameElements
+import ParsePart
 
 -- | Keeps track of how many troops on each country, who owns each country as well as player order and number of troops remaining to be placed for each player.
 data SetupBoardState = InternalGameState

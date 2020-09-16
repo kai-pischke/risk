@@ -308,7 +308,8 @@ instance ToJSON GameState where
     toJSON (InternalGameState troopsMap playersMap gen phase players getsCard discard deck hand) =
         object [pack "kind" .= pack "State",
                 pack "players" .= players,
-                pack "playerTroopsMap" .= ((fromList.zip (map show countries)) $ map getOwnerTroopMap countries),
+                pack "playerMap" .= (fromList. zip (map show countries). map (playersMap Map.!)) countries,
+                pack "troopMap" .= (fromList. zip (map show countries). map (troopsMap Map.!)) countries,
                 pack "stdGen" .= gen,
                 pack "phase" .= phase,
                 pack "deck" .=  deck,
@@ -318,8 +319,6 @@ instance ToJSON GameState where
         where
             countries = [(minBound :: Country)..]
             cardmap = map (\p -> (show $ fst p, snd p)) (assocs hand)
-            getOwnerTroopMap:: Country -> Map String (Switch String Player)
-            getOwnerTroopMap c = fromList [("number_of_troops", LSwitch $ show $ troopsMap Map.! c), ("owner", RSwitch $ playersMap Map.! c)]
 
 instance FromJSON GameState where
     parseJSON (Object v) = do
@@ -334,21 +333,26 @@ instance FromJSON GameState where
                 discard <- (v.: pack "discard")
                 getsCard <- (v.: pack "getsCard")
 
-                pTMap <- (v.: pack "plyerTroopsMap")
+                pMap <- (v.: pack "playerMap")
+                tMap <- (v.: pack "troopMap")
                 cardsMapReadIn <- (v.: pack "card")
 
                 let cardsList = map (\p -> (readMaybe $ fst p, snd p)) (assocs cardsMapReadIn)
-                let pListR = map (\c -> (c, readMaybe $ (pTMap Map.! c) Map.! "owner")) countries
-                let tListR = map (\c -> (c, readMaybe $ (pTMap Map.! c) Map.! "number_of_troops")) countries
+                let pListR = map (\c -> (c, pMap Map.!? c)) countries
+                let tListR = map (\c -> (c, tMap Map.!? c)) countries
 
-
-                if (any (\p -> snd p == Nothing) pListR || any (\p -> snd p == Nothing) tListR || any (\p -> fst p == Nothing) cardsList)
+                if (any (\p -> snd p == Nothing) pListR)
                     then do mempty
                     else do
-                        let playersMap = fromList $ map (\p -> (fst p, fromJust $ snd p)) pListR
-                        let troopsMap = fromList $ map (\p -> (fst p, fromJust $ snd p)) tListR
-                        let cardMap = fromList $ map (\p -> (fromJust $ fst p, snd p)) cardsList
+                        let pListRR = map (\p -> (fst p, (readMaybe. fromJust) $ snd p)) pListR
 
-                        return (InternalGameState troopsMap playersMap stdGen phase players getsCard discard deck cardMap)
+                        if (any (\p -> snd p == Nothing) pListRR || any (\p -> fst p == Nothing) cardsList)
+                            then do mempty
+                            else do
+                                let playersMap = fromList $ map (\p -> (fst p, fromJust $ snd p)) pListRR
+                                let troopsMap = fromList $ map (\p -> (fst p, fromJust $ snd p)) tListR
+                                let cardMap = fromList $ map (\p -> (fromJust $ fst p, snd p)) cardsList
+
+                                return (InternalGameState troopsMap playersMap stdGen phase players getsCard discard deck cardMap)
         where
             countries = [(minBound ::Country)..]
