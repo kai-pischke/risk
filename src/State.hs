@@ -346,7 +346,7 @@ instance FromJSON GameState where
                     else do
                         let pListRR = map (\p -> (fst p, (readMaybe. fromJust) $ snd p)) pListR
 
-                        if (any (\p -> snd p == Nothing) pListRR || any (\p -> fst p == Nothing) cardsList)
+                        if (any (\p -> snd p == Nothing) pListRR || any (\p -> snd p == Nothing) tListR || any (\p -> fst p == Nothing) cardsList)
                             then do mempty
                             else do
                                 let playersMap = fromList $ map (\p -> (fst p, fromJust $ snd p)) pListRR
@@ -356,3 +356,4 @@ instance FromJSON GameState where
                                 return (InternalGameState troopsMap playersMap stdGen phase players getsCard discard deck cardMap)
         where
             countries = [(minBound ::Country)..]
+    parseJSON _ = mempty

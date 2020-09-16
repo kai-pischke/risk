@@ -15,9 +15,13 @@ module SetupBoard
           setUpTurnOrder
         ) where
 
-import Data.Map (Map, fromList, assocs, (!))
+import Data.Map (Map, fromList, assocs, (!?), (!))
 import Data.Maybe (fromJust, isNothing)
 import Control.Monad (join)
+import Data.Aeson
+import Data.Text (pack)
+import Text.Read (readMaybe)
+
 import qualified Data.Map as Map
 import RiskBoard
 import GameElements
@@ -161,3 +165,58 @@ internalBoard :: SetupState -> SetupBoardState
 internalBoard (Incomplete s) = s
 internalBoard (PartiallyComplete s) = s
 internalBoard (Complete s) = s
+
+instance ToJSON SetupState where
+    toJSON ss = toJSON  $ internalBoard ss
+
+instance FromJSON SetupState where
+    parseJSON (Object v) = do
+        sbs <- parseJSON (Object v)
+        return (toSetupState sbs)
+    parseJSON _ = mempty
+
+instance ToJSON SetupBoardState where
+    toJSON (InternalGameState troopsMap playersMap players remainingToPlace) =
+        object [pack "kind" .= pack "Setup",
+                pack "players" .= players,
+                pack "playerMap" .= ((fromList.zip (map show countries)) $ map ((\mp -> if (mp == Nothing) then Unowned else Owner (fromJust mp)). (playersMap !)) countries),
+                pack "troopMap" .= ((fromList.zip (map show countries)) $ map (troopsMap !) countries),
+                pack "playerRemaining" .= (fromList.map (\p -> (show $ fst p, snd p)) .assocs) remainingToPlace]
+        where
+            countries = [(minBound :: Country)..]
+
+
+instance FromJSON SetupBoardState where
+    parseJSON (Object v) = do
+        kind <- (v.: pack "kind")
+        if (kind /= "Setup")
+            then do mempty
+            else do
+                players <- (v.: pack "players")
+
+                pMap <- (v.: pack "playerMap")
+                tMap <- (v.: pack "troopMap")
+                pRem <- (v.: pack "playerRemaining")
+
+
+                let pListR = map (\c -> (c, pMap !? c)) countries
+                let tListR = map (\c -> (c, tMap !? c)) countries
+                let remListR = map (\p -> (readMaybe $ fst p, snd p)) $ assocs pRem
+
+                if (any (\p -> snd p == Nothing) pListR)
+                    then do mempty
+                    else do
+                        let pListRR = map (\p -> (fst p, (readMaybe. fromJust) $ snd p)) pListR
+
+                        if (any (\p -> snd p == Nothing) pListRR || any (\p -> snd p == Nothing) tListR || any (\p -> fst p == Nothing) remListR)
+                            then do mempty
+                            else do
+                                let playersMap = fromList $ map (\p -> (fst p, fromJust $ snd p)) pListRR
+                                let troopsMap = fromList $ map (\p -> (fst p, fromJust $ snd p)) tListR
+                                let remMap = fromList $ map (\p -> (fromJust $ fst p, snd p)) remListR
+
+                                return (InternalGameState troopsMap playersMap players remMap)
+        where
+            countries = [(minBound ::Country)..]
+
+    parseJSON _ = mempty
