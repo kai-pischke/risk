@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="%24con2tag_6139sy6VR6E1BYGvyc0KVC"><span id="%24con2tag_HhrwqJ3GL6jBMJ4ZxYE36F"></span></span><span class="hs-comment">{-|
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="%24con2tag_HjVGj5jinBhJhLaWezUx0t"><span id="%24con2tag_JF7Zdkq8Id4D4skMcH8u7g"></span></span><span class="hs-comment">{-|
 Module      : GameElements
 Description : Game pieces.
 Maintainer  : Kai, Alex, River
@@ -14,7 +14,7 @@ This module holds the types that represent individual game pieces and other game
 </span><span id="line-14"></span><span>
 </span><span id="line-15"></span><span class="hs-comment">-- | Each player is represented by the colour they play as.</span><span>
 </span><span id="line-16"></span><span class="hs-keyword">data</span><span> </span><span id="Player"><span class="annot"><a href="GameElements.html#Player"><span class="hs-identifier hs-var">Player</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Black"><span class="annot"><a href="GameElements.html#Black"><span class="hs-identifier hs-var">Black</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Blue"><span class="annot"><a href="GameElements.html#Blue"><span class="hs-identifier hs-var">Blue</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Green"><span class="annot"><a href="GameElements.html#Green"><span class="hs-identifier hs-var">Green</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Red"><span class="annot"><a href="GameElements.html#Red"><span class="hs-identifier hs-var">Red</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Yellow"><span class="annot"><a href="GameElements.html#Yellow"><span class="hs-identifier hs-var">Yellow</span></a></span></span><span>
-</span><span id="line-17"></span><span>            </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679126785"><span id="local-6989586621679126787"><span class="annot"><span class="annottext">Player -&gt; Player -&gt; Bool
+</span><span id="line-17"></span><span>            </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679127415"><span id="local-6989586621679127417"><span class="annot"><span class="annottext">Player -&gt; Player -&gt; Bool
 (Player -&gt; Player -&gt; Bool)
 -&gt; (Player -&gt; Player -&gt; Bool) -&gt; Eq Player
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -22,7 +22,7 @@ forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c/= :: Player -&gt; Player -&gt; Bool
 == :: Player -&gt; Player -&gt; Bool
 $c== :: Player -&gt; Player -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679126778"><span id="local-6989586621679126780"><span id="local-6989586621679126782"><span class="annot"><span class="annottext">Int -&gt; Player -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127408"><span id="local-6989586621679127410"><span id="local-6989586621679127412"><span class="annot"><span class="annottext">Int -&gt; Player -&gt; ShowS
 [Player] -&gt; ShowS
 Player -&gt; String
 (Int -&gt; Player -&gt; ShowS)
@@ -35,7 +35,7 @@ show :: Player -&gt; String
 $cshow :: Player -&gt; String
 showsPrec :: Int -&gt; Player -&gt; ShowS
 $cshowsPrec :: Int -&gt; Player -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679126762"><span id="local-6989586621679126764"><span id="local-6989586621679126766"><span id="local-6989586621679126768"><span id="local-6989586621679126770"><span id="local-6989586621679126772"><span id="local-6989586621679126774"><span class="annot"><span class="annottext">Eq Player
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127392"><span id="local-6989586621679127394"><span id="local-6989586621679127396"><span id="local-6989586621679127398"><span id="local-6989586621679127400"><span id="local-6989586621679127402"><span id="local-6989586621679127404"><span class="annot"><span class="annottext">Eq Player
 Eq Player =&gt;
 (Player -&gt; Player -&gt; Ordering)
 -&gt; (Player -&gt; Player -&gt; Bool)
@@ -73,7 +73,7 @@ $c&lt; :: Player -&gt; Player -&gt; Bool
 compare :: Player -&gt; Player -&gt; Ordering
 $ccompare :: Player -&gt; Player -&gt; Ordering
 $cp1Ord :: Eq Player
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679126753"><span id="local-6989586621679126755"><span id="local-6989586621679126757"><span id="local-6989586621679126759"><span class="annot"><span class="annottext">ReadPrec [Player]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127383"><span id="local-6989586621679127385"><span id="local-6989586621679127387"><span id="local-6989586621679127389"><span class="annot"><span class="annottext">ReadPrec [Player]
 ReadPrec Player
 Int -&gt; ReadS Player
 ReadS [Player]
@@ -97,14 +97,14 @@ $creadsPrec :: Int -&gt; ReadS Player
 </span><span id="line-18"></span><span>
 </span><span id="line-19"></span><span class="hs-comment">-- | We ignore the country shown on the card.</span><span>
 </span><span id="line-20"></span><span class="hs-keyword">data</span><span> </span><span id="Card"><span class="annot"><a href="GameElements.html#Card"><span class="hs-identifier hs-var">Card</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Infantry"><span class="annot"><a href="GameElements.html#Infantry"><span class="hs-identifier hs-var">Infantry</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Cavalry"><span class="annot"><a href="GameElements.html#Cavalry"><span class="hs-identifier hs-var">Cavalry</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Artillery"><span class="annot"><a href="GameElements.html#Artillery"><span class="hs-identifier hs-var">Artillery</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Wild"><span class="annot"><a href="GameElements.html#Wild"><span class="hs-identifier hs-var">Wild</span></a></span></span><span>
-</span><span id="line-21"></span><span>            </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679126744"><span id="local-6989586621679126746"><span class="annot"><span class="annottext">Card -&gt; Card -&gt; Bool
+</span><span id="line-21"></span><span>            </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679127374"><span id="local-6989586621679127376"><span class="annot"><span class="annottext">Card -&gt; Card -&gt; Bool
 (Card -&gt; Card -&gt; Bool) -&gt; (Card -&gt; Card -&gt; Bool) -&gt; Eq Card
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 /= :: Card -&gt; Card -&gt; Bool
 $c/= :: Card -&gt; Card -&gt; Bool
 == :: Card -&gt; Card -&gt; Bool
 $c== :: Card -&gt; Card -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679126738"><span id="local-6989586621679126740"><span id="local-6989586621679126742"><span class="annot"><span class="annottext">Int -&gt; Card -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127368"><span id="local-6989586621679127370"><span id="local-6989586621679127372"><span class="annot"><span class="annottext">Int -&gt; Card -&gt; ShowS
 [Card] -&gt; ShowS
 Card -&gt; String
 (Int -&gt; Card -&gt; ShowS)
@@ -117,7 +117,7 @@ show :: Card -&gt; String
 $cshow :: Card -&gt; String
 showsPrec :: Int -&gt; Card -&gt; ShowS
 $cshowsPrec :: Int -&gt; Card -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679126723"><span id="local-6989586621679126725"><span id="local-6989586621679126727"><span id="local-6989586621679126729"><span id="local-6989586621679126731"><span id="local-6989586621679126733"><span id="local-6989586621679126735"><span class="annot"><span class="annottext">Eq Card
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127353"><span id="local-6989586621679127355"><span id="local-6989586621679127357"><span id="local-6989586621679127359"><span id="local-6989586621679127361"><span id="local-6989586621679127363"><span id="local-6989586621679127365"><span class="annot"><span class="annottext">Eq Card
 Eq Card =&gt;
 (Card -&gt; Card -&gt; Ordering)
 -&gt; (Card -&gt; Card -&gt; Bool)
@@ -155,14 +155,31 @@ $c&lt; :: Card -&gt; Card -&gt; Bool
 compare :: Card -&gt; Card -&gt; Ordering
 $ccompare :: Card -&gt; Card -&gt; Ordering
 $cp1Ord :: Eq Card
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127345"><span id="local-6989586621679127347"><span id="local-6989586621679127349"><span id="local-6989586621679127351"><span class="annot"><span class="annottext">ReadPrec [Card]
+ReadPrec Card
+Int -&gt; ReadS Card
+ReadS [Card]
+(Int -&gt; ReadS Card)
+-&gt; ReadS [Card] -&gt; ReadPrec Card -&gt; ReadPrec [Card] -&gt; Read Card
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+readListPrec :: ReadPrec [Card]
+$creadListPrec :: ReadPrec [Card]
+readPrec :: ReadPrec Card
+$creadPrec :: ReadPrec Card
+readList :: ReadS [Card]
+$creadList :: ReadS [Card]
+readsPrec :: Int -&gt; ReadS Card
+$creadsPrec :: Int -&gt; ReadS Card
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-22"></span><span>
 </span><span id="line-23"></span><span class="hs-comment">-- | Cards always come in sets of 3 when being traded in.</span><span>
 </span><span id="line-24"></span><span class="hs-keyword">type</span><span> </span><span id="CardSet"><span class="annot"><a href="GameElements.html#CardSet"><span class="hs-identifier hs-var">CardSet</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="GameElements.html#Card"><span class="hs-identifier hs-type">Card</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="GameElements.html#Card"><span class="hs-identifier hs-type">Card</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="GameElements.html#Card"><span class="hs-identifier hs-type">Card</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-25"></span><span>
 </span><span id="line-26"></span><span class="hs-comment">-- | A player csan trade in at most 2 sets at once.</span><span>
 </span><span id="line-27"></span><span class="hs-keyword">data</span><span> </span><span id="TradeIn"><span class="annot"><a href="GameElements.html#TradeIn"><span class="hs-identifier hs-var">TradeIn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="None"><span class="annot"><a href="GameElements.html#None"><span class="hs-identifier hs-var">None</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="OneSet"><span class="annot"><a href="GameElements.html#OneSet"><span class="hs-identifier hs-var">OneSet</span></a></span></span><span> </span><span class="annot"><a href="GameElements.html#CardSet"><span class="hs-identifier hs-type">CardSet</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="TwoSet"><span class="annot"><a href="GameElements.html#TwoSet"><span class="hs-identifier hs-var">TwoSet</span></a></span></span><span> </span><span class="annot"><a href="GameElements.html#CardSet"><span class="hs-identifier hs-type">CardSet</span></a></span><span> </span><span class="annot"><a href="GameElements.html#CardSet"><span class="hs-identifier hs-type">CardSet</span></a></span><span>
-</span><span id="line-28"></span><span>            </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679126716"><span id="local-6989586621679126718"><span class="annot"><span class="annottext">TradeIn -&gt; TradeIn -&gt; Bool
+</span><span id="line-28"></span><span>            </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679127338"><span id="local-6989586621679127340"><span class="annot"><span class="annottext">TradeIn -&gt; TradeIn -&gt; Bool
 (TradeIn -&gt; TradeIn -&gt; Bool)
 -&gt; (TradeIn -&gt; TradeIn -&gt; Bool) -&gt; Eq TradeIn
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -170,7 +187,7 @@ forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c/= :: TradeIn -&gt; TradeIn -&gt; Bool
 == :: TradeIn -&gt; TradeIn -&gt; Bool
 $c== :: TradeIn -&gt; TradeIn -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679126710"><span id="local-6989586621679126712"><span id="local-6989586621679126714"><span class="annot"><span class="annottext">Int -&gt; TradeIn -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127332"><span id="local-6989586621679127334"><span id="local-6989586621679127336"><span class="annot"><span class="annottext">Int -&gt; TradeIn -&gt; ShowS
 [TradeIn] -&gt; ShowS
 TradeIn -&gt; String
 (Int -&gt; TradeIn -&gt; ShowS)
@@ -183,4 +200,5 @@ show :: TradeIn -&gt; String
 $cshow :: TradeIn -&gt; String
 showsPrec :: Int -&gt; TradeIn -&gt; ShowS
 $cshowsPrec :: Int -&gt; TradeIn -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span></pre></body></html>
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span></pre></body></html>

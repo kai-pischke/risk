@@ -62,6 +62,7 @@ OneSet :: CardSet -> TradeIn
 TwoSet :: CardSet -> CardSet -> TradeIn
 instance GHC.Show.Show GameElements.TradeIn
 instance GHC.Classes.Eq GameElements.TradeIn
+instance GHC.Read.Read GameElements.Card
 instance GHC.Classes.Ord GameElements.Card
 instance GHC.Show.Show GameElements.Card
 instance GHC.Classes.Eq GameElements.Card
@@ -201,6 +202,27 @@ instance GHC.Enum.Enum RiskBoard.Country
 instance GHC.Read.Read RiskBoard.Country
 instance GHC.Show.Show RiskBoard.Country
 
+module ParsePart
+data Switch a b
+LSwitch :: a -> Switch a b
+RSwitch :: b -> Switch a b
+data Owner
+Owner :: Player -> Owner
+Unowned :: Owner
+instance Data.Aeson.Types.ToJSON.ToJSON ParsePart.Owner
+instance (Data.Aeson.Types.ToJSON.ToJSON a, Data.Aeson.Types.ToJSON.ToJSON b) => Data.Aeson.Types.ToJSON.ToJSON (ParsePart.Switch a b)
+instance Data.Aeson.Types.ToJSON.ToJSON System.Random.Internal.StdGen
+instance Data.Aeson.Types.FromJSON.FromJSON System.Random.Internal.StdGen
+instance Data.Aeson.Types.ToJSON.ToJSON GameElements.Player
+instance Data.Aeson.Types.FromJSON.FromJSON GameElements.Player
+instance Data.Aeson.Types.ToJSON.ToJSON GameElements.Card
+instance Data.Aeson.Types.FromJSON.FromJSON GameElements.Card
+instance Data.Aeson.Types.ToJSON.ToJSON GameElements.TradeIn
+instance Data.Aeson.Types.FromJSON.FromJSON GameElements.TradeIn
+instance Data.Aeson.Types.ToJSON.ToJSON RiskBoard.Country
+instance Data.Aeson.Types.FromJSON.FromJSON RiskBoard.Country
+instance Data.Aeson.Types.FromJSON.FromJSONKey RiskBoard.Country
+
 
 -- | The is a basic representation of the Game during the initial troop
 --   placement rounds.
@@ -247,6 +269,10 @@ instance GHC.Show.Show SetupBoard.SetupState
 instance GHC.Classes.Eq SetupBoard.SetupState
 instance GHC.Show.Show SetupBoard.SetupBoardState
 instance GHC.Classes.Eq SetupBoard.SetupBoardState
+instance Data.Aeson.Types.ToJSON.ToJSON SetupBoard.SetupState
+instance Data.Aeson.Types.FromJSON.FromJSON SetupBoard.SetupState
+instance Data.Aeson.Types.ToJSON.ToJSON SetupBoard.SetupBoardState
+instance Data.Aeson.Types.FromJSON.FromJSON SetupBoard.SetupBoardState
 
 
 -- | The basic representation of a Game excluding all dynamic and
@@ -331,6 +357,10 @@ instance GHC.Show.Show State.Phase
 instance GHC.Classes.Eq State.Phase
 instance GHC.Show.Show State.MiniPhase
 instance GHC.Classes.Eq State.MiniPhase
+instance Data.Aeson.Types.ToJSON.ToJSON State.GameState
+instance Data.Aeson.Types.FromJSON.FromJSON State.GameState
+instance Data.Aeson.Types.ToJSON.ToJSON State.Phase
+instance Data.Aeson.Types.FromJSON.FromJSON State.Phase
 
 
 -- | The basic implementation of the rules for the game, verifying
@@ -430,6 +460,11 @@ fortify :: Country -> Country -> Int -> GameState -> Maybe GameState
 --   call nextTurn.
 skipFortify :: GameState -> Maybe GameState
 
+-- | Only valid during the <a>Attack</a> <a>TimeToTrade</a>
+--   <a>MiniPhase</a>. Takes a <a>TradeIn</a> (owned by the current player)
+--   and caches it in for troops.
+trade :: TradeIn -> [(Country, Int)] -> GameState -> Maybe GameState
+
 
 -- | This module defines the messages we make use of in <tt>Interface</tt>.
 module Message
@@ -444,6 +479,7 @@ Setup :: SetupState -> Update
 Play :: GameState -> Update
 data Question
 NumDefenders :: Question
+GetTrade :: Question
 data Error
 InvalidMove :: Error
 NotYourTurn :: Error
@@ -459,12 +495,13 @@ data RequestType
 StartGame :: RequestType
 PlaceTroop :: Country -> RequestType
 Attack :: Country -> Country -> Attackers -> RequestType
-Reinforce :: [(Country, Int)] -> RequestType
+Reinforce :: TradeIn -> [(Country, Int)] -> RequestType
 Fortify :: Country -> Country -> Int -> RequestType
 Invade :: Int -> RequestType
 ChooseDefenders :: Defenders -> RequestType
 EndAttack :: RequestType
 SkipFortify :: RequestType
+Trade :: TradeIn -> [(Country, Int)] -> RequestType
 instance GHC.Show.Show Message.Request
 instance GHC.Classes.Eq Message.Request
 instance GHC.Show.Show Message.RequestType
@@ -490,10 +527,8 @@ decodeRequest :: ByteString -> Either Request ParseError
 -- | Encodes a <a>Response</a> to a <a>ByteString</a>.
 encodeResponse :: Response -> ByteString
 type ParseError = ByteString
-instance Data.Aeson.Types.ToJSON.ToJSON Parse.Owner
-instance Data.Aeson.Types.ToJSON.ToJSON Message.Response
-instance (Data.Aeson.Types.ToJSON.ToJSON a, Data.Aeson.Types.ToJSON.ToJSON b) => Data.Aeson.Types.ToJSON.ToJSON (Parse.Switch a b)
 instance Data.Aeson.Types.FromJSON.FromJSON Message.Request
+instance Data.Aeson.Types.ToJSON.ToJSON Message.Response
 
 
 -- | This module wraps many of the functions in moves in additional
@@ -524,6 +559,8 @@ addPlayer :: Game -> (Player, Game)
 receive :: Request -> Game -> (Response, Game)
 instance GHC.Classes.Eq Interface.Game
 instance GHC.Show.Show Interface.Game
+instance Data.Aeson.Types.ToJSON.ToJSON Interface.Game
+instance Data.Aeson.Types.FromJSON.FromJSON Interface.Game
 
 
 -- | This module packages the whole game into a single functin (<a>run</a>)

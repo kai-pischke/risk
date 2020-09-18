@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 02151696254d750b2f811aeb9bd9189aa2c1f35e67c0c179956efc2f458cc2d1
+-- hash: 86a3388cf2df68494fb7d2dc54d209394e1d025e229882a65f90bdcc9bfe7878
 
 name:           risk
 version:        0.1.0.0
@@ -52,10 +52,10 @@ library
     , bytestring
     , containers
     , random >=1.2
+    , splitmix
     , text
     , utf8-string
     , websockets
-    , splitmix
   default-language: Haskell2010
 
 executable risk-exe
@@ -73,6 +73,7 @@ executable risk-exe
     , containers
     , random >=1.2
     , risk
+    , splitmix
     , text
     , utf8-string
     , websockets
@@ -106,6 +107,7 @@ test-suite risk-test
     , multiset
     , random >=1.2
     , risk
+    , splitmix
     , text
     , utf8-string
     , websockets

@@ -80,6 +80,7 @@ reqInfo p (ChooseDefenders d) = show p ++ " chose to roll " ++ show (fromEnum d)
 reqInfo p EndAttack = show p ++ " ended the attack phase."
 reqInfo p SkipFortify = show p ++ " skipped the fortify phase."
 reqInfo p (Trade _ _) = show p ++ " did a trade."
+
 -- deals with one cycle of receiving and then sending responses    
 play :: WS.Connection -> Player -> MVar State -> IO ()
 play conn player state = do

@@ -61,5 +61,7 @@ module Message (
     | EndAttack
     | SkipFortify
     | Trade TradeIn [(Country, Int)]
+    | SaveGame Int
+    | LoadGame Int
     deriving (Eq, Show)
   -----------------------------------

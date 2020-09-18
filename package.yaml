@@ -27,6 +27,7 @@ dependencies:
 - utf8-string
 - array
 - text
+- splitmix
 
 library:
   source-dirs: src

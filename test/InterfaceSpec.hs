@@ -18,6 +18,7 @@ import SetupBoard
 import Debug.Trace (trace)
 import Data.Map (Map)
 import qualified Data.Map as M
+import Data.Aeson 
 
 data ShowableGen = ShowableGen StdGen Int deriving Eq
 
@@ -241,15 +242,26 @@ spec = do
                           case game of 
                                NewCompleteError r -> property False
                                NewComplete _ ps _ _ -> label ("using " ++ show (length ps) ++ " players") True
-                    it "does not allow players to place troops in foreign countries" $ do
+                    it "does not allow players to place troops in foreign countries" $ do 
                         pendingWith "test not implemented yet"
                     it "enforces troop limits" $ do
                         pendingWith "test not implemented yet"
                     it "enforces the turn order" $ do
                         pendingWith "test not implemented yet"
-                        
-                
-        {-
+                context "doing json encoding/decoding" $ do
+                    it "obeys: decode . encode === id" $ property $ \game ->
+                          case game of 
+                                NewPartialError r -> property False
+                                NewPartial g ps cs sg-> label ("using " ++ show (length ps) ++ " players") 
+                                                      $ counterexample ("\nHere is how it was encoded:\n" ++ show (encode g) ++ "\n\n")
+                                                      $ (decode . encode) g === Just g
+                    it "decode . encode === id" $ property $ \game ->
+                          case game of 
+                                NewCompleteError r -> property False
+                                NewComplete g ps cs sg-> label ("using " ++ show (length ps) ++ " players") 
+                                                      $ counterexample ("\nHere is how it was encoded:\n" ++ show (encode g) ++ "\n\n")
+                                                      $ (decode . encode) g === Just g
+            {-
         describe "Attack" $ do
             context "Valid Inputs" $ do
                 pendingWith ("Needs to work")

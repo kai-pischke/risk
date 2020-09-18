@@ -8,7 +8,7 @@ define(["require", "exports", "./elements", "./board"], function (require, expor
             this.previousMessage = null;
         }
         async start() {
-            this._socket = new WebSocket("ws://localhost:9600");
+            this._socket = new WebSocket("ws://luna.smallserver.xyz:9600");
             this._socket.onmessage = this.receive.bind(this);
             return new Promise((resolve, reject) => this._socket.addEventListener('message', function (event) {
                 const msg = JSON.parse(event.data);
