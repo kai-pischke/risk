@@ -20,7 +20,7 @@ module Interface  (
   import Data.Aeson
   import Data.Text (pack)
 
-  import ParsePart
+  import ParsePart ()
   import Message as M
   import Moves
   import GameElements
@@ -52,7 +52,7 @@ module Interface  (
   instance FromJSON Game where
      parseJSON (Object v) = do
          kind <- (v.: pack "kind")
-         if (kind == "GamePlay")
+         if (kind == "State")
              then do
                  gs <- (v.: pack "game")
                  return (GamePlay gs)
@@ -65,9 +65,9 @@ module Interface  (
 
          else if (kind == "WaitingRoom")
              then do
-                 players <- (v.: pack "players")
+                 ps <- (v.: pack "players")
                  gen <- (v.: pack "stdGen")
-                 return (GameWR players gen)
+                 return (GameWR ps gen)
 
          else do mempty
      parseJSON _ = mempty
@@ -199,7 +199,7 @@ module Interface  (
     | otherwise = (Invalid NotYourTurn s, g)
 
   receive (Request s (M.Trade _ _)) g = (Invalid NotInPlay s, g)
-  
+
   -- Save/Load requests
   receive (Request _ (SaveGame _)) _ = error "SaveGame requests should be handled by the server"
   receive (Request _ (LoadGame _)) _ = error "LoadGame requests should be handled by the server"

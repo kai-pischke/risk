@@ -44,7 +44,7 @@ import Data.Text (pack)
 import Data.Maybe (fromJust)
 import Text.Read (readMaybe)
 import Data.Map(assocs, fromList)
-import ParsePart (Switch(..))
+import ParsePart ()
 
 --- internal representation of game state ---
 data GameState = InternalGameState
@@ -305,20 +305,20 @@ instance FromJSON Phase where
 
 
 instance ToJSON GameState where
-    toJSON (InternalGameState troopsMap playersMap gen phase players getsCard discard deck hand) =
+    toJSON (InternalGameState troopsMap playersMap gen pphase players pgetsCard discard pdeck phand) =
         object [pack "kind" .= pack "State",
                 pack "players" .= players,
                 pack "playerMap" .= (fromList. zip (map show countries). map (playersMap Map.!)) countries,
                 pack "troopMap" .= (fromList. zip (map show countries). map (troopsMap Map.!)) countries,
                 pack "stdGen" .= gen,
-                pack "phase" .= phase,
-                pack "deck" .=  deck,
+                pack "phase" .= pphase,
+                pack "deck" .=  pdeck,
                 pack "discard" .=  discard,
-                pack "getsCard" .= getsCard,
+                pack "getsCard" .= pgetsCard,
                 pack "card" .= cardmap]
         where
             countries = [(minBound :: Country)..]
-            cardmap = map (\p -> (show $ fst p, snd p)) (assocs hand)
+            cardmap = fromList $ map (\p -> (show $ fst p, snd p)) (assocs phand)
 
 instance FromJSON GameState where
     parseJSON (Object v) = do
@@ -326,34 +326,30 @@ instance FromJSON GameState where
         if (kind /= "State")
             then do mempty
             else do
+
                 players <- (v.: pack "players")
                 stdGen <- (v.: pack "stdGen")
-                phase <- (v.: pack "phase")
-                deck <- (v.: pack "deck")
+                pphase <- (v.: pack "phase")
+                pdeck <- (v.: pack "deck")
                 discard <- (v.: pack "discard")
-                getsCard <- (v.: pack "getsCard")
+                pgetsCard <- (v.: pack "getsCard")
 
                 pMap <- (v.: pack "playerMap")
                 tMap <- (v.: pack "troopMap")
                 cardsMapReadIn <- (v.: pack "card")
 
                 let cardsList = map (\p -> (readMaybe $ fst p, snd p)) (assocs cardsMapReadIn)
-                let pListR = map (\c -> (c, pMap Map.!? c)) countries
-                let tListR = map (\c -> (c, tMap Map.!? c)) countries
+                let pListR = map (\c -> (c, pMap Map.!? (show c))) countries
+                let tListR = map (\c -> (c, tMap Map.!? (show c))) countries
 
-                if (any (\p -> snd p == Nothing) pListR)
+                if (any (\p -> snd p == Nothing) pListR || any (\p -> snd p == Nothing) tListR || any (\p -> fst p == Nothing) cardsList)
                     then do mempty
                     else do
-                        let pListRR = map (\p -> (fst p, (readMaybe. fromJust) $ snd p)) pListR
+                        let playersMap = fromList $ map (\p -> (fst p, fromJust $ snd p)) pListR
+                        let troopsMap = fromList $ map (\p -> (fst p, fromJust $ snd p)) tListR
+                        let cardMap = fromList $ map (\p -> (fromJust $ fst p, snd p)) cardsList
 
-                        if (any (\p -> snd p == Nothing) pListRR || any (\p -> snd p == Nothing) tListR || any (\p -> fst p == Nothing) cardsList)
-                            then do mempty
-                            else do
-                                let playersMap = fromList $ map (\p -> (fst p, fromJust $ snd p)) pListRR
-                                let troopsMap = fromList $ map (\p -> (fst p, fromJust $ snd p)) tListR
-                                let cardMap = fromList $ map (\p -> (fromJust $ fst p, snd p)) cardsList
-
-                                return (InternalGameState troopsMap playersMap stdGen phase players getsCard discard deck cardMap)
+                        return (InternalGameState troopsMap playersMap stdGen pphase players pgetsCard discard pdeck cardMap)
         where
             countries = [(minBound ::Country)..]
     parseJSON _ = mempty

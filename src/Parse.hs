@@ -27,12 +27,17 @@ import Text.Read (readMaybe)
 import Data.Map(assocs)
 
 import SetupBoard
-import qualified State as S (MiniPhase(..), Phase(..), turnOrder, phase, troops, owner, cards)
+import qualified State as S (turnOrder, phase, troops, owner, cards)
 import RiskBoard (Country)
-import GameElements (Player, TradeIn(..), Card)
+import GameElements (Player)
 import ParsePart
 ---------------------------------------------
 
+data Switch a b = LSwitch a | RSwitch b
+
+instance (ToJSON a , ToJSON b) => ToJSON (Switch a b) where
+    toJSON (RSwitch x) = toJSON x
+    toJSON (LSwitch x) = toJSON x
 
 
 setupBoardOwner:: SetupState -> Country -> (Maybe Player, Int)

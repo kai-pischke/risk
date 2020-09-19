@@ -172,6 +172,7 @@ instance ToJSON SetupState where
 instance FromJSON SetupState where
     parseJSON (Object v) = do
         sbs <- parseJSON (Object v)
+
         return (toSetupState sbs)
     parseJSON _ = mempty
 
@@ -193,29 +194,23 @@ instance FromJSON SetupBoardState where
             then do mempty
             else do
                 players <- (v.: pack "players")
-
                 pMap <- (v.: pack "playerMap")
                 tMap <- (v.: pack "troopMap")
                 pRem <- (v.: pack "playerRemaining")
 
-
-                let pListR = map (\c -> (c, pMap !? c)) countries
-                let tListR = map (\c -> (c, tMap !? c)) countries
+                let pListR = map (\c -> (c, pMap !? (show c))) countries
+                let tListR = map (\c -> (c, tMap !? (show c))) countries
                 let remListR = map (\p -> (readMaybe $ fst p, snd p)) $ assocs pRem
 
-                if (any (\p -> snd p == Nothing) pListR)
+                if (any (\p -> snd p == Nothing) pListR || any (\p -> snd p == Nothing) tListR || any (\p -> fst p == Nothing) remListR)
                     then do mempty
                     else do
-                        let pListRR = map (\p -> (fst p, (readMaybe. fromJust) $ snd p)) pListR
 
-                        if (any (\p -> snd p == Nothing) pListRR || any (\p -> snd p == Nothing) tListR || any (\p -> fst p == Nothing) remListR)
-                            then do mempty
-                            else do
-                                let playersMap = fromList $ map (\p -> (fst p, fromJust $ snd p)) pListRR
-                                let troopsMap = fromList $ map (\p -> (fst p, fromJust $ snd p)) tListR
-                                let remMap = fromList $ map (\p -> (fromJust $ fst p, snd p)) remListR
+                        let playersMap = fromList $ map (\p -> (fst p, fromJust $ snd p)) pListR
+                        let troopsMap = fromList $ map (\p -> (fst p, fromJust $ snd p)) tListR
+                        let remMap = fromList $ map (\p -> (fromJust $ fst p, snd p)) remListR
 
-                                return (InternalGameState troopsMap playersMap players remMap)
+                        return (InternalGameState troopsMap playersMap players remMap)
         where
             countries = [(minBound ::Country)..]
 

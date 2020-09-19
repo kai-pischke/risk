@@ -1,5 +1,4 @@
 module ParsePart (
-Switch(..),
 Owner(..)
 ) where
 
@@ -14,13 +13,6 @@ import GameElements
 import RiskBoard
 
 ---- Helper DataType ------------------------
-data Switch a b = LSwitch a | RSwitch b
-
-instance (ToJSON a , ToJSON b) => ToJSON (Switch a b) where
-    toJSON (RSwitch x) = toJSON x
-    toJSON (LSwitch x) = toJSON x
-
-
 data Owner = Owner Player | Unowned
 
 instance ToJSON (Owner) where
