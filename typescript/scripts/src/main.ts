@@ -2,22 +2,23 @@ import {Draw} from "./draw";
 import {Board} from "./board";
 import {Connection} from "./sock";
 import {Moves} from "./moves";
-import {countryClickedOn} from "./map";
+import {countryOn} from "./map";
+import {Player} from "./elements";
 
 //-- Global Variables -----------------------
 
 function countryClicked(e : MouseEvent, r : number, canvas : HTMLElement){
-    let country = countryClickedOn(e, r, canvas);
+    let country = countryOn(e, r, canvas);
     if (country != null){
         document.dispatchEvent(new CustomEvent("CountryClickedOn",{detail: country}));
     }
 }
 
 (async() => {
-    let ui = new Draw();
     let board = new Board([],[]);
     let conn = new Connection();
-    let colour : string = await conn.start();
+    let colour : Player = await conn.start();
+    let ui = new Draw(colour);
     let moves = new Moves(colour, ui)
 
     conn.me = colour;
