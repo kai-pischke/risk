@@ -92,6 +92,29 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
                 this._ctx.fillText(state.troops(country) + '', myloc.x, myloc.y);
                 this._ctx.closePath();
             });
+            let hand = document.getElementById("hand");
+            hand.innerHTML = "";
+            let i;
+            for (i = 0; i < state.cards.length; i++) {
+                const c = state.cards[i];
+                let imgstr = "";
+                switch (c) {
+                    case "Wild":
+                        imgstr = "Wild.png";
+                        break;
+                    case "Infantry":
+                        imgstr = "Infantry.png";
+                        break;
+                    case "Artillery":
+                        imgstr = "Artillery.jpg";
+                        break;
+                    case "Cavalry":
+                        imgstr = "Cavalry.jpg";
+                }
+                let str = "";
+                str = "<div class = \"card\" id = \"card" + i.toString() + "\" data-type = \"" + c + "\"><img src = \"" + imgstr + "\" width = 100%> <div class = \"container\"><h4><b>" + c + "</b></h4></div>";
+                hand.innerHTML += str;
+            }
         }
         playerToColour(p) {
             let fill;

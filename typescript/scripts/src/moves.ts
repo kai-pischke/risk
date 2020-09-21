@@ -81,6 +81,8 @@ export class Moves{
         }
         var toReinforce = this.numberToReinforce(board, currentPlayer);
         var countryMap = {} as Record<Country, number>;
+        var cardsToTrade = [];
+        var tradeIn = [];
 
         function listenForReinforce(e : CustomEvent) {
             const country = e.detail;
@@ -109,7 +111,31 @@ export class Moves{
 
         }
 
+        function cardClickHandler(e:Event){
+          let elemId = this.id;
+          if (cardsToTrade.includes(elemId)) {
+            let i = cardsToTrade.indexOf(elemId);
+            cardsToTrade.splice(i,1);
+            tradeIn.splice(i,1)
+            document.getElementById(elemId).style.border = "none";
+          } else {
+            cardsToTrade.push(elemId);
+            document.getElementById(elemId).style.border = "3px solid green";
+            let c = document.getElementById(elemId).getAttribute("data-type");
+            tradeIn.push(elemId)
+          }
+
+
+        }
+
         document.addEventListener("CountryClickedOn", listenForReinforce);
+
+        let i = 0;
+        for (i = 0; i < board.cards.length; i++){
+          let elem = document.getElementById("card" + i.toString());
+          elem.addEventListener("click", cardClickHandler);
+        }
+
     }
 
     async attack(board : Board){ //Doesn't check if they're neighbours

@@ -62,6 +62,8 @@ define(["require", "exports", "./elements"], function (require, exports, element
             }
             var toReinforce = this.numberToReinforce(board, currentPlayer);
             var countryMap = {};
+            var cardsToTrade = [];
+            var tradeIn = [];
             function listenForReinforce(e) {
                 const country = e.detail;
                 if (board.owner(country) == me) {
@@ -86,7 +88,27 @@ define(["require", "exports", "./elements"], function (require, exports, element
                     document.removeEventListener("CountryClickedOn", listenForReinforce);
                 }
             }
+            function cardClickHandler(e) {
+                let elemId = this.id;
+                if (cardsToTrade.includes(elemId)) {
+                    let i = cardsToTrade.indexOf(elemId);
+                    cardsToTrade.splice(i, 1);
+                    tradeIn.splice(i, 1);
+                    document.getElementById(elemId).style.border = "none";
+                }
+                else {
+                    cardsToTrade.push(elemId);
+                    document.getElementById(elemId).style.border = "3px solid green";
+                    let c = document.getElementById(elemId).getAttribute("data-type");
+                    tradeIn.push(elemId);
+                }
+            }
             document.addEventListener("CountryClickedOn", listenForReinforce);
+            let i = 0;
+            for (i = 0; i < board.cards.length; i++) {
+                let elem = document.getElementById("card" + i.toString());
+                elem.addEventListener("click", cardClickHandler);
+            }
         }
         async attack(board) {
             console.log("---------------- starting attack ------------------------");
