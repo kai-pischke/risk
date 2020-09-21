@@ -65,7 +65,8 @@ type ParseError = ByteString
 
 -- | This is the 'ByteString' holding the JSON-encoded response to a parse error.
 parseError :: ParseError
-parseError = fromString "{\"Invalid JSON\"}"
+parseError = encode $ object [pack "kind".= pack "Error",
+                     pack "error" .= "ParseError"]
 
 ---- Instances For To/From JSON -------------
 
