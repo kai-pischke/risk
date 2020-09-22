@@ -89,7 +89,7 @@ reqInfo p (ChooseDefenders d) = show p ++ " chose to roll " ++ show (fromEnum d)
 reqInfo p EndAttack = show p ++ " ended the attack phase."
 reqInfo p SkipFortify = show p ++ " skipped the fortify phase."
 reqInfo p (Trade _ _) = show p ++ " did a trade."
-reqInfo p (SaveGame i) = show p ++ " wants to save the game with id " ++ show i ++ "."
+reqInfo p SaveGame = show p ++ " wants to save the game."
 reqInfo p (LoadGame i) = show p ++ " wants to load the game with id " ++ show i ++ "."
 
 takeJusts :: [Maybe a] -> [a]
@@ -111,6 +111,7 @@ getGames = do
 save :: MVar State -> IO ()
 save s = do
     gamesFolder <- getAppUserDataDirectory gamesFolderName
+    print gamesFolder
     gs <- getGames
     let gameId = case gs of 
                     [] -> 0
@@ -133,11 +134,14 @@ play conn player state = do
         bytesReq <- WS.receiveData conn
         case decodeRequest bytesReq of 
             Left req -> case req of 
-                (Request _ (SaveGame _)) -> save state
+                (Request _ SaveGame) -> do
+                    putStrLn $ "SERVER REQUEST  >> " ++ reqInfo player SaveGame
+                    save state
                 (Request _ (LoadGame _)) -> undefined
                 _ -> do
                     respond conn state req
-            Right err -> 
+            Right err -> do
+                putStrLn "INVALID JSON    >> :("
                 WS.sendTextData conn err
 
  -- send the same thing to every player  

@@ -8,6 +8,10 @@ define(["require", "exports", "./draw", "./board", "./sock", "./moves", "./map"]
             document.dispatchEvent(new CustomEvent("CountryClickedOn", { detail: country }));
         }
     }
+    function changeTroops(d) {
+        const label = document.getElementById("ntroopslabel");
+        label.innerHTML = parseInt(label.innerHTML) + d;
+    }
     (async () => {
         let board = new board_1.Board([], []);
         let conn = new sock_1.Connection();
@@ -16,10 +20,13 @@ define(["require", "exports", "./draw", "./board", "./sock", "./moves", "./map"]
         let moves = new moves_1.Moves(colour, ui);
         conn.me = colour;
         const canvas = document.getElementById("canvas");
+        //const popup = document.getElementById("popupBox");
+        //popup.classList.add("show");
         //-- Listeners ------------------------------
         document.getElementById("startGame").onclick = conn.start_game.bind(conn);
         document.getElementById("endAttack").onclick = (() => { document.dispatchEvent(new CustomEvent("EndAttack")); });
         document.getElementById("skipFortify").onclick = (() => { document.dispatchEvent(new CustomEvent("SkipFortify")); });
+        document.getElementById("saveGame").onclick = (() => { document.dispatchEvent(new CustomEvent("SaveGame")); });
         document.getElementById("submitNumberTroops").onclick = (() => { document.dispatchEvent(new CustomEvent("SubmitNumberTroops")); });
         document.getElementById("cancelNumberTroops").onclick = (() => { document.getElementById("popupNumberTroops").style.display = "none"; });
         document.getElementById("submitNumberDef").onclick = (() => { document.dispatchEvent(new CustomEvent("SubmitNumberDef")); });
@@ -44,6 +51,13 @@ define(["require", "exports", "./draw", "./board", "./sock", "./moves", "./map"]
         document.addEventListener('SkipFortify', function (e) {
             conn.send(JSON.stringify({
                 action: "SkipFortify",
+                sender: colour
+            }));
+        });
+        document.addEventListener('SaveGame', function (e) {
+            alert("save");
+            conn.send(JSON.stringify({
+                action: "SaveGame",
                 sender: colour
             }));
         });

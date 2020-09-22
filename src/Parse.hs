@@ -77,6 +77,8 @@ instance FromJSON Request where
 
         if (requestType == ("StartGame" :: String))
             then return (Request sender StartGame)
+        else if (requestType == ("SaveGame" :: String))
+            then return (Request sender SaveGame)
         else if (requestType == "PlaceTroop")
             then do
                 c <- (v .: pack "country")

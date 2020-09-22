@@ -206,6 +206,10 @@ define(["require", "exports", "./elements"], function (require, exports, element
             const me = this.me;
             const ui = this.ui;
             const currentPlayer = board.players[0];
+            const box = document.getElementById("popupBox");
+            const troopslabel = document.getElementById("ntroopslabel");
+            const plusbutton = document.querySelector("#popupBox button[data-quantity='plus']");
+            const minusbutton = document.querySelector("#popupBox button[data-quantity='minus']");
             ui.setColour(ac, this.attColour);
             ui.setColour(dc, this.defColour);
             ui.draw(board);
@@ -213,18 +217,27 @@ define(["require", "exports", "./elements"], function (require, exports, element
             if (this.me != currentPlayer) {
                 return;
             }
-            document.getElementById("labelForTroopsToInvade").innerHTML = "Number of Troops to invade " + ac + " from " + dc;
-            document.getElementById("numberInv").max = (board.troops(ac) - 1).toString();
-            document.getElementById("numberInv").min = remainingAttackers.toString();
-            document.getElementById("popupNumberInv").style.display = "block";
+            function changeTroops(d) {
+                troopslabel.innerHTML = parseInt(troopslabel.innerHTML) + d;
+            }
+            plusbutton.onclick = (() => {
+                changeTroops(1);
+            });
+            minusbutton.onclick = (() => {
+                changeTroops(-1);
+            });
+            //document.getElementById("labelForTroopsToInvade").innerHTML = "Number of Troops to invade " + ac + " from " + dc;
+            //(document.getElementById("numberInv") as HTMLInputElement).max = (board.troops(ac) -1).toString();
+            //(document.getElementById("numberInv") as HTMLInputElement).min = remainingAttackers.toString();
+            box.classList.add("show");
             function listenForNumberInvaders(e) {
                 document.dispatchEvent(new CustomEvent("Send", { detail: JSON.stringify({
                         action: "Invade",
                         sender: me,
-                        number_of_troops: parseInt(document.getElementById("numberInv").value)
+                        number_of_troops: parseInt(troopslabel.innerHTML)
                     })
                 }));
-                document.getElementById("popupNumberInv").style.display = "none";
+                box.classList.remove("show");
                 document.removeEventListener("SubmitNumberInv", listenForNumberInvaders);
             }
             document.addEventListener("SubmitNumberInv", listenForNumberInvaders);
