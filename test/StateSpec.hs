@@ -227,10 +227,15 @@ spec = do
     let game = allRed
     let draw1 = drawCard Red game
     let draw2 = drawCard Red draw1
+    let next = nextPhase draw2
     context "Valid draws" $ do
       it "Correctly adds card into player's hand" $ do
         length (cards draw1 Red) `shouldBe` 1
         length (cards draw2 Red) `shouldBe` 2
+      it "Correctly sets hasDrawn" $ do
+        draw1 `shouldSatisfy` hasDrawn
+        draw2 `shouldSatisfy` hasDrawn
+        next `shouldSatisfy` (not.hasDrawn)
       it "Correctly doesn't change other players' hands" $ do
         cards draw1 Blue `shouldBe` []
         cards draw1 Green `shouldBe` []
