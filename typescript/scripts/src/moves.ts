@@ -41,6 +41,45 @@ export class Moves{
         return numTroops;
     }
 
+    private cardSetBonus(set){
+      if (set.length < 3) return 0
+      else if (set.length == 3){
+        let sorted = set.sort()
+        switch (sorted[2]){
+          case "Artillery":
+            if (sorted[0] == "Artillery" && sorted[1] == "Artillery") return 8;
+            else return 0;
+            break;
+          case "Cavalry":
+            if (sorted[0] == "Cavalry" && sorted[1] == "Cavalry") return 6
+            else return 0;
+            break;
+          case "Infantry":
+            if(sorted[0] == "Infantry" && sorted[1] == "Infantry") return 4;
+            else if (sorted[0] == "Artillery" && sorted[1] == "Cavalry") return 10;
+            else return 0;
+            break;
+          case "Wild":
+            if (sorted[1] == "Wild" || sorted[0] != sorted[1]) return 10
+            else if (sorted[0] == "Infantry" && sorted[1] == "Infantry") return 4
+            else if (sorted[0] == "Cavalry" && sorted[1] == "Cavalry") return 6
+            else if (sorted[0] == "Artillery" && sorted[1] == "Artillery") return 8
+            else return 0
+            break;
+        }
+      }
+    }
+
+    private tradeInBonus(t) {
+      return this.cardSetBonus(t[0]) + this.cardSetBonus(t[1]);
+    }
+
+    private jsonifyTradeIn(t){
+      if (t[0].length == 3 && t[1].length == 3) return t
+      else if (t[0].length == 3) return [t[0]]
+      else return []
+    }
+
     async setup(board : Board){
         const me = this.me;
         const currentPlayer =  board.players[0]
@@ -81,8 +120,10 @@ export class Moves{
         }
         var toReinforce = this.numberToReinforce(board, currentPlayer);
         var countryMap = {} as Record<Country, number>;
-        var cardsToTrade = [];
-        var tradeIn = [];
+        var cardsToTrade = [new Array(), new Array()]
+        var tradeIn = [new Array(), new Array()]
+        var self = this;
+
 
         function listenForReinforce(e : CustomEvent) {
             const country = e.detail;
@@ -104,29 +145,58 @@ export class Moves{
                         action: "Reinforce",
                         sender: me,
                         troops: countryMap,
-                        trade_in: []
+                        trade_in: self.jsonifyTradeIn(tradeIn)
                     })}));
                 document.removeEventListener("CountryClickedOn", listenForReinforce);
+
+                let i = 0;
+                for (i = 0; i < board.cards.length; i++){
+                  let elem = document.getElementById("card" + i.toString());
+                  elem.removeEventListener("click", cardClickHandler);
+                }
             }
 
         }
 
         function cardClickHandler(e:Event){
           let elemId = this.id;
-          if (cardsToTrade.includes(elemId)) {
-            let i = cardsToTrade.indexOf(elemId);
-            cardsToTrade.splice(i,1);
-            tradeIn.splice(i,1)
+          let whichSet = 0
+          if (cardsToTrade[0].length == 3) whichSet = 1
+          if (whichSet == 1 && cardsToTrade[1].length == 3) return;
+
+          if (cardsToTrade[whichSet].includes(elemId) && toReinforce > self.tradeInBonus(tradeIn)) {
+            toReinforce -= self.tradeInBonus(tradeIn)
+            let i = cardsToTrade[whichSet].indexOf(elemId);
+            cardsToTrade[whichSet].splice(i,1);
+            tradeIn[whichSet].splice(i,1)
             document.getElementById(elemId).style.border = "none";
-          } else {
-            cardsToTrade.push(elemId);
-            document.getElementById(elemId).style.border = "3px solid green";
-            let c = document.getElementById(elemId).getAttribute("data-type");
-            tradeIn.push(elemId)
+            toReinforce += self.tradeInBonus(tradeIn)
+            console.log(JSON.stringify(tradeIn))
+            }
+            else {
+              if (tradeIn[whichSet].length < 3){
+                cardsToTrade[whichSet].push(elemId);
+                document.getElementById(elemId).style.border = "3px solid #7fbf7f";
+                let c = document.getElementById(elemId).getAttribute("data-type");
+                tradeIn[whichSet].push(c)
+
+                //Check the tradeIn is correct if it's complete
+                if (self.cardSetBonus(tradeIn[whichSet]) == 0 && tradeIn[whichSet].length == 3){
+                  console.log("Invalid combo for cardset")
+                  let i = 0
+                  for (i = 0; i < 3; i++){
+                    document.getElementById(cardsToTrade[whichSet][i]).style.border = "none"
+                  }
+                  cardsToTrade[whichSet] = []
+                  tradeIn[whichSet] = []
+                }
+                else if (tradeIn[whichSet].length == 3) {
+                  toReinforce += self.cardSetBonus(tradeIn[whichSet])
+                }
+                console.log(JSON.stringify(tradeIn))
+              }
+            }
           }
-
-
-        }
 
         document.addEventListener("CountryClickedOn", listenForReinforce);
 
