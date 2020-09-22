@@ -201,7 +201,7 @@ module Interface  (
   receive (Request s (M.Trade _ _)) g = (Invalid NotInPlay s, g)
 
   -- Save/Load requests
-  receive (Request _ (SaveGame _)) _ = error "SaveGame requests should be handled by the server"
+  receive (Request _ SaveGame) _ = error "SaveGame requests should be handled by the server"
   receive (Request _ (LoadGame _)) _ = error "LoadGame requests should be handled by the server"
   --------------------------------------
 

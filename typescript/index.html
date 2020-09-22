@@ -3,6 +3,7 @@
     <style>
       * {
         box-sizing: border-box;
+        font-family: 'Quicksand', sans-serif;
       }
       .cNB {
         position: relative;
@@ -152,6 +153,92 @@
       .divider {
         width: 5px
       }
+      
+      .popup {
+        position: absolute;
+        left: 50%;
+        top: 25%;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      /* The actual popup */
+      .popup .popuptext {
+        visibility: hidden;
+        width: 240px;
+        background-color: #FFEBCD;
+        color: #2F4F4F;
+        text-align: center;
+        border-radius: 10px;
+        padding: 20px 0;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -120px;
+        cursor: default;
+      }
+
+      /* Popup arrow */
+      .popup .popuptext::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -10px;
+        border-width: 10px;
+        border-style: solid;
+        border-color: #FFEBCD transparent transparent transparent;
+      }
+
+
+      .circle {
+        width: 2em;
+        height: 2em;
+        border-radius: 50%;
+        border: 2px solid #2F4F4F;
+        box-shadow: none;
+        cursor: pointer;
+        background-color: #FFF8DC;
+        margin-top: 2em;
+        font: 0.9rem Arial,sans-serif;
+        font-weight: bold;
+        
+      }
+      
+      /* Toggle this class - hide and show the popup */
+      .popup .show {
+        visibility: visible;
+        -webkit-animation: fadeIn 1s;
+        animation: fadeIn 1s;
+      }
+
+      .numberdisp {
+        font-size: 2em;
+        padding: 0.5em;
+      }
+
+      .button {
+        border-radius: 10px;
+        border: none;
+        padding: 0.8em;
+        box-shadow: none;
+        cursor: pointer;
+        color: #FFEBCD;
+        background-color: #FF7F50;
+        margin-top: 2em;
+        font-size: 1.1em;
+      }
+      /* Add animation (fade in the popup) */
+      @-webkit-keyframes fadeIn {
+        from {opacity: 0;} 
+        to {opacity: 1;}
+      }
+
+      @keyframes fadeIn {
+        from {opacity: 0;}
+        to {opacity:1 ;}
+      }
     </style>
     <head>
         <meta charset="UTF-8">
@@ -163,6 +250,7 @@
         <button id="startGame">Start</button>
         <button id="endAttack">End Attack</button>
         <button id="skipFortify">Skip Fortify</button>
+        <button id="saveGame">Save</button>
         <div class = "cNB">
             <h2 id = "countryNameBadge"></h2>
         </div>
@@ -188,7 +276,25 @@
                     <button id = "cancelNumberTroops" type="button" class="btn cancel">Close</button>
             </div>
         </div>
-
+        <div class="popup">
+          <span class="popuptext" id="popupBox">
+              <label for="numberFort">
+                <strong id = "labelForTroopsToInvade">With how many troops should we invade?</strong>
+              </label>
+              <div class="input-group plus-minus-input">
+                <button type="button" class="circle" data-quantity="plus" data-field="quantity" onclick="changeTroops(1)">
+                  +
+                </button>
+                <label class="numberdisp" id="ntroopslabel">7</label>
+                <button type="button" class="circle" data-quantity="minus" data-field="quantity" onclick="changeTroops(-1)">
+                  -
+                </button>
+               </div>
+               <button id="submitNumberInv" type="button" class="button">
+                launch the attack!
+               </button>
+          </span>
+        </div>
         <div class="numberDefPopup">
             <div class="popupNumberDef" id="popupNumberDef">
                     <h2>Please Select Number Of Defenders</h2>
@@ -199,7 +305,7 @@
                     <button id = "submitNumberDef" type="button" class="btn">Send</button>
             </div>
         </div>
-
+<!--
         <div class="numberInvPopup">
             <div class="popupNumberInv" id="popupNumberInv">
                     <h2>Please Select Number Of Troops To Invade With</h2>
@@ -211,7 +317,7 @@
 
             </div>
         </div>
-
+-->
         <div class="numberFortPopup">
             <div class="popupNumberFort" id="popupNumberFort">
                     <h2>Please Select Number Of Troops To Fortify With</h2>

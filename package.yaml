@@ -28,6 +28,8 @@ dependencies:
 - array
 - text
 - splitmix
+- directory
+- filepath
 
 library:
   source-dirs: src

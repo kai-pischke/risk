@@ -245,61 +245,61 @@ module ParseSpec where
         it "Correctly deals with valid requests" $ do
           map (decodeRequest.fromString) startGameValid `shouldBe` map Left startGameValidDecoded
         it "Correctly deals with invalid requests" $ do
-          map (decodeRequest.fromString) startGameInvalid `shouldBe` map (Right . fromString) (replicate (length startGameInvalid) "{\"Invalid JSON\"}")
+          map (decodeRequest.fromString) startGameInvalid `shouldBe` map (Right . fromString) (replicate (length startGameInvalid) "{\"kind\":\"Error\",\"error\":\"ParseError\"}")
 
       context "PlaceTroop" $ do
         it "Correctly deals with valid requests" $ do
           map (decodeRequest.fromString) placeTroopValid `shouldBe` map Left placeTroopValidDecoded
         it "Correctly deals with invalid requests" $ do
-          map (decodeRequest.fromString) placeTroopInvalid `shouldBe` map (Right . fromString) (replicate (length placeTroopInvalid) "{\"Invalid JSON\"}")
+          map (decodeRequest.fromString) placeTroopInvalid `shouldBe` map (Right . fromString) (replicate (length placeTroopInvalid) "{\"kind\":\"Error\",\"error\":\"ParseError\"}")
 
       context "Attack" $ do
         it "Correctly deals with valid requests" $ do
           map (decodeRequest.fromString) attackValid `shouldBe` map Left attackValidDecoded
         it "Correctly deals with invalid requests" $ do
-          map (decodeRequest.fromString) attackInvalid `shouldBe` map (Right . fromString) (replicate (length attackInvalid) "{\"Invalid JSON\"}")
+          map (decodeRequest.fromString) attackInvalid `shouldBe` map (Right . fromString) (replicate (length attackInvalid) "{\"kind\":\"Error\",\"error\":\"ParseError\"}")
 
       context "Reinforce" $ do
         it "Correctly deals with valid requests" $ do
           map (decodeRequest.fromString) reinforceValid `shouldBe` map Left reinforceValidDecoded
         it "Correctly deals with invalid requests" $ do
-          map (decodeRequest.fromString) reinforceInvalid `shouldBe` map (Right . fromString) (replicate (length reinforceInvalid) "{\"Invalid JSON\"}")
+          map (decodeRequest.fromString) reinforceInvalid `shouldBe` map (Right . fromString) (replicate (length reinforceInvalid) "{\"kind\":\"Error\",\"error\":\"ParseError\"}")
 
       context "Fortify" $ do
         it "Correctly deals with valid requests" $ do
           map (decodeRequest.fromString) fortifyValid `shouldBe` map Left fortifyValidDecoded
         it "Correctly deals with invalid requests" $ do
-          map (decodeRequest.fromString) fortifyInvalid `shouldBe` map (Right . fromString) (replicate (length fortifyInvalid) "{\"Invalid JSON\"}")
+          map (decodeRequest.fromString) fortifyInvalid `shouldBe` map (Right . fromString) (replicate (length fortifyInvalid) "{\"kind\":\"Error\",\"error\":\"ParseError\"}")
 
       context "Invade" $ do
         it "Correctly deals with valid requests" $ do
           map (decodeRequest.fromString) invadeValid `shouldBe` map Left invadeValidDecoded
         it "Correctly deals with invalid requests" $ do
-          map (decodeRequest.fromString) invadeInvalid `shouldBe` map (Right . fromString) (replicate (length invadeInvalid) "{\"Invalid JSON\"}")
+          map (decodeRequest.fromString) invadeInvalid `shouldBe` map (Right . fromString) (replicate (length invadeInvalid) "{\"kind\":\"Error\",\"error\":\"ParseError\"}")
 
       context "ChooseDefenders" $ do
         it "Correctly deals with valid requests" $ do
           map (decodeRequest.fromString) chooseDefendersValid `shouldBe` map Left chooseDefendersValidDecoded
         it "Correctly deals with invalid requests" $ do
-          map (decodeRequest.fromString) chooseDefendersInvalid `shouldBe` map (Right . fromString) (replicate (length chooseDefendersInvalid) "{\"Invalid JSON\"}")
+          map (decodeRequest.fromString) chooseDefendersInvalid `shouldBe` map (Right . fromString) (replicate (length chooseDefendersInvalid) "{\"kind\":\"Error\",\"error\":\"ParseError\"}")
 
       context "EndAttack" $ do
         it "Correctly deals with valid requests" $ do
           map (decodeRequest.fromString) endAttackValid `shouldBe` map Left endAttackValidDecoded
         it "Correctly deals with invalid requests" $ do
-          map (decodeRequest.fromString) endAttackInvalid `shouldBe` map (Right . fromString) (replicate (length endAttackInvalid) "{\"Invalid JSON\"}")
+          map (decodeRequest.fromString) endAttackInvalid `shouldBe` map (Right . fromString) (replicate (length endAttackInvalid) "{\"kind\":\"Error\",\"error\":\"ParseError\"}")
 
       context "SkipFortify" $ do
         it "Correctly deals with valid requests" $ do
           map (decodeRequest.fromString) skipFortifyValid `shouldBe` map Left skipFortifyValidDecoded
         it "Correctly deals with invalid requests" $ do
-          map (decodeRequest.fromString) skipFortifyInvalid `shouldBe` map (Right . fromString) (replicate (length skipFortifyInvalid) "{\"Invalid JSON\"}")
+          map (decodeRequest.fromString) skipFortifyInvalid `shouldBe` map (Right . fromString) (replicate (length skipFortifyInvalid) "{\"kind\":\"Error\",\"error\":\"ParseError\"}")
 
       context "Trade" $ do
         it "Correctly deals with valid requests" $ do
           map (decodeRequest.fromString) tradeValid `shouldBe` map Left tradeValidDecoded
         it "Correctly deals with invalid requests" $ do
-          map (decodeRequest.fromString) tradeInvalid `shouldBe` map (Right . fromString) (replicate (length tradeInvalid) "{\"Invalid JSON\"}")
+          map (decodeRequest.fromString) tradeInvalid `shouldBe` map (Right . fromString) (replicate (length tradeInvalid) "{\"kind\":\"Error\",\"error\":\"ParseError\"}")
 
     ---------------------------------------------------------
 

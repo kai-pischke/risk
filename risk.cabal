@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 86a3388cf2df68494fb7d2dc54d209394e1d025e229882a65f90bdcc9bfe7878
+-- hash: f89cd56d793d81892ea7aa79d767f920febf8f5dd37e09876f09a8d7e9185b40
 
 name:           risk
 version:        0.1.0.0
@@ -51,6 +51,8 @@ library
     , base >=4.8 && <5
     , bytestring
     , containers
+    , directory
+    , filepath
     , random >=1.2
     , splitmix
     , text
@@ -71,6 +73,8 @@ executable risk-exe
     , base >=4.8 && <5
     , bytestring
     , containers
+    , directory
+    , filepath
     , random >=1.2
     , risk
     , splitmix
@@ -102,6 +106,8 @@ test-suite risk-test
     , base >=4.8 && <5
     , bytestring
     , containers
+    , directory
+    , filepath
     , hspec
     , hspec-discover
     , multiset

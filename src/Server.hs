@@ -18,6 +18,12 @@ import Control.Exception (finally)
 import Control.Concurrent.MVar (MVar, modifyMVar, newMVar, readMVar, modifyMVar_)
 import Control.Monad (forM_, forever)
 import Data.ByteString.Lazy.UTF8 as BLU
+import System.Directory
+import System.FilePath
+import Data.List
+import Text.Read
+import Data.Aeson (encode)
+import qualified Data.ByteString.Lazy as B
 
 {- The State type holds all the current connections 
    and the current state of the Game.
@@ -26,6 +32,9 @@ import Data.ByteString.Lazy.UTF8 as BLU
    that all the connection threads will be able to read and write to. -}
 
 data State = State [(Player, WS.Connection)] Game
+
+gamesFolderName :: FilePath
+gamesFolderName = "risk" </> "games"
 
 -- simply replaces the Game in a State with a new Game
 updateGame :: Game -> State -> State
@@ -80,6 +89,36 @@ reqInfo p (ChooseDefenders d) = show p ++ " chose to roll " ++ show (fromEnum d)
 reqInfo p EndAttack = show p ++ " ended the attack phase."
 reqInfo p SkipFortify = show p ++ " skipped the fortify phase."
 reqInfo p (Trade _ _) = show p ++ " did a trade."
+reqInfo p SaveGame = show p ++ " wants to save the game."
+reqInfo p (LoadGame i) = show p ++ " wants to load the game with id " ++ show i ++ "."
+
+takeJusts :: [Maybe a] -> [a]
+takeJusts [] = []
+takeJusts ((Just x):xs) = x : takeJusts xs
+takeJusts (Nothing:xs) = takeJusts xs
+
+getGames :: IO([Int]) 
+getGames = do 
+    gamesFolder <- getAppUserDataDirectory gamesFolderName
+    fileList <- getDirectoryContents gamesFolder
+    let filtered = takeJusts
+                 $ map (>>= readMaybe)  
+                 $ map (stripPrefix "saved_game") 
+                 $ map takeBaseName 
+                 $ filter (isExtensionOf "json") fileList
+    return filtered 
+    
+save :: MVar State -> IO ()
+save s = do
+    gamesFolder <- getAppUserDataDirectory gamesFolderName
+    print gamesFolder
+    gs <- getGames
+    let gameId = case gs of 
+                    [] -> 0
+                    _  -> maximum gs + 1
+    State players game <- readMVar s
+    let encoded = encode game
+    B.writeFile (gamesFolder </> addExtension ("saved_game" ++ show gameId) "json") encoded
 
 -- deals with one cycle of receiving and then sending responses    
 play :: WS.Connection -> Player -> MVar State -> IO ()
@@ -94,9 +133,15 @@ play conn player state = do
     forever $ do        
         bytesReq <- WS.receiveData conn
         case decodeRequest bytesReq of 
-            Left req -> do 
-                respond conn state req
-            Right err -> 
+            Left req -> case req of 
+                (Request _ SaveGame) -> do
+                    putStrLn $ "SERVER REQUEST  >> " ++ reqInfo player SaveGame
+                    save state
+                (Request _ (LoadGame _)) -> undefined
+                _ -> do
+                    respond conn state req
+            Right err -> do
+                putStrLn "INVALID JSON    >> :("
                 WS.sendTextData conn err
 
  -- send the same thing to every player  
