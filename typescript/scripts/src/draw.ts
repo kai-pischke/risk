@@ -3,15 +3,86 @@ import {Board} from "./board";
 import {COUNTRY_LOC} from "./map";
 import {NEIGHBOURS} from "./neighbours";
 
+class Popup{
+    private _box: HTMLElement;
+    private _ntroops: HTMLElement;
+    private _plusbutton: HTMLElement;
+    private _minusbutton: HTMLElement;
+    private _min: number = 0;
+    private _max: number = 0;
+
+    constructor() {
+        this._box = document.getElementById("popupBox");
+
+        this._ntroops = document.getElementById("popupntroops");
+        this._plusbutton = document.querySelector("#popupBox button[data-quantity='plus']") as HTMLElement;
+        this._minusbutton = document.querySelector("#popupBox button[data-quantity='minus']") as HTMLElement;
+
+        this._plusbutton.onclick = (() => {
+          this.changeTroops(1);
+        });
+        this._minusbutton.onclick = (() => {
+          this.changeTroops(-1);
+        });
+        this.submit = "Submit";
+    }
+
+    private changeTroops(d) {
+        const n = parseInt(this._ntroops.innerHTML)
+        if (n+d <= this._max && n+d >= this._min){
+            this._ntroops.innerHTML = (n + d).toString();
+        }
+
+    }
+
+    public get value(): number {
+        return parseInt(this._ntroops.innerHTML);
+    }
+
+    public set visible(b: Boolean){
+        if (b){
+            this._box.classList.add("show");
+        } else {
+            this._box.classList.remove("show");
+        }
+    }
+
+    public set label(l: string){
+        document.getElementById("popupLabel").innerHTML = l;
+    }
+
+    public set submit(l: string){
+        document.getElementById("popupSubmit").innerHTML = l;
+    }
+
+    public set min(newmin: number){
+        this._min = newmin;
+        this._ntroops.innerHTML = newmin.toString();
+    }
+
+    public set max(newmax: number){
+        const n = parseInt(this._ntroops.innerHTML);
+        this._max = newmax;
+        if (n> newmax){
+            this._ntroops.innerHTML = newmax.toString();
+        }
+    }
+}
+
 export class Draw{
 
     private _ctx: CanvasRenderingContext2D;
     public outerRadius = 35;
     public innerRadius = 25;
+    public popup: Popup;
+
     private _countryColour = {} as Record<Country, string>;
+
 
     constructor(player:Player) {
         const canvas = document.getElementById("canvas");
+
+        this.popup = new Popup();
 
         if (!(canvas instanceof HTMLCanvasElement)) {
             throw new Error("The element of is not an HTMLCanvasElement.");
@@ -26,6 +97,8 @@ export class Draw{
         ALL_COUNTRIES.forEach((key, index) => {this._countryColour[key] = "white"});
 
     }
+
+
 
     public setColour(c : Country, s: string){
         this._countryColour[c] = s;

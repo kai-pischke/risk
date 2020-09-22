@@ -14,10 +14,7 @@ function countryClicked(e : MouseEvent, r : number, canvas : HTMLElement){
     }
 }
 
-function changeTroops(d) {
-    const label = document.getElementById("ntroopslabel");
-    label.innerHTML = parseInt(label.innerHTML) + d;
-}
+
 
 (async() => {
     let board = new Board([],[]);
@@ -28,22 +25,20 @@ function changeTroops(d) {
 
     conn.me = colour;
     const canvas=document.getElementById("canvas");
-    
+
     //const popup = document.getElementById("popupBox");
     //popup.classList.add("show");
-    
+
 //-- Listeners ------------------------------
     document.getElementById("startGame").onclick = conn.start_game.bind(conn);
     document.getElementById("endAttack").onclick = (() => {document.dispatchEvent(new CustomEvent("EndAttack"))});
     document.getElementById("skipFortify").onclick = (() => {document.dispatchEvent(new CustomEvent("SkipFortify"))});
     document.getElementById("saveGame").onclick   = (() => {document.dispatchEvent(new CustomEvent("SaveGame"))});
-    
-    document.getElementById("submitNumberTroops").onclick = (() => {document.dispatchEvent(new CustomEvent("SubmitNumberTroops"))});
-    document.getElementById("cancelNumberTroops").onclick = (() => {document.getElementById("popupNumberTroops").style.display = "none";});
-    document.getElementById("submitNumberDef").onclick    = (() => {document.dispatchEvent(new CustomEvent("SubmitNumberDef"))});
-    document.getElementById("submitNumberInv").onclick    = (() => {document.dispatchEvent(new CustomEvent("SubmitNumberInv"))});
-    document.getElementById("submitNumberFort").onclick   = (() => {document.dispatchEvent(new CustomEvent("SubmitNumberFort"))});
-    
+
+    document.getElementById("popupSubmit").onclick = (() => {document.dispatchEvent(new CustomEvent("PopupSubmit"))});
+    //document.getElementById("cancelNumberTroops").onclick = (() => {document.getElementById("popupNumberTroops").style.display = "none";});
+
+
 
 
 

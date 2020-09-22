@@ -2,12 +2,64 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Draw = void 0;
+    class Popup {
+        constructor() {
+            this._min = 0;
+            this._max = 0;
+            this._box = document.getElementById("popupBox");
+            this._ntroops = document.getElementById("popupntroops");
+            this._plusbutton = document.querySelector("#popupBox button[data-quantity='plus']");
+            this._minusbutton = document.querySelector("#popupBox button[data-quantity='minus']");
+            this._plusbutton.onclick = (() => {
+                this.changeTroops(1);
+            });
+            this._minusbutton.onclick = (() => {
+                this.changeTroops(-1);
+            });
+            this.submit = "Submit";
+        }
+        changeTroops(d) {
+            const n = parseInt(this._ntroops.innerHTML);
+            if (n + d <= this._max && n + d >= this._min) {
+                this._ntroops.innerHTML = (n + d).toString();
+            }
+        }
+        get value() {
+            return parseInt(this._ntroops.innerHTML);
+        }
+        set visible(b) {
+            if (b) {
+                this._box.classList.add("show");
+            }
+            else {
+                this._box.classList.remove("show");
+            }
+        }
+        set label(l) {
+            document.getElementById("popupLabel").innerHTML = l;
+        }
+        set submit(l) {
+            document.getElementById("popupSubmit").innerHTML = l;
+        }
+        set min(newmin) {
+            this._min = newmin;
+            this._ntroops.innerHTML = newmin.toString();
+        }
+        set max(newmax) {
+            const n = parseInt(this._ntroops.innerHTML);
+            this._max = newmax;
+            if (n > newmax) {
+                this._ntroops.innerHTML = newmax.toString();
+            }
+        }
+    }
     class Draw {
         constructor(player) {
             this.outerRadius = 35;
             this.innerRadius = 25;
             this._countryColour = {};
             const canvas = document.getElementById("canvas");
+            this.popup = new Popup();
             if (!(canvas instanceof HTMLCanvasElement)) {
                 throw new Error("The element of is not an HTMLCanvasElement.");
             }

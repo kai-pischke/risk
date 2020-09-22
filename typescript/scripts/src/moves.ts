@@ -248,9 +248,10 @@ export class Moves{
             }
 
             if (dc != null && ac != null){
-                document.getElementById("labelForTroopsToAttack").innerHTML = "Number of Troops to attack " + dc + " from " + ac;
-                (document.getElementById("numberTroops") as HTMLInputElement).max = Math.min((board.troops(ac) - 1), 3).toString();
-                document.getElementById("popupNumberTroops").style.display = "block";
+                ui.popup.label = "Number of Troops to attack " + dc + " from " + ac;
+                ui.popup.max = Math.min((board.troops(ac) - 1), 3);
+                ui.popup.min = 1;
+                ui.popup.visible = true;
 
             }
         }
@@ -263,7 +264,7 @@ export class Moves{
                         sender: me,
                         attacking_country: ac,
                         defending_country: dc,
-                        number_of_attackers: parseInt((document.getElementById("numberTroops") as HTMLInputElement).value)
+                        number_of_attackers: ui.popup.value
                     })}));
                 attackEnded(new CustomEvent(""));
             }
@@ -272,14 +273,14 @@ export class Moves{
         function attackEnded(e : CustomEvent){
             document.removeEventListener("AttackEnded", attackEnded);
             document.removeEventListener("CountryClickedOn", listenForAttack);
-            document.removeEventListener("SubmitNumberTroops", listenForAttackSubmit);
-            document.getElementById("popupNumberTroops").style.display = "none";
+            document.removeEventListener("PopupSubmit", listenForAttackSubmit);
+            ui.popup.visible = false;
             ui.clearColour()
         }
 
         document.addEventListener("EndAttack", attackEnded);
         document.addEventListener("CountryClickedOn", listenForAttack);
-        document.addEventListener("SubmitNumberTroops", listenForAttackSubmit);
+        document.addEventListener("PopupSubmit", listenForAttackSubmit);
 
     }
 
@@ -297,21 +298,22 @@ export class Moves{
             return;
         }
         console.log((board.troops(dc)))
-        document.getElementById("labelForTroopsToDefend").innerHTML = "Number of Troops to defend " + dc + " from the " + attackers + " attackers from " + ac;
-        (document.getElementById("numberDef") as HTMLInputElement).max = Math.min((board.troops(dc)), 2).toString();
-        document.getElementById("popupNumberDef").style.display = "block";
+        ui.popup.label = "Number of Troops to defend " + dc + " from the " + attackers + " attackers from " + ac;
+        ui.popup.max = Math.min((board.troops(dc)), 2);
+        ui.popup.min = 1;
+        ui.popup.visible = true;
 
         function listenForNumberDefenders(e: CustomEvent){
             document.dispatchEvent(new CustomEvent("Send",
                 {detail: JSON.stringify({
                     action: "ChooseDefenders",
                     sender: me,
-                    number_of_defenders: parseInt((document.getElementById("numberDef") as HTMLInputElement).value)
+                    number_of_defenders: ui.popup.value
                 })}));
-            document.getElementById("popupNumberDef").style.display = "none";
-            document.removeEventListener("SubmitNumberDef", listenForNumberDefenders);
+            ui.popup.visible = false;
+            document.removeEventListener("PopupSubmit", listenForNumberDefenders);
         }
-        document.addEventListener("SubmitNumberDef", listenForNumberDefenders);
+        document.addEventListener("PopupSubmit", listenForNumberDefenders);
     }
 
     async invade(board : Board, ac : Country, dc : Country, remainingAttackers : number){
@@ -319,12 +321,9 @@ export class Moves{
         const me = this.me;
         const ui = this.ui;
         const currentPlayer = board.players[0];
-        const box = document.getElementById("popupBox");
-        const troopslabel = document.getElementById("ntroopslabel");
-        const plusbutton = document.querySelector("#popupBox button[data-quantity='plus']") as HTMLElement;
-        const minusbutton = document.querySelector("#popupBox button[data-quantity='minus']") as HTMLElement;
-        
-        
+
+
+
         ui.setColour(ac, this.attColour);
         ui.setColour(dc, this.defColour);
         ui.draw(board);
@@ -332,36 +331,27 @@ export class Moves{
         if (this.me != currentPlayer){
             return;
         }
-        
-        function changeTroops(d) {
-          troopslabel.innerHTML = parseInt(troopslabel.innerHTML) + d;
-        }
-        
-        plusbutton.onclick = (() => {
-          changeTroops(1);
-        }); 
-        minusbutton.onclick = (() => {
-          changeTroops(-1);
-        }); 
-        
-        //document.getElementById("labelForTroopsToInvade").innerHTML = "Number of Troops to invade " + ac + " from " + dc;
-        //(document.getElementById("numberInv") as HTMLInputElement).max = (board.troops(ac) -1).toString();
-        //(document.getElementById("numberInv") as HTMLInputElement).min = remainingAttackers.toString();
-        box.classList.add("show");
-  
-        
+
+
+        ui.popup.label = "Number of Troops to invade " + dc + " from " + ac;
+        ui.popup.max = (board.troops(ac) -1);
+        ui.popup.min = remainingAttackers;
+        ui.popup.visible = true;
+
+
+
         function listenForNumberInvaders(e: CustomEvent){
             document.dispatchEvent(new CustomEvent("Send",
                 {detail: JSON.stringify({
                     action: "Invade",
                     sender: me,
-                    number_of_troops: parseInt(troopslabel.innerHTML)
+                    number_of_troops: ui.popup.value
                 })
             }));
-            box.classList.remove("show");
-            document.removeEventListener("SubmitNumberInv", listenForNumberInvaders);
+            ui.popup.visible = false;
+            document.removeEventListener("PopupSubmit", listenForNumberInvaders);
         }
-        document.addEventListener("SubmitNumberInv", listenForNumberInvaders);
+        document.addEventListener("PopupSubmit", listenForNumberInvaders);
 
     }
 
@@ -404,8 +394,10 @@ export class Moves{
             }
 
             if (fc != null && tc != null){
-                (document.getElementById("numberFort") as HTMLInputElement).max = (board.troops(country) - 1).toString();
-                document.getElementById("popupNumberFort").style.display = "block";
+                ui.popup.label = "Number of Troops to fortify " + fc + " from " + tc;
+                ui.popup.max = (board.troops(fc) -1);
+                ui.popup.min = 1;
+                ui.popup.visible = true;
             }
         }
 
@@ -417,7 +409,7 @@ export class Moves{
                         sender: me,
                         from_country: fc,
                         to_country: tc,
-                        number_of_troops: parseInt((document.getElementById("numberFort") as HTMLInputElement).value)
+                        number_of_troops: ui.popup.value
                     })}));
                     skipFortify(new CustomEvent(""));
             }
@@ -425,14 +417,14 @@ export class Moves{
         function skipFortify(e: CustomEvent){
             document.removeEventListener("SkipFortify", skipFortify);
             document.removeEventListener("CountryClickedOn", listenForFortify);
-            document.removeEventListener("SubmitNumberFort", listenForFortifySubmit);
-            document.getElementById("popupNumberFort").style.display = "none";
+            document.removeEventListener("PopupSubmit", listenForFortifySubmit);
+            ui.popup.visible = false;
             ui.clearColour()
         }
 
         document.addEventListener("SkipFortify", skipFortify);
         document.addEventListener("CountryClickedOn", listenForFortify);
-        document.addEventListener("SubmitNumberFort", listenForFortifySubmit);
+        document.addEventListener("PopupSubmit", listenForFortifySubmit);
 
     }
 
