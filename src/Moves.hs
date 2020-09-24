@@ -146,16 +146,17 @@ module Moves (
       f (Attack (WonBattle cAtt cDef attLeft))
         | not (cAtt `isNeighbour` cDef) || (owner gs cAtt == owner gs cDef) || (owner gs cAtt /= currPlayer gs) = error "Impossible MiniPhase"
         | (nTroops >= fromEnum attLeft) && (nTroops < troops gs cAtt) =
-          Just $ ((changeMiniPhase Normal) .forceDiscard . (tryKick (owner gs cAtt) (owner gs cDef)) . (drawCard (currPlayer gs)) . (changeOwner cDef (currPlayer gs)). (changeTroops cAtt (-nTroops)) . (changeTroops cDef nTroops)) gs
+          Just $ (forceDiscard . (tryKick (owner gs cAtt) (owner gs cDef)) . (tryDrawCard (currPlayer gs)) . (changeOwner cDef (currPlayer gs)). (changeTroops cAtt (-nTroops)) . (changeTroops cDef nTroops)) gs
         | otherwise = Nothing
         where forceDiscard gs' = if (length (cards gs' (currPlayer gs')) >= 6)
                                    then changeMiniPhase TimeToTrade gs'
-                                   else gs'
+                                   else changeMiniPhase Normal gs'
       f _ = Nothing
       tryKick :: Player -> Player -> GameState -> GameState
       tryKick pAtt pDef gs' = if all ((/= pDef).owner gs') [toEnum 0 :: Country ..]
                           then kick pAtt pDef gs'
                           else gs'
+      tryDrawCard p gs' = if (hasDrawn gs') then gs' else drawCard p gs'
 
   -- |Only valid during the 'Attack' 'TimeToTrade' 'MiniPhase'. Takes a 'TradeIn' (owned by the current player) and caches it in for troops.
   trade :: TradeIn -> [(Country, Int)] -> GameState -> Maybe GameState
