@@ -85,6 +85,7 @@ define(["require", "exports", "./elements"], function (require, exports, element
             const me = this.me;
             const currentPlayer = board.players[0];
             this.ui.draw(board);
+            this.ui.addPhase("Setup");
             if (this.me != currentPlayer) {
                 return;
             }
@@ -108,7 +109,8 @@ define(["require", "exports", "./elements"], function (require, exports, element
             const me = this.me;
             const currentPlayer = board.players[0];
             const ui = this.ui;
-            this.ui.draw(board);
+            ui.draw(board);
+            ui.addPhase("Reinforce");
             if (this.me != currentPlayer) {
                 return;
             }
@@ -117,10 +119,12 @@ define(["require", "exports", "./elements"], function (require, exports, element
             var cardsToTrade = [new Array(), new Array()];
             var tradeIn = [new Array(), new Array()];
             var self = this;
+            ui.addRecruit(toReinforce);
             function listenForReinforce(e) {
                 const country = e.detail;
                 if (board.owner(country) == me) {
                     toReinforce -= 1;
+                    ui.addRecruit(toReinforce);
                     console.log(toReinforce);
                     board.changeTroops(country, board.troops(country) + 1);
                     ui.draw(board);
@@ -199,7 +203,8 @@ define(["require", "exports", "./elements"], function (require, exports, element
             const attColour = this.attColour;
             const defColour = this.defColour;
             const currentPlayer = board.players[0];
-            this.ui.draw(board);
+            ui.draw(board);
+            ui.addPhase("Attack");
             if (this.me != currentPlayer) {
                 return;
             }
@@ -211,20 +216,24 @@ define(["require", "exports", "./elements"], function (require, exports, element
                     ac = country;
                     ui.setColour(ac, attColour);
                     ui.draw(board);
+                    ui.addPhase("Attack");
                 }
                 else if (ac == country) {
                     ui.setColour(ac, "white");
                     ui.draw(board);
+                    ui.addPhase("Attack");
                     ac = null;
                 }
                 if (board.owner(country) != me && dc == null) {
                     dc = country;
                     ui.setColour(dc, defColour);
                     ui.draw(board);
+                    ui.addPhase("Attack");
                 }
                 else if (dc == country) {
                     ui.setColour(dc, "white");
                     ui.draw(board);
+                    ui.addPhase("Attack");
                     dc = null;
                 }
                 if (dc != null && ac != null) {
@@ -319,7 +328,8 @@ define(["require", "exports", "./elements"], function (require, exports, element
             const attColour = this.attColour;
             const defColour = this.defColour;
             const currentPlayer = board.players[0];
-            this.ui.draw(board);
+            ui.draw(board);
+            ui.addPhase("Fortify");
             if (this.me != currentPlayer) {
                 return;
             }

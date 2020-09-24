@@ -7,8 +7,10 @@ import {Player} from "./elements";
 
 //-- Global Variables -----------------------
 
-function countryClicked(e : MouseEvent, r : number, canvas : HTMLElement){
-    let country = countryOn(e, r, canvas);
+function countryClicked(e : MouseEvent, r : number, xoff : number, yoff : number){
+
+
+    let country = countryOn(e, r, xoff, yoff);
     if (country != null){
         document.dispatchEvent(new CustomEvent("CountryClickedOn",{detail: country}));
     }
@@ -26,10 +28,7 @@ function countryClicked(e : MouseEvent, r : number, canvas : HTMLElement){
     conn.me = colour;
     const canvas=document.getElementById("canvas");
 
-    //const popup = document.getElementById("popupBox");
-    //popup.classList.add("show");
-
-//-- Listeners ------------------------------
+    //-- Listeners ------------------------------
     document.getElementById("startGame").onclick = conn.start_game.bind(conn);
     document.getElementById("endAttack").onclick = (() => {document.dispatchEvent(new CustomEvent("EndAttack"))});
     document.getElementById("skipFortify").onclick = (() => {document.dispatchEvent(new CustomEvent("SkipFortify"))});
@@ -38,18 +37,33 @@ function countryClicked(e : MouseEvent, r : number, canvas : HTMLElement){
     document.getElementById("popupSubmit").onclick = (() => {document.dispatchEvent(new CustomEvent("PopupSubmit"))});
     //document.getElementById("cancelNumberTroops").onclick = (() => {document.getElementById("popupNumberTroops").style.display = "none";});
 
-
-
-
-
     //-- That Pass Information In -----------
-    canvas.onmouseup = function(e : MouseEvent){countryClicked(e, ui.outerRadius, canvas);};
     document.addEventListener('Setup', function (e : CustomEvent) {moves.setup(e.detail)});
     document.addEventListener('Reinforce', function (e : CustomEvent) {moves.reinforce(e.detail)});
     document.addEventListener('Attack', function (e : CustomEvent) {moves.attack(e.detail)});
     document.addEventListener('Fortify', function (e : CustomEvent) {moves.fortify(e.detail)});
     document.addEventListener('MidBattle', function (e : CustomEvent) {moves.chooseDefenders(e.detail.board, e.detail.ac, e.detail.dc, e.detail.att)});
     document.addEventListener('BattleEnd', function (e : CustomEvent) {moves.invade(e.detail.board, e.detail.ac, e.detail.dc, e.detail.attrem)});
+
+    const rect = canvas.getBoundingClientRect()
+
+    // IDK why +1 but seems to make it recognise perfectly
+    const xoff = rect.left + ui.borderSize + 1;
+    const yoff = rect.top + ui.borderSize + 1;
+
+    canvas.onmouseup = function(e : MouseEvent){countryClicked(e, ui.outerRadius, xoff, yoff);};
+    canvas.onmousemove = function(e : MouseEvent){
+        const country = countryOn(e, ui.outerRadius, xoff, yoff);
+        let hover = false;
+        let hoverID = "";
+        if (country == null){
+            hover = false;
+        } else {
+            hover = true;
+            hoverID = country;
+        }
+        document.getElementById("countryNameBadge").innerHTML = hover ? hoverID : "";
+    }
 
     //-- That Pass Information Out ----------
     document.addEventListener('Send', function (e : CustomEvent) {conn.send(e.detail)});

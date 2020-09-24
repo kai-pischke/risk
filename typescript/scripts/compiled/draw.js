@@ -57,13 +57,15 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
         constructor(player) {
             this.outerRadius = 35;
             this.innerRadius = 25;
+            this.borderSize = 3;
             this._countryColour = {};
             const canvas = document.getElementById("canvas");
             this.popup = new Popup();
             if (!(canvas instanceof HTMLCanvasElement)) {
                 throw new Error("The element of is not an HTMLCanvasElement.");
             }
-            canvas.style.border = "3px solid " + this.playerToColour(player);
+            this.colour = this.playerToColour(player);
+            canvas.style.border = this.borderSize.toString() + "px solid " + this.colour;
             console.log(player);
             this._ctx = canvas.getContext("2d");
             this._ctx.textBaseline = "middle";
@@ -78,6 +80,7 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
         }
         draw(state) {
             // draw lines
+            this._ctx.fillStyle = "white";
             elements_1.ALL_COUNTRIES.forEach((country, c_index) => {
                 const myloc = map_1.COUNTRY_LOC[country];
                 neighbours_1.NEIGHBOURS[country].forEach((neighbour, n_index) => {
@@ -108,30 +111,7 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
                 this._ctx.beginPath();
                 this._ctx.arc(myloc.x, myloc.y, this.outerRadius, 0, Math.PI * 2, false);
                 // get fill
-                let fill;
-                const owner = state.owner(country);
-                switch (owner) {
-                    case "Black":
-                        fill = "black";
-                        break;
-                    case "Blue":
-                        fill = "#63ace5";
-                        break;
-                    case "Green":
-                        fill = "#7fbf7f";
-                        break;
-                    case "Red":
-                        fill = "#ff6f69";
-                        break;
-                    case "Yellow":
-                        fill = "#ffcc5c";
-                        break;
-                    case "Empty":
-                        fill = "#b266b2";
-                        break;
-                    default:
-                        const _exhaustiveCheck = owner;
-                }
+                const fill = this.playerToColour(state.owner(country));
                 this._ctx.fillStyle = fill;
                 this._ctx.fill();
                 this._ctx.closePath();
@@ -167,6 +147,14 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
                 str = "<div class = \"card\" id = \"card" + i.toString() + "\" data-type = \"" + c + "\"><img src = \"" + imgstr + "\" width = 100%> <div class = \"container\"><h4><b>" + c + "</b></h4></div>";
                 hand.innerHTML += str;
             }
+            const numPlayers = state.players.length;
+            const s = 600 / numPlayers;
+            for (i = 0; i < numPlayers; i++) {
+                this._ctx.fillStyle = this.playerToColour(state.players[i]);
+                this._ctx.fillRect(1200, 200 + i * s, 200, s);
+            }
+            this._ctx.fillStyle = "white";
+            this._ctx.fillRect(1200, 0, 200, 200);
         }
         playerToColour(p) {
             let fill;
@@ -193,6 +181,18 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
                     const _exhaustiveCheck = p;
             }
             return fill;
+        }
+        addPhase(p) {
+            this._ctx.fillStyle = "black";
+            this._ctx.font = "40px 'Helvetica'";
+            this._ctx.fillText(p, 1300, 50);
+        }
+        addRecruit(toRecruit) {
+            if (toRecruit != null) {
+                this._ctx.fillStyle = "black";
+                this._ctx.font = "40px 'Helvetica'";
+                this._ctx.fillText(toRecruit.toString(), 1300, 150);
+            }
         }
     }
     exports.Draw = Draw;

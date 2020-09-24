@@ -85,7 +85,7 @@ export class Moves{
         const currentPlayer =  board.players[0]
 
         this.ui.draw(board);
-
+        this.ui.addPhase("Setup")
         if (this.me != currentPlayer){
             return;
         }
@@ -114,21 +114,26 @@ export class Moves{
         const currentPlayer = board.players[0];
         const ui = this.ui;
 
-        this.ui.draw(board);
+        ui.draw(board);
+        ui.addPhase("Reinforce")
         if (this.me != currentPlayer){
             return;
         }
+
+
         var toReinforce = this.numberToReinforce(board, currentPlayer);
         var countryMap = {} as Record<Country, number>;
         var cardsToTrade = [new Array(), new Array()]
         var tradeIn = [new Array(), new Array()]
         var self = this;
 
+        ui.addRecruit(toReinforce)
 
         function listenForReinforce(e : CustomEvent) {
             const country = e.detail;
             if (board.owner(country) == me){
                 toReinforce -=1
+                ui.addRecruit(toReinforce)
                 console.log(toReinforce)
                 board.changeTroops(country, board.troops(country) + 1)
                 ui.draw(board);
@@ -215,8 +220,8 @@ export class Moves{
         const attColour = this.attColour;
         const defColour = this.defColour;
         const currentPlayer = board.players[0];
-
-        this.ui.draw(board);
+        ui.draw(board);
+        ui.addPhase("Attack")
         if (this.me != currentPlayer){
             return;
         }
@@ -231,9 +236,11 @@ export class Moves{
                 ac = country;
                 ui.setColour(ac, attColour);
                 ui.draw(board);
+                ui.addPhase("Attack")
             } else if (ac == country){
                 ui.setColour(ac, "white")
                 ui.draw(board);
+                ui.addPhase("Attack")
                 ac = null;
             }
 
@@ -241,9 +248,11 @@ export class Moves{
                 dc = country;
                 ui.setColour(dc, defColour);
                 ui.draw(board);
+                ui.addPhase("Attack")
             } else if (dc == country){
                 ui.setColour(dc, "white")
                 ui.draw(board);
+                ui.addPhase("Attack")
                 dc = null;
             }
 
@@ -362,7 +371,8 @@ export class Moves{
         const defColour = this.defColour;
         const currentPlayer = board.players[0];
 
-        this.ui.draw(board);
+        ui.draw(board);
+        ui.addPhase("Fortify")
         if (this.me != currentPlayer){
             return;
         }

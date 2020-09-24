@@ -46,12 +46,10 @@ define(["require", "exports", "./elements"], function (require, exports, element
         "Western United States": { x: 151, y: 300 },
         "Yakutsk": { x: 1000, y: 100 },
     };
-    function countryOn(e, r, canvas) {
+    function countryOn(e, r, xoff, yoff) {
         e.preventDefault();
-        // get the mouse position
-        const rect = canvas.getBoundingClientRect();
-        var mouseX = e.clientX - rect.left;
-        var mouseY = e.clientY - rect.top;
+        var mouseX = e.clientX - xoff;
+        var mouseY = e.clientY - yoff;
         // iterate each shape in the shapes array
         for (var i = 0; i < elements_1.ALL_COUNTRIES.length; i++) {
             let country = elements_1.ALL_COUNTRIES[i];
