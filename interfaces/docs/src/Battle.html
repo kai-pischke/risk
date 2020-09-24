@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="%24con2tag_G1iSHElnihPKGiqN2aNyWk"><span id="%24con2tag_ClW5x8OCtYu6UM94iMTeWj"></span></span><span class="hs-comment">{-|
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="%24con2tag_JKpSmRby7QKDHCBDdaxohx"><span id="%24con2tag_K0Zngtw6pyaFVPEPUUTiwG"></span></span><span class="hs-comment">{-|
 Module      : Battle
 Description : Battle interaction logic.
 Maintainer  : Kai
@@ -13,7 +13,7 @@ This module deals with attacking and defending types and gives an interface to c
 </span><span id="line-13"></span><span>
 </span><span id="line-14"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">System.Random</span></span><span>
 </span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span>
-</span><span id="line-16"></span><span class="hs-keyword">data</span><span> </span><span id="Defenders"><span class="annot"><a href="Battle.html#Defenders"><span class="hs-identifier hs-var">Defenders</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="OneDef"><span class="annot"><a href="Battle.html#OneDef"><span class="hs-identifier hs-var">OneDef</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="TwoDef"><span class="annot"><a href="Battle.html#TwoDef"><span class="hs-identifier hs-var">TwoDef</span></a></span></span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679127287"><span id="local-6989586621679127289"><span class="annot"><span class="annottext">Defenders -&gt; Defenders -&gt; Bool
+</span><span id="line-16"></span><span class="hs-keyword">data</span><span> </span><span id="Defenders"><span class="annot"><a href="Battle.html#Defenders"><span class="hs-identifier hs-var">Defenders</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="OneDef"><span class="annot"><a href="Battle.html#OneDef"><span class="hs-identifier hs-var">OneDef</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="TwoDef"><span class="annot"><a href="Battle.html#TwoDef"><span class="hs-identifier hs-var">TwoDef</span></a></span></span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679128722"><span id="local-6989586621679128724"><span class="annot"><span class="annottext">Defenders -&gt; Defenders -&gt; Bool
 (Defenders -&gt; Defenders -&gt; Bool)
 -&gt; (Defenders -&gt; Defenders -&gt; Bool) -&gt; Eq Defenders
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -21,7 +21,7 @@ forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c/= :: Defenders -&gt; Defenders -&gt; Bool
 == :: Defenders -&gt; Defenders -&gt; Bool
 $c== :: Defenders -&gt; Defenders -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127280"><span id="local-6989586621679127282"><span id="local-6989586621679127284"><span class="annot"><span class="annottext">Int -&gt; Defenders -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679128715"><span id="local-6989586621679128717"><span id="local-6989586621679128719"><span class="annot"><span class="annottext">Int -&gt; Defenders -&gt; ShowS
 [Defenders] -&gt; ShowS
 Defenders -&gt; String
 (Int -&gt; Defenders -&gt; ShowS)
@@ -36,7 +36,7 @@ show :: Defenders -&gt; String
 $cshow :: Defenders -&gt; String
 showsPrec :: Int -&gt; Defenders -&gt; ShowS
 $cshowsPrec :: Int -&gt; Defenders -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127264"><span id="local-6989586621679127266"><span id="local-6989586621679127268"><span id="local-6989586621679127270"><span id="local-6989586621679127272"><span id="local-6989586621679127274"><span id="local-6989586621679127276"><span class="annot"><span class="annottext">Eq Defenders
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679128699"><span id="local-6989586621679128701"><span id="local-6989586621679128703"><span id="local-6989586621679128705"><span id="local-6989586621679128707"><span id="local-6989586621679128709"><span id="local-6989586621679128711"><span class="annot"><span class="annottext">Eq Defenders
 Eq Defenders =&gt;
 (Defenders -&gt; Defenders -&gt; Ordering)
 -&gt; (Defenders -&gt; Defenders -&gt; Bool)
@@ -75,7 +75,7 @@ compare :: Defenders -&gt; Defenders -&gt; Ordering
 $ccompare :: Defenders -&gt; Defenders -&gt; Ordering
 $cp1Ord :: Eq Defenders
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-17"></span><span class="hs-keyword">data</span><span> </span><span id="Attackers"><span class="annot"><a href="Battle.html#Attackers"><span class="hs-identifier hs-var">Attackers</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="OneAtt"><span class="annot"><a href="Battle.html#OneAtt"><span class="hs-identifier hs-var">OneAtt</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="TwoAtt"><span class="annot"><a href="Battle.html#TwoAtt"><span class="hs-identifier hs-var">TwoAtt</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="ThreeAtt"><span class="annot"><a href="Battle.html#ThreeAtt"><span class="hs-identifier hs-var">ThreeAtt</span></a></span></span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679127256"><span id="local-6989586621679127258"><span class="annot"><span class="annottext">Attackers -&gt; Attackers -&gt; Bool
+</span><span id="line-17"></span><span class="hs-keyword">data</span><span> </span><span id="Attackers"><span class="annot"><a href="Battle.html#Attackers"><span class="hs-identifier hs-var">Attackers</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="OneAtt"><span class="annot"><a href="Battle.html#OneAtt"><span class="hs-identifier hs-var">OneAtt</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="TwoAtt"><span class="annot"><a href="Battle.html#TwoAtt"><span class="hs-identifier hs-var">TwoAtt</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="ThreeAtt"><span class="annot"><a href="Battle.html#ThreeAtt"><span class="hs-identifier hs-var">ThreeAtt</span></a></span></span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679128691"><span id="local-6989586621679128693"><span class="annot"><span class="annottext">Attackers -&gt; Attackers -&gt; Bool
 (Attackers -&gt; Attackers -&gt; Bool)
 -&gt; (Attackers -&gt; Attackers -&gt; Bool) -&gt; Eq Attackers
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -83,7 +83,7 @@ forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c/= :: Attackers -&gt; Attackers -&gt; Bool
 == :: Attackers -&gt; Attackers -&gt; Bool
 $c== :: Attackers -&gt; Attackers -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127250"><span id="local-6989586621679127252"><span id="local-6989586621679127254"><span class="annot"><span class="annottext">Int -&gt; Attackers -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679128685"><span id="local-6989586621679128687"><span id="local-6989586621679128689"><span class="annot"><span class="annottext">Int -&gt; Attackers -&gt; ShowS
 [Attackers] -&gt; ShowS
 Attackers -&gt; String
 (Int -&gt; Attackers -&gt; ShowS)
@@ -98,7 +98,7 @@ show :: Attackers -&gt; String
 $cshow :: Attackers -&gt; String
 showsPrec :: Int -&gt; Attackers -&gt; ShowS
 $cshowsPrec :: Int -&gt; Attackers -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127235"><span id="local-6989586621679127237"><span id="local-6989586621679127239"><span id="local-6989586621679127241"><span id="local-6989586621679127243"><span id="local-6989586621679127245"><span id="local-6989586621679127247"><span class="annot"><span class="annottext">Eq Attackers
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679128670"><span id="local-6989586621679128672"><span id="local-6989586621679128674"><span id="local-6989586621679128676"><span id="local-6989586621679128678"><span id="local-6989586621679128680"><span id="local-6989586621679128682"><span class="annot"><span class="annottext">Eq Attackers
 Eq Attackers =&gt;
 (Attackers -&gt; Attackers -&gt; Ordering)
 -&gt; (Attackers -&gt; Attackers -&gt; Bool)
@@ -139,119 +139,119 @@ $cp1Ord :: Eq Attackers
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-18"></span><span>
 </span><span id="line-19"></span><span class="hs-comment">-- | Note that for Enum, enumeration starts at 1 not 0.</span><span>
-</span><span id="line-20"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679127221"><span id="local-6989586621679127223"><span id="local-6989586621679127225"><span id="local-6989586621679127227"><span id="local-6989586621679127231"><span id="local-6989586621679127233"><span class="annot"><span class="hs-identifier hs-type">Enum</span></span><span> </span><span class="annot"><a href="Battle.html#Defenders"><span class="hs-identifier hs-type">Defenders</span></a></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-21"></span><span>    </span><span id="local-6989586621679127219"><span class="annot"><span class="annottext">fromEnum :: Defenders -&gt; Int
+</span><span id="line-20"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679128656"><span id="local-6989586621679128658"><span id="local-6989586621679128660"><span id="local-6989586621679128662"><span id="local-6989586621679128666"><span id="local-6989586621679128668"><span class="annot"><span class="hs-identifier hs-type">Enum</span></span><span> </span><span class="annot"><a href="Battle.html#Defenders"><span class="hs-identifier hs-type">Defenders</span></a></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-21"></span><span>    </span><span id="local-6989586621679128654"><span class="annot"><span class="annottext">fromEnum :: Defenders -&gt; Int
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var">fromEnum</span></span></span><span> </span><span class="annot"><a href="Battle.html#OneDef"><span class="hs-identifier hs-type">OneDef</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-number">1</span></span><span>
 </span><span id="line-22"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><a href="Battle.html#TwoDef"><span class="hs-identifier hs-type">TwoDef</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-number">2</span></span><span> </span><span>
-</span><span id="line-23"></span><span>    </span><span id="local-6989586621679127217"><span class="annot"><span class="annottext">toEnum :: Int -&gt; Defenders
+</span><span id="line-23"></span><span>    </span><span id="local-6989586621679128652"><span class="annot"><span class="annottext">toEnum :: Int -&gt; Defenders
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var">toEnum</span></span></span><span> </span><span class="hs-number">1</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Defenders
 </span><a href="Battle.html#OneDef"><span class="hs-identifier hs-var">OneDef</span></a></span><span>
 </span><span id="line-24"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="hs-number">2</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Defenders
 </span><a href="Battle.html#TwoDef"><span class="hs-identifier hs-var">TwoDef</span></a></span><span>
-</span><span id="line-25"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span id="local-6989586621679127215"><span class="annot"><span class="annottext">n :: Int
-</span><a href="#local-6989586621679127215"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Defenders
+</span><span id="line-25"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span id="local-6989586621679128650"><span class="annot"><span class="annottext">n :: Int
+</span><a href="#local-6989586621679128650"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Defenders
 forall a. HasCallStack =&gt; String -&gt; a
 </span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-string">&quot;toEnum{Defenders}: tag (&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; String
 forall a. Show a =&gt; a -&gt; String
 </span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679127215"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><a href="#local-6989586621679128650"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="hs-string">&quot;) is outside of enumeration's range (1,2)&quot;</span></span><span class="hs-special">)</span><span>
 </span><span id="line-26"></span><span>
 </span><span id="line-27"></span><span class="hs-comment">-- | Note that for Enum, enumeration starts at 1 not 0.</span><span>
-</span><span id="line-28"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679127199"><span id="local-6989586621679127201"><span id="local-6989586621679127203"><span id="local-6989586621679127205"><span id="local-6989586621679127209"><span id="local-6989586621679127211"><span class="annot"><span class="hs-identifier hs-type">Enum</span></span><span> </span><span class="annot"><a href="Battle.html#Attackers"><span class="hs-identifier hs-type">Attackers</span></a></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-29"></span><span>    </span><span id="local-6989586621679127198"><span class="annot"><span class="annottext">fromEnum :: Attackers -&gt; Int
-</span><a href="#local-6989586621679127198"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromEnum</span></a></span></span><span> </span><span class="annot"><a href="Battle.html#OneAtt"><span class="hs-identifier hs-type">OneAtt</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-number">1</span></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679128634"><span id="local-6989586621679128636"><span id="local-6989586621679128638"><span id="local-6989586621679128640"><span id="local-6989586621679128644"><span id="local-6989586621679128646"><span class="annot"><span class="hs-identifier hs-type">Enum</span></span><span> </span><span class="annot"><a href="Battle.html#Attackers"><span class="hs-identifier hs-type">Attackers</span></a></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-29"></span><span>    </span><span id="local-6989586621679128633"><span class="annot"><span class="annottext">fromEnum :: Attackers -&gt; Int
+</span><a href="#local-6989586621679128633"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromEnum</span></a></span></span><span> </span><span class="annot"><a href="Battle.html#OneAtt"><span class="hs-identifier hs-type">OneAtt</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-number">1</span></span><span>
 </span><span id="line-30"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><a href="Battle.html#TwoAtt"><span class="hs-identifier hs-type">TwoAtt</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-number">2</span></span><span>
 </span><span id="line-31"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><a href="Battle.html#ThreeAtt"><span class="hs-identifier hs-type">ThreeAtt</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-number">3</span></span><span> </span><span>
-</span><span id="line-32"></span><span>    </span><span id="local-6989586621679127197"><span class="annot"><span class="annottext">toEnum :: Int -&gt; Attackers
-</span><a href="#local-6989586621679127197"><span class="hs-identifier hs-var hs-var hs-var hs-var">toEnum</span></a></span></span><span> </span><span class="hs-number">1</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Attackers
+</span><span id="line-32"></span><span>    </span><span id="local-6989586621679128632"><span class="annot"><span class="annottext">toEnum :: Int -&gt; Attackers
+</span><a href="#local-6989586621679128632"><span class="hs-identifier hs-var hs-var hs-var hs-var">toEnum</span></a></span></span><span> </span><span class="hs-number">1</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Attackers
 </span><a href="Battle.html#OneAtt"><span class="hs-identifier hs-var">OneAtt</span></a></span><span>
 </span><span id="line-33"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="hs-number">2</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Attackers
 </span><a href="Battle.html#TwoAtt"><span class="hs-identifier hs-var">TwoAtt</span></a></span><span>
 </span><span id="line-34"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="hs-number">3</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Attackers
 </span><a href="Battle.html#ThreeAtt"><span class="hs-identifier hs-var">ThreeAtt</span></a></span><span>
-</span><span id="line-35"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span id="local-6989586621679127196"><span class="annot"><span class="annottext">n :: Int
-</span><a href="#local-6989586621679127196"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Attackers
+</span><span id="line-35"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span id="local-6989586621679128631"><span class="annot"><span class="annottext">n :: Int
+</span><a href="#local-6989586621679128631"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Attackers
 forall a. HasCallStack =&gt; String -&gt; a
 </span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-string">&quot;toEnum{Attackers}: tag (&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; String
 forall a. Show a =&gt; a -&gt; String
 </span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679127196"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><a href="#local-6989586621679128631"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="hs-string">&quot;) is outside of enumeration's range (1,3)&quot;</span></span><span class="hs-special">)</span><span>
 </span><span id="line-36"></span><span>
-</span><span id="line-37"></span><span id="local-6989586621679127310"><span class="annot"><a href="Battle.html#roll"><span class="hs-identifier hs-type">roll</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">RandomGen</span></span><span> </span><span class="annot"><a href="#local-6989586621679127310"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679127310"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679127310"><span class="hs-identifier hs-type">g</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span class="hs-special">)</span></span><span>
+</span><span id="line-37"></span><span id="local-6989586621679128745"><span class="annot"><a href="Battle.html#roll"><span class="hs-identifier hs-type">roll</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">RandomGen</span></span><span> </span><span class="annot"><a href="#local-6989586621679128745"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679128745"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679128745"><span class="hs-identifier hs-type">g</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span class="hs-special">)</span></span><span>
 </span><span id="line-38"></span><span id="roll"><span class="annot"><span class="annottext">roll :: Int -&gt; g -&gt; (g, [Int])
-</span><a href="Battle.html#roll"><span class="hs-identifier hs-var hs-var">roll</span></a></span></span><span> </span><span class="hs-number">0</span><span> </span><span id="local-6989586621679127194"><span class="annot"><span class="annottext">g :: g
-</span><a href="#local-6989586621679127194"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">g
-</span><a href="#local-6989586621679127194"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span>
-</span><span id="line-39"></span><span class="annot"><a href="Battle.html#roll"><span class="hs-identifier hs-var">roll</span></a></span><span> </span><span id="local-6989586621679127193"><span class="annot"><span class="annottext">n :: Int
-</span><a href="#local-6989586621679127193"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span id="local-6989586621679127192"><span class="annot"><span class="annottext">g :: g
-</span><a href="#local-6989586621679127192"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679127191"><span class="annot"><span class="annottext">x :: Int
-</span><a href="#local-6989586621679127191"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127190"><span class="annot"><span class="annottext">g' :: g
-</span><a href="#local-6989586621679127190"><span class="hs-identifier hs-var">g'</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int, Int) -&gt; g -&gt; (Int, g)
+</span><a href="Battle.html#roll"><span class="hs-identifier hs-var hs-var">roll</span></a></span></span><span> </span><span class="hs-number">0</span><span> </span><span id="local-6989586621679128629"><span class="annot"><span class="annottext">g :: g
+</span><a href="#local-6989586621679128629"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">g
+</span><a href="#local-6989586621679128629"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span class="annot"><a href="Battle.html#roll"><span class="hs-identifier hs-var">roll</span></a></span><span> </span><span id="local-6989586621679128628"><span class="annot"><span class="annottext">n :: Int
+</span><a href="#local-6989586621679128628"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span id="local-6989586621679128627"><span class="annot"><span class="annottext">g :: g
+</span><a href="#local-6989586621679128627"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679128626"><span class="annot"><span class="annottext">x :: Int
+</span><a href="#local-6989586621679128626"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679128625"><span class="annot"><span class="annottext">g' :: g
+</span><a href="#local-6989586621679128625"><span class="hs-identifier hs-var">g'</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int, Int) -&gt; g -&gt; (Int, g)
 forall g a. (RandomGen g, UniformRange a) =&gt; (a, a) -&gt; g -&gt; (a, g)
 </span><span class="hs-identifier hs-var">uniformR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-number">6</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">g
-</span><a href="#local-6989586621679127192"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><a href="#local-6989586621679128627"><span class="hs-identifier hs-var">g</span></a></span><span>
 </span><span id="line-40"></span><span>           </span><span class="hs-keyword">in</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679127191"><span class="hs-identifier hs-var">x</span></a></span><span class="annot"><span class="annottext">Int -&gt; [Int] -&gt; [Int]
+</span><a href="#local-6989586621679128626"><span class="hs-identifier hs-var">x</span></a></span><span class="annot"><span class="annottext">Int -&gt; [Int] -&gt; [Int]
 forall a. a -&gt; [a] -&gt; [a]
 </span><span class="hs-glyph hs-var">:</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; [Int]) -&gt; (g, [Int]) -&gt; (g, [Int])
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; g -&gt; (g, [Int])
 forall g. RandomGen g =&gt; Int -&gt; g -&gt; (g, [Int])
 </span><a href="Battle.html#roll"><span class="hs-identifier hs-var">roll</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679127193"><span class="hs-identifier hs-var">n</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+</span><a href="#local-6989586621679128628"><span class="hs-identifier hs-var">n</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
 forall a. Num a =&gt; a -&gt; a -&gt; a
 </span><span class="hs-glyph hs-var">-</span></span><span class="annot"><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">g
-</span><a href="#local-6989586621679127190"><span class="hs-identifier hs-var">g'</span></a></span><span>
+</span><a href="#local-6989586621679128625"><span class="hs-identifier hs-var">g'</span></a></span><span>
 </span><span id="line-41"></span><span>
 </span><span id="line-42"></span><span class="hs-comment">-- | Takes a number of attackers ('Attackers') and a number of defenders ('Defenders') and calculates the attackers lost, the defeners lost and the new StdGen (returned in a tuple in that order).</span><span>
 </span><span id="line-43"></span><span class="annot"><a href="Battle.html#doBattle"><span class="hs-identifier hs-type">doBattle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Battle.html#Attackers"><span class="hs-identifier hs-type">Attackers</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Battle.html#Defenders"><span class="hs-identifier hs-type">Defenders</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StdGen</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StdGen</span></span><span class="hs-special">)</span><span>
 </span><span id="line-44"></span><span id="doBattle"><span class="annot"><span class="annottext">doBattle :: Attackers -&gt; Defenders -&gt; StdGen -&gt; (Int, Int, StdGen)
-</span><a href="Battle.html#doBattle"><span class="hs-identifier hs-var hs-var">doBattle</span></a></span></span><span> </span><span id="local-6989586621679127187"><span class="annot"><span class="annottext">a :: Attackers
-</span><a href="#local-6989586621679127187"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621679127186"><span class="annot"><span class="annottext">d :: Defenders
-</span><a href="#local-6989586621679127186"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span id="local-6989586621679127185"><span class="annot"><span class="annottext">g :: StdGen
-</span><a href="#local-6989586621679127185"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679127184"><span class="hs-identifier hs-var">attackerLosses</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679127183"><span class="hs-identifier hs-var">defenderLosses</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">StdGen
-</span><a href="#local-6989586621679127182"><span class="hs-identifier hs-var">g''</span></a></span><span class="hs-special">)</span><span>
+</span><a href="Battle.html#doBattle"><span class="hs-identifier hs-var hs-var">doBattle</span></a></span></span><span> </span><span id="local-6989586621679128622"><span class="annot"><span class="annottext">a :: Attackers
+</span><a href="#local-6989586621679128622"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621679128621"><span class="annot"><span class="annottext">d :: Defenders
+</span><a href="#local-6989586621679128621"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span id="local-6989586621679128620"><span class="annot"><span class="annottext">g :: StdGen
+</span><a href="#local-6989586621679128620"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679128619"><span class="hs-identifier hs-var">attackerLosses</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679128618"><span class="hs-identifier hs-var">defenderLosses</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679128617"><span class="hs-identifier hs-var">g''</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-45"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-46"></span><span>    </span><span class="hs-special">(</span><span id="local-6989586621679127181"><span class="annot"><span class="annottext">g' :: StdGen
-</span><a href="#local-6989586621679127181"><span class="hs-identifier hs-var">g'</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127180"><span class="annot"><span class="annottext">as :: [Int]
-</span><a href="#local-6989586621679127180"><span class="hs-keyword hs-var">as</span></a></span></span><span class="hs-special">)</span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; StdGen -&gt; (StdGen, [Int])
+</span><span id="line-46"></span><span>    </span><span class="hs-special">(</span><span id="local-6989586621679128616"><span class="annot"><span class="annottext">g' :: StdGen
+</span><a href="#local-6989586621679128616"><span class="hs-identifier hs-var">g'</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679128615"><span class="annot"><span class="annottext">as :: [Int]
+</span><a href="#local-6989586621679128615"><span class="hs-keyword hs-var">as</span></a></span></span><span class="hs-special">)</span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; StdGen -&gt; (StdGen, [Int])
 forall g. RandomGen g =&gt; Int -&gt; g -&gt; (g, [Int])
 </span><a href="Battle.html#roll"><span class="hs-identifier hs-var">roll</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Attackers -&gt; Int
 forall a. Enum a =&gt; a -&gt; Int
 </span><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">Attackers
-</span><a href="#local-6989586621679127187"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">StdGen
-</span><a href="#local-6989586621679127185"><span class="hs-identifier hs-var">g</span></a></span><span>
-</span><span id="line-47"></span><span>    </span><span class="hs-special">(</span><span id="local-6989586621679127182"><span class="annot"><span class="annottext">g'' :: StdGen
-</span><a href="#local-6989586621679127182"><span class="hs-identifier hs-var">g''</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127179"><span class="annot"><span class="annottext">ds :: [Int]
-</span><a href="#local-6989586621679127179"><span class="hs-identifier hs-var">ds</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; StdGen -&gt; (StdGen, [Int])
+</span><a href="#local-6989586621679128622"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679128620"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span id="line-47"></span><span>    </span><span class="hs-special">(</span><span id="local-6989586621679128617"><span class="annot"><span class="annottext">g'' :: StdGen
+</span><a href="#local-6989586621679128617"><span class="hs-identifier hs-var">g''</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679128614"><span class="annot"><span class="annottext">ds :: [Int]
+</span><a href="#local-6989586621679128614"><span class="hs-identifier hs-var">ds</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; StdGen -&gt; (StdGen, [Int])
 forall g. RandomGen g =&gt; Int -&gt; g -&gt; (g, [Int])
 </span><a href="Battle.html#roll"><span class="hs-identifier hs-var">roll</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Defenders -&gt; Int
 forall a. Enum a =&gt; a -&gt; Int
 </span><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">Defenders
-</span><a href="#local-6989586621679127186"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">StdGen
-</span><a href="#local-6989586621679127181"><span class="hs-identifier hs-var">g'</span></a></span><span>
-</span><span id="line-48"></span><span>    </span><span id="local-6989586621679127178"><span class="annot"><span class="annottext">result :: [(Int, Int)]
-</span><a href="#local-6989586621679127178"><span class="hs-identifier hs-var hs-var">result</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; [Int] -&gt; [(Int, Int)]
+</span><a href="#local-6989586621679128621"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679128616"><span class="hs-identifier hs-var">g'</span></a></span><span>
+</span><span id="line-48"></span><span>    </span><span id="local-6989586621679128613"><span class="annot"><span class="annottext">result :: [(Int, Int)]
+</span><a href="#local-6989586621679128613"><span class="hs-identifier hs-var hs-var">result</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; [Int] -&gt; [(Int, Int)]
 forall a b. [a] -&gt; [b] -&gt; [(a, b)]
 </span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Int] -&gt; [Int]
 forall a. Ord a =&gt; [a] -&gt; [a]
 </span><span class="hs-identifier hs-var">sort</span></span><span> </span><span class="annot"><span class="annottext">[Int]
-</span><a href="#local-6989586621679127180"><span class="hs-keyword hs-var">as</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Int] -&gt; [Int]
+</span><a href="#local-6989586621679128615"><span class="hs-keyword hs-var">as</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Int] -&gt; [Int]
 forall a. Ord a =&gt; [a] -&gt; [a]
 </span><span class="hs-identifier hs-var">sort</span></span><span> </span><span class="annot"><span class="annottext">[Int]
-</span><a href="#local-6989586621679127179"><span class="hs-identifier hs-var">ds</span></a></span><span class="hs-special">)</span><span> </span><span>
-</span><span id="line-49"></span><span>    </span><span id="local-6989586621679127184"><span class="annot"><span class="annottext">attackerLosses :: Int
-</span><a href="#local-6989586621679127184"><span class="hs-identifier hs-var hs-var">attackerLosses</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Int, Int)] -&gt; Int
+</span><a href="#local-6989586621679128614"><span class="hs-identifier hs-var">ds</span></a></span><span class="hs-special">)</span><span> </span><span>
+</span><span id="line-49"></span><span>    </span><span id="local-6989586621679128619"><span class="annot"><span class="annottext">attackerLosses :: Int
+</span><a href="#local-6989586621679128619"><span class="hs-identifier hs-var hs-var">attackerLosses</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Int, Int)] -&gt; Int
 forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
 </span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="annot"><span class="annottext">([(Int, Int)] -&gt; Int) -&gt; [(Int, Int)] -&gt; Int
 forall a b. (a -&gt; b) -&gt; a -&gt; b
@@ -262,9 +262,9 @@ forall a b c. (a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c
 </span><span class="hs-identifier hs-var">uncurry</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Ord a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">(&lt;)</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[(Int, Int)]
-</span><a href="#local-6989586621679127178"><span class="hs-identifier hs-var">result</span></a></span><span>
-</span><span id="line-50"></span><span>    </span><span id="local-6989586621679127183"><span class="annot"><span class="annottext">defenderLosses :: Int
-</span><a href="#local-6989586621679127183"><span class="hs-identifier hs-var hs-var">defenderLosses</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Int, Int)] -&gt; Int
+</span><a href="#local-6989586621679128613"><span class="hs-identifier hs-var">result</span></a></span><span>
+</span><span id="line-50"></span><span>    </span><span id="local-6989586621679128618"><span class="annot"><span class="annottext">defenderLosses :: Int
+</span><a href="#local-6989586621679128618"><span class="hs-identifier hs-var hs-var">defenderLosses</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Int, Int)] -&gt; Int
 forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
 </span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="annot"><span class="annottext">([(Int, Int)] -&gt; Int) -&gt; [(Int, Int)] -&gt; Int
 forall a b. (a -&gt; b) -&gt; a -&gt; b
@@ -275,4 +275,4 @@ forall a b c. (a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c
 </span><span class="hs-identifier hs-var">uncurry</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Ord a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">(&gt;=)</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[(Int, Int)]
-</span><a href="#local-6989586621679127178"><span class="hs-identifier hs-var">result</span></a></span></pre></body></html>
+</span><a href="#local-6989586621679128613"><span class="hs-identifier hs-var">result</span></a></span></pre></body></html>

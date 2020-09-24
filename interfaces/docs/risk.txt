@@ -203,14 +203,10 @@ instance GHC.Read.Read RiskBoard.Country
 instance GHC.Show.Show RiskBoard.Country
 
 module ParsePart
-data Switch a b
-LSwitch :: a -> Switch a b
-RSwitch :: b -> Switch a b
 data Owner
 Owner :: Player -> Owner
 Unowned :: Owner
 instance Data.Aeson.Types.ToJSON.ToJSON ParsePart.Owner
-instance (Data.Aeson.Types.ToJSON.ToJSON a, Data.Aeson.Types.ToJSON.ToJSON b) => Data.Aeson.Types.ToJSON.ToJSON (ParsePart.Switch a b)
 instance Data.Aeson.Types.ToJSON.ToJSON System.Random.Internal.StdGen
 instance Data.Aeson.Types.FromJSON.FromJSON System.Random.Internal.StdGen
 instance Data.Aeson.Types.ToJSON.ToJSON GameElements.Player
@@ -502,6 +498,8 @@ ChooseDefenders :: Defenders -> RequestType
 EndAttack :: RequestType
 SkipFortify :: RequestType
 Trade :: TradeIn -> [(Country, Int)] -> RequestType
+SaveGame :: RequestType
+LoadGame :: Int -> RequestType
 instance GHC.Show.Show Message.Request
 instance GHC.Classes.Eq Message.Request
 instance GHC.Show.Show Message.RequestType
@@ -527,8 +525,9 @@ decodeRequest :: ByteString -> Either Request ParseError
 -- | Encodes a <a>Response</a> to a <a>ByteString</a>.
 encodeResponse :: Response -> ByteString
 type ParseError = ByteString
-instance Data.Aeson.Types.FromJSON.FromJSON Message.Request
+instance (Data.Aeson.Types.ToJSON.ToJSON a, Data.Aeson.Types.ToJSON.ToJSON b) => Data.Aeson.Types.ToJSON.ToJSON (Parse.Switch a b)
 instance Data.Aeson.Types.ToJSON.ToJSON Message.Response
+instance Data.Aeson.Types.FromJSON.FromJSON Message.Request
 
 
 -- | This module wraps many of the functions in moves in additional

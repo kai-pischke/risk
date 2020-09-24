@@ -90,6 +90,7 @@ updateCardDrawing g = case statePhase g of
    (Attack (WonBattle _ _ _)) -> changeGetCard (const True) g
    _ -> g
 
+
 -- general helper functions --
 fmaybe :: a -> Maybe a -> a
 fmaybe d = maybe d id
@@ -106,6 +107,18 @@ modifyMapWithError :: Ord a => a -> (b -> b) -> String -> Map a b -> Map a b
 modifyMapWithError k f s m = Map.insert k (f v) m
    where v = fmaybe (error s) (Map.lookup k m)
 
+shuffle :: RandomGen g => [a] -> g -> ([a], g)
+shuffle xs g = (ys, g')
+  where (_, ys, g') = fischeryates (xs, [], g)
+
+fischeryates :: RandomGen g => ([a], [a], g) -> ([a], [a], g)
+fischeryates ([], ys, g) = ([], ys, g)
+fischeryates (xs, ys, g) = fischeryates (xs', x:ys, g')
+  where 
+  (i, g') = uniformR (0, length xs - 1) g
+  x = xs !! i
+  xs' = take i xs ++ drop (i+1) xs
+    
 -- map functions for Internal State --
 changeTroopMap :: (Map Country Int -> Map Country Int) -> GameState -> GameState
 changeTroopMap f (InternalGameState t p g h l g' d d' h') = InternalGameState (f t) p g h l g' d d' h'
@@ -196,7 +209,9 @@ nextPhase = changePhase advancePhase
 -- (inserting the provided 'MiniPhase').
 -- Note that calling this function on a 'WonBattle' will cause it to remember that the current player gets a card this turn.
 changeMiniPhase :: MiniPhase -> GameState -> GameState
-changeMiniPhase = (updateCardDrawing .) . changePhase . updateMiniPhase
+changeMiniPhase = changePhase . updateMiniPhase
+-- old way:
+-- changeMiniPhase = (updateCardDrawing .) . changePhase . updateMiniPhase 
 
 -- | Returns the list of cards in the player's hand
 cards :: GameState -> Player -> [Card]
@@ -215,13 +230,14 @@ useCard p c = addToDiscard . removeCard
 -- | Adds the top card to the player's hand.
 -- Shuffles the discard pile if necessary using a provided shuffle function.
 drawCard :: Player -> GameState -> GameState
-drawCard p = takeTop . fillDeck
+drawCard p = changeGetCard (const True) . takeTop . fillDeck
    where
-   shuff = id
    fillDeck :: GameState -> GameState
    fillDeck g = if null (deck g)
-                then changeDeck (const $ shuff $ discardPile g) $ changeDisc (const []) g
+                then let (newDeck, newGen) = shuffle (discardPile g) (stateStdGen g)
+                     in changeGen (const newGen) $ changeDeck (const newDeck) $ changeDisc (const []) g
                 else g
+                
    takeTop :: GameState -> GameState
    takeTop g = let c = head (deck g)
                in changeDeck tail $ changeHand (modifyMapWithError p (c:) errP) g
