@@ -206,9 +206,6 @@ spec = do
         (phase changeToWonBattle) `shouldBe` (Attack (WonBattle Peru Argentina TwoAtt))
       it "correctly changes to WonBattle for non-adjacent countries" $ do
         (phase changeToWonBattle2) `shouldBe` (Attack (WonBattle India Brazil TwoAtt))
-      it "correctly sets hasDrawn to True" $ do
-        (hasDrawn changeToWonBattle) `shouldBe` True
-        (hasDrawn changeToWonBattle) `shouldBe` True
     context "In WonBattle attack phase" $ do
       it "correctly changes to Normal phase" $ do
         phase changeToNormal `shouldBe` (Attack Normal)
@@ -227,7 +224,7 @@ spec = do
     let game = allRed
     let draw1 = drawCard Red game
     let draw2 = drawCard Red draw1
-    let next = nextPhase draw2
+    let next = nextTurn draw2
     context "Valid draws" $ do
       it "Correctly adds card into player's hand" $ do
         length (cards draw1 Red) `shouldBe` 1
