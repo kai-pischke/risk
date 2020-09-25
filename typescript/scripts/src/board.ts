@@ -50,4 +50,27 @@ export class Board {
     get players() {
         return this._players;
     }
+
+    public numberToReinforce(p : Player): number {
+        const playersCountries: Array<Country> = ALL_COUNTRIES.filter((c : Country) => {return this.owner(c) == p;});
+        const northAmerica: Array<Country> = ["Alaska", "Alberta", "Central America", "Eastern United States", "Greenland", "Northwest Territory", "Ontario", "Quebec", "Western United States"];
+        const southAmerica: Array<Country> = ["Argentina", "Brazil", "Peru", "Venezuela"];
+        const europe: Array<Country> = ["Great Britain", "Iceland", "Northern Europe", "Scandinavia", "Southern Europe", "Ukraine", "Western Europe"];
+        const africa: Array<Country> = ["Congo", "East Africa", "Egypt", "Madagascar", "North Africa", "South Africa"];
+        const asia: Array<Country> = ["Afghanistan", "China", "India", "Irkutsk", "Japan", "Kamchatka", "Middle East", "Mongolia", "Siam", "Siberia", "Ural", "Yakutsk"];
+        const australia: Array<Country> = ["Eastern Australia", "Indonesia", "New Guinea", "Western Australia"];
+        const continents: Array<[number, Array<Country>]> = [[5, northAmerica],[2, southAmerica],[5, europe],[3, africa],[7, asia],[2, australia]];
+
+        const fromCountry = Math.floor(playersCountries.length/3)
+        var numTroops = Math.max(fromCountry, 3)
+
+        console.log(numTroops)
+        for (var i = 0;i<continents.length;i++){
+            if (continents[i][1].every((c: Country) => {return playersCountries.includes(c);})){
+                numTroops += continents[i][0]
+            }
+        }
+        console.log(numTroops);
+        return numTroops;
+    }
 }

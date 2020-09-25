@@ -152,6 +152,9 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
             for (i = 0; i < numPlayers; i++) {
                 this._ctx.fillStyle = this.playerToColour(state.players[i]);
                 this._ctx.fillRect(1200, 200 + i * s, 200, s);
+                this._ctx.fillStyle = "white";
+                this._ctx.font = "40px 'Helvetica'";
+                this._ctx.fillText(state.numberToReinforce(state.players[i]).toString(), 1300, 200 + (i + .5) * s);
             }
             this._ctx.fillStyle = "white";
             this._ctx.fillRect(1200, 0, 200, 200);

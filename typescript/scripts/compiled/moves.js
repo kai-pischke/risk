@@ -9,26 +9,6 @@ define(["require", "exports", "./elements"], function (require, exports, element
             this.me = whoAmI;
             this.ui = whatIsUi;
         }
-        numberToReinforce(board, p) {
-            const playersCountries = elements_1.ALL_COUNTRIES.filter((c) => { return board.owner(c) == this.me; });
-            const northAmerica = ["Alaska", "Alberta", "Central America", "Eastern United States", "Greenland", "Northwest Territory", "Ontario", "Quebec", "Western United States"];
-            const southAmerica = ["Argentina", "Brazil", "Peru", "Venezuela"];
-            const europe = ["Great Britain", "Iceland", "Northern Europe", "Scandinavia", "Southern Europe", "Ukraine", "Western Europe"];
-            const africa = ["Congo", "East Africa", "Egypt", "Madagascar", "North Africa", "South Africa"];
-            const asia = ["Afghanistan", "China", "India", "Irkutsk", "Japan", "Kamchatka", "Middle East", "Mongolia", "Siam", "Siberia", "Ural", "Yakutsk"];
-            const australia = ["Eastern Australia", "Indonesia", "New Guinea", "Western Australia"];
-            const continents = [[5, northAmerica], [2, southAmerica], [5, europe], [3, africa], [7, asia], [2, australia]];
-            const fromCountry = Math.floor(playersCountries.length / 3);
-            var numTroops = Math.max(fromCountry, 3);
-            console.log(numTroops);
-            for (var i = 0; i < continents.length; i++) {
-                if (continents[i][1].every((c) => { return playersCountries.includes(c); })) {
-                    numTroops += continents[i][0];
-                }
-            }
-            console.log(numTroops);
-            return numTroops;
-        }
         cardSetBonus(set) {
             if (set.length < 3)
                 return 0;
@@ -114,7 +94,7 @@ define(["require", "exports", "./elements"], function (require, exports, element
             if (this.me != currentPlayer) {
                 return;
             }
-            var toReinforce = this.numberToReinforce(board, currentPlayer);
+            var toReinforce = board.numberToReinforce(currentPlayer);
             var countryMap = {};
             var cardsToTrade = [new Array(), new Array()];
             var tradeIn = [new Array(), new Array()];
@@ -124,10 +104,10 @@ define(["require", "exports", "./elements"], function (require, exports, element
                 const country = e.detail;
                 if (board.owner(country) == me) {
                     toReinforce -= 1;
-                    ui.addRecruit(toReinforce);
-                    console.log(toReinforce);
                     board.changeTroops(country, board.troops(country) + 1);
                     ui.draw(board);
+                    ui.addPhase("Reinforce");
+                    ui.addRecruit(toReinforce);
                     if (country in countryMap) {
                         countryMap[country] = countryMap[country] + 1;
                     }
@@ -275,6 +255,7 @@ define(["require", "exports", "./elements"], function (require, exports, element
             ui.setColour(dc, this.defColour);
             ui.draw(board);
             ui.clearColour();
+            ui.addPhase("MidBattle");
             if (this.me != currentPlayer) {
                 return;
             }
