@@ -47,15 +47,12 @@ export const COUNTRY_LOC: Record<Country,{x; y;}> = {
 
 
 
-export function countryOn(e : MouseEvent, r : number, canvas : HTMLElement) : (Country | null){
+export function countryOn(e : MouseEvent, r : number, xoff : number, yoff : number) : (Country | null){
     e.preventDefault();
 
-    // get the mouse position
-    const rect = canvas.getBoundingClientRect()
 
-    var mouseX=e.clientX-rect.left;
-    var mouseY=e.clientY-rect.top;
-
+    var mouseX=e.clientX-xoff;
+    var mouseY=e.clientY-yoff;
     // iterate each shape in the shapes array
     for(var i = 0;i<ALL_COUNTRIES.length;i++) {
         let country = ALL_COUNTRIES[i]

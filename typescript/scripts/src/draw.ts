@@ -72,12 +72,12 @@ class Popup{
 export class Draw{
 
     private _ctx: CanvasRenderingContext2D;
+    private colour: string;
     public outerRadius = 35;
     public innerRadius = 25;
+    public borderSize = 3;
     public popup: Popup;
-
     private _countryColour = {} as Record<Country, string>;
-
 
     constructor(player:Player) {
         const canvas = document.getElementById("canvas");
@@ -87,7 +87,8 @@ export class Draw{
         if (!(canvas instanceof HTMLCanvasElement)) {
             throw new Error("The element of is not an HTMLCanvasElement.");
         }
-        canvas.style.border = "3px solid " + this.playerToColour(player);
+        this.colour = this.playerToColour(player)
+        canvas.style.border = this.borderSize.toString() + "px solid " + this.colour;
         console.log(player);
 
         this._ctx = canvas.getContext("2d");
@@ -97,8 +98,6 @@ export class Draw{
         ALL_COUNTRIES.forEach((key, index) => {this._countryColour[key] = "white"});
 
     }
-
-
 
     public setColour(c : Country, s: string){
         this._countryColour[c] = s;
@@ -110,6 +109,7 @@ export class Draw{
 
     public draw(state: Board) {
         // draw lines
+        this._ctx.fillStyle = "white";
         ALL_COUNTRIES.forEach((country, c_index) => {
             const myloc = COUNTRY_LOC[country];
             NEIGHBOURS[country].forEach((neighbour, n_index) => {
@@ -146,30 +146,7 @@ export class Draw{
             this._ctx.arc(myloc.x, myloc.y, this.outerRadius, 0, Math.PI*2, false);
 
             // get fill
-            let fill;
-            const owner = state.owner(country);
-            switch (owner) {
-                case "Black":
-                    fill = "black";
-                    break;
-                case "Blue":
-                    fill = "#63ace5";
-                    break;
-                case "Green":
-                    fill = "#7fbf7f";
-                    break;
-                case "Red":
-                    fill = "#ff6f69";
-                    break;
-                case "Yellow":
-                    fill = "#ffcc5c";
-                    break;
-                case "Empty":
-                    fill = "#b266b2";
-                    break;
-                default:
-                    const _exhaustiveCheck: never = owner;
-            }
+            const fill = this.playerToColour(state.owner(country));
 
             this._ctx.fillStyle = fill;
             this._ctx.fill();
@@ -185,33 +162,46 @@ export class Draw{
             this._ctx.closePath();
         });
 
+
         let hand = document.getElementById("hand");
         hand.innerHTML = "";
         let i;
         for (i = 0; i < state.cards.length; i++){
-          const c = state.cards[i];
-          let imgstr = ""
+            const c = state.cards[i];
+            let imgstr = ""
 
-          switch (c) {
-            case "Wild":
-              imgstr = "Wild.png"
-              break;
-            case "Infantry":
-              imgstr = "Infantry.png"
-              break;
-            case "Artillery":
-              imgstr = "Artillery.jpg"
-              break;
-            case "Cavalry":
-            imgstr = "Cavalry.jpg"
-          }
+            switch (c) {
+                case "Wild":
+                    imgstr = "Wild.png"
+                    break;
+                    case "Infantry":
+                        imgstr = "Infantry.png"
+                        break;
+                    case "Artillery":
+                        imgstr = "Artillery.jpg"
+                        break;
+                    case "Cavalry":
+                        imgstr = "Cavalry.jpg"
+            }
 
-          let str = ""
-          str = "<div class = \"card\" id = \"card" + i.toString() + "\" data-type = \"" + c + "\"><img src = \"" + imgstr + "\" width = 100%> <div class = \"container\"><h4><b>" + c + "</b></h4></div>";
-          hand.innerHTML += str;
+            let str = ""
+            str = "<div class = \"card\" id = \"card" + i.toString() + "\" data-type = \"" + c + "\"><img src = \"" + imgstr + "\" width = 100%> <div class = \"container\"><h4><b>" + c + "</b></h4></div>";
+            hand.innerHTML += str;
         }
 
+        const numPlayers = state.players.length
+        const s = 600/numPlayers
 
+        for (i=0; i< numPlayers; i++){
+            this._ctx.fillStyle = this.playerToColour(state.players[i]);
+            this._ctx.fillRect(1200, 200 + i*s, 200, s);
+            this._ctx.fillStyle = "white";
+            this._ctx.font = "40px 'Helvetica'";
+            this._ctx.fillText(state.numberToReinforce(state.players[i]).toString(), 1300, 200 + (i+.5)*s);
+        }
+
+        this._ctx.fillStyle = "white";
+        this._ctx.fillRect(1200, 0, 200, 200);
     }
 
     private playerToColour(p : Player | "Empty") : string {
@@ -239,6 +229,20 @@ export class Draw{
               const _exhaustiveCheck: never = p;
       }
       return fill;
+    }
+
+    public addPhase(p : string){
+        this._ctx.fillStyle = "black";
+        this._ctx.font = "40px 'Helvetica'";
+        this._ctx.fillText(p, 1300, 50);
+    }
+
+    public addRecruit(toRecruit: (number | null)){
+        if (toRecruit != null){
+            this._ctx.fillStyle = "black";
+            this._ctx.font = "40px 'Helvetica'";
+            this._ctx.fillText(toRecruit.toString(), 1300, 150);
+        }
     }
 
 }
