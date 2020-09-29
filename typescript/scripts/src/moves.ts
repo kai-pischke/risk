@@ -157,7 +157,8 @@ export class Moves{
         let elem = document.getElementById("card" + i.toString());
         elem.addEventListener("click", cardClickHandler);
       }
-      
+    }
+
     private setupNum(b : Board) {
         const init = 50 - 5*b.players.length;
         const owned = ALL_COUNTRIES.filter((c : Country) => {return b.owner(c) == this.me;})
@@ -211,6 +212,22 @@ export class Moves{
 
         this.addTroops(toReinforce, "Reinforce", board, ui)
 
+    }
+
+    async getTrade(board: Board){
+      console.log("---------------- starting trade ------------------------")
+
+      const currentPlayer = board.players[0]
+      const ui = this.ui
+
+      ui.draw(board)
+      ui.addPhase("Trading")
+
+      if (this.me != currentPlayer) {
+        return;
+      }
+
+      this.addTroops(0, "Trading", board, ui)
     }
 
     async attack(board : Board){ //Doesn't check if they're neighbours
