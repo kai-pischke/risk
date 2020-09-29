@@ -151,9 +151,7 @@ module Interface  (
       case invade nTroops gstate of
         Nothing -> (Invalid InvalidMove s, g)
         Just gstate' -> if (length (turnOrder gstate') > 1)
-                          then if (phase gstate' == State.Attack TimeToTrade)
-                                  then (Special GetTrade s, GamePlay gstate')
-                                  else (General(Play gstate'), GamePlay gstate')
+                          then (General(Play gstate'), GamePlay gstate')
                           else (GameWon (head $ turnOrder gstate'), GamePlay gstate')
     | otherwise = (Invalid NotYourTurn s, g)
   receive (Request s (Invade _)) g = (Invalid NotInPlay s, g)

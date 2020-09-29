@@ -85,12 +85,6 @@ updateMiniPhase :: MiniPhase -> Phase -> Phase
 updateMiniPhase m (Attack _) = Attack m
 updateMiniPhase _ y = y
 
-updateCardDrawing :: GameState -> GameState
-updateCardDrawing g = case statePhase g of
-   (Attack (WonBattle _ _ _)) -> changeGetCard (const True) g
-   _ -> g
-
-
 -- general helper functions --
 fmaybe :: a -> Maybe a -> a
 fmaybe d = maybe d id
@@ -207,11 +201,8 @@ nextPhase = changePhase advancePhase
 
 -- | Does nothing if not in 'Attack' 'Phase', otherwise sets phase to 'Attack' 'MiniPhase'
 -- (inserting the provided 'MiniPhase').
--- Note that calling this function on a 'WonBattle' will cause it to remember that the current player gets a card this turn.
 changeMiniPhase :: MiniPhase -> GameState -> GameState
 changeMiniPhase = changePhase . updateMiniPhase
--- old way:
--- changeMiniPhase = (updateCardDrawing .) . changePhase . updateMiniPhase 
 
 -- | Returns the list of cards in the player's hand
 cards :: GameState -> Player -> [Card]
@@ -257,7 +248,7 @@ kick p1 p2 = updateCards . removePlayer
          ++ show p1 ++ " since "
          ++ show p1 ++ " isn't in the game."
 
--- | @True@ if and only if the current player has drawn a card this turn.
+-- | @True@ if and only if the 'drawCard' has been called at least once this turn.
 hasDrawn :: GameState -> Bool
 hasDrawn = getsCard
 
