@@ -78,6 +78,7 @@ export class Draw{
     public borderSize = 3;
     public popup: Popup;
     private _countryColour = {} as Record<Country, string>;
+    private _cardColour = new Map();
 
     constructor(player:Player) {
         const canvas = document.getElementById("canvas");
@@ -184,8 +185,13 @@ export class Draw{
                         imgstr = "Cavalry.jpg"
             }
 
+            let styleStr = ""
+            if (this._cardColour.has("card" + i.toString())) styleStr = "\"border: 3px solid " + this._cardColour.get("card" + i.toString()) + "\"";
+            console.log(this._cardColour)
+            console.log("style: " + styleStr)
+
             let str = ""
-            str = "<div class = \"card\" id = \"card" + i.toString() + "\" data-type = \"" + c + "\"><img src = \"" + imgstr + "\" width = 100%> <div class = \"container\"><h4><b>" + c + "</b></h4></div>";
+            str = "<div class = \"card\" id = \"card" + i.toString() + "\" data-type = \"" + c + "\" style = " + styleStr + "><img src = \"" + imgstr + "\" width = 100%> <div class = \"container\"><h4><b>" + c + "</b></h4></div>";
             hand.innerHTML += str;
         }
 
@@ -243,6 +249,22 @@ export class Draw{
             this._ctx.font = "40px 'Helvetica'";
             this._ctx.fillText(toRecruit.toString(), 1300, 150);
         }
+    }
+
+    public setCardColour(id : string, colour : string) {
+      this._cardColour.set(id,colour)
+      document.getElementById(id).style.border = "3px solid " + colour
+    }
+
+    public removeCardColour(id : string) {
+      if(this._cardColour.has(id)) {
+        this._cardColour.delete(id)
+        document.getElementById(id).style.border = "none"
+      }
+    }
+
+    public clearCardColours() {
+      this._cardColour = new Map()
     }
 
 }
