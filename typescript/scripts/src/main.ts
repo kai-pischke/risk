@@ -7,8 +7,12 @@ import {Player} from "./elements";
 
 //-- Global Variables -----------------------
 
-function countryClicked(e : MouseEvent, r : number, xoff : number, yoff : number){
-
+function countryClicked(e : MouseEvent, ui: Draw, canvas : HTMLElement){
+    const rect = canvas.getBoundingClientRect();
+    const r = ui.outerRadius;
+    // IDK why +1 but makes work
+    const xoff = rect.left + ui.borderSize + 1;
+    const yoff = rect.top + ui.borderSize + 1;
 
     let country = countryOn(e, r, xoff, yoff);
     if (country != null){
@@ -45,15 +49,18 @@ function countryClicked(e : MouseEvent, r : number, xoff : number, yoff : number
     document.addEventListener('MidBattle', function (e : CustomEvent) {moves.chooseDefenders(e.detail.board, e.detail.ac, e.detail.dc, e.detail.att)});
     document.addEventListener('BattleEnd', function (e : CustomEvent) {moves.invade(e.detail.board, e.detail.ac, e.detail.dc, e.detail.attrem)});
 
-    const rect = canvas.getBoundingClientRect()
+
 
     // IDK why +1 but seems to make it recognise perfectly
-    const xoff = rect.left + ui.borderSize + 1;
-    const yoff = rect.top + ui.borderSize + 1;
-
-    canvas.onmouseup = function(e : MouseEvent){countryClicked(e, ui.outerRadius, xoff, yoff);};
+    canvas.onmouseup = function(e : MouseEvent){countryClicked(e, ui, canvas);};
     canvas.onmousemove = function(e : MouseEvent){
-        const country = countryOn(e, ui.outerRadius, xoff, yoff);
+        const rect = canvas.getBoundingClientRect();
+        const r = ui.outerRadius;
+        // IDK why +1 but makes work
+        const xoff = rect.left + ui.borderSize + 1;
+        const yoff = rect.top + ui.borderSize + 1;
+
+        const country = countryOn(e, r, xoff, yoff);
         let hover = false;
         let hoverID = "";
         if (country == null){
