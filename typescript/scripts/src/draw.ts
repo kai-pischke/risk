@@ -25,6 +25,7 @@ class Popup{
           this.changeTroops(-1);
         });
         this.submit = "Submit";
+        this.cancel = "Cancel";
     }
 
     private changeTroops(d) {
@@ -55,9 +56,23 @@ class Popup{
         document.getElementById("popupSubmit").innerHTML = l;
     }
 
+    public set cancel(l: string){
+        document.getElementById("popupCancel").innerHTML = l;
+    }
+
+    public set default(newdef: number){
+        this._ntroops.innerHTML = newdef.toString();
+    }
+
     public set min(newmin: number){
+        const n = parseInt(this._ntroops.innerHTML);
         this._min = newmin;
-        this._ntroops.innerHTML = newmin.toString();
+        if (n< newmin){
+            this._ntroops.innerHTML = newmin.toString();
+        }
+    }
+    public get min(){
+        return this._min;
     }
 
     public set max(newmax: number){
@@ -66,6 +81,9 @@ class Popup{
         if (n> newmax){
             this._ntroops.innerHTML = newmax.toString();
         }
+    }
+    public get max(){
+        return this._max;
     }
 }
 

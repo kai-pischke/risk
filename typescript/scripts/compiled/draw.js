@@ -17,6 +17,7 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
                 this.changeTroops(-1);
             });
             this.submit = "Submit";
+            this.cancel = "Cancel";
         }
         changeTroops(d) {
             const n = parseInt(this._ntroops.innerHTML);
@@ -41,9 +42,21 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
         set submit(l) {
             document.getElementById("popupSubmit").innerHTML = l;
         }
+        set cancel(l) {
+            document.getElementById("popupCancel").innerHTML = l;
+        }
+        set default(newdef) {
+            this._ntroops.innerHTML = newdef.toString();
+        }
         set min(newmin) {
+            const n = parseInt(this._ntroops.innerHTML);
             this._min = newmin;
-            this._ntroops.innerHTML = newmin.toString();
+            if (n < newmin) {
+                this._ntroops.innerHTML = newmin.toString();
+            }
+        }
+        get min() {
+            return this._min;
         }
         set max(newmax) {
             const n = parseInt(this._ntroops.innerHTML);
@@ -52,6 +65,9 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
                 this._ntroops.innerHTML = newmax.toString();
             }
         }
+        get max() {
+            return this._max;
+        }
     }
     class Draw {
         constructor(player) {
@@ -59,6 +75,7 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
             this.innerRadius = 25;
             this.borderSize = 3;
             this._countryColour = {};
+            this._cardColour = new Map();
             const canvas = document.getElementById("canvas");
             this.popup = new Popup();
             if (!(canvas instanceof HTMLCanvasElement)) {
@@ -143,8 +160,13 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
                     case "Cavalry":
                         imgstr = "Cavalry.jpg";
                 }
+                let styleStr = "";
+                if (this._cardColour.has("card" + i.toString()))
+                    styleStr = "\"border: 3px solid " + this._cardColour.get("card" + i.toString()) + "\"";
+                console.log(this._cardColour);
+                console.log("style: " + styleStr);
                 let str = "";
-                str = "<div class = \"card\" id = \"card" + i.toString() + "\" data-type = \"" + c + "\"><img src = \"" + imgstr + "\" width = 100%> <div class = \"container\"><h4><b>" + c + "</b></h4></div>";
+                str = "<div class = \"card\" id = \"card" + i.toString() + "\" data-type = \"" + c + "\" style = " + styleStr + "><img src = \"" + imgstr + "\" width = 100%> <div class = \"container\"><h4><b>" + c + "</b></h4></div>";
                 hand.innerHTML += str;
             }
             const numPlayers = state.players.length;
@@ -196,6 +218,19 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
                 this._ctx.font = "40px 'Helvetica'";
                 this._ctx.fillText(toRecruit.toString(), 1300, 150);
             }
+        }
+        setCardColour(id, colour) {
+            this._cardColour.set(id, colour);
+            document.getElementById(id).style.border = "3px solid " + colour;
+        }
+        removeCardColour(id) {
+            if (this._cardColour.has(id)) {
+                this._cardColour.delete(id);
+                document.getElementById(id).style.border = "none";
+            }
+        }
+        clearCardColours() {
+            this._cardColour = new Map();
         }
     }
     exports.Draw = Draw;

@@ -18,8 +18,6 @@ export class Moves{
         this.ui = whatIsUi;
     }
 
-
-
     private cardSetBonus(set){
       if (set.length < 3) return 0
       else if (set.length == 3){
@@ -59,12 +57,22 @@ export class Moves{
       else return []
     }
 
+    private setupNum(b : Board) {
+        const init = 50 - 5*b.players.length;
+        const owned = ALL_COUNTRIES.filter((c : Country) => {return b.owner(c) == this.me;})
+        const used = owned.map((c : Country) => {return b.troops(c);}).reduce((a, b) => a + b, 0);
+
+        return init - used;
+    }
+
     async setup(board : Board){
         const me = this.me;
-        const currentPlayer =  board.players[0]
+        const currentPlayer = board.players[0];
+        const toPlace = this.setupNum(board);
 
         this.ui.draw(board);
         this.ui.addPhase("Setup")
+        this.ui.addRecruit(toPlace)
         if (this.me != currentPlayer){
             return;
         }
@@ -203,8 +211,10 @@ export class Moves{
         const attColour = this.attColour;
         const defColour = this.defColour;
         const currentPlayer = board.players[0];
+
         ui.draw(board);
         ui.addPhase("Attack")
+
         if (this.me != currentPlayer){
             return;
         }
@@ -242,6 +252,7 @@ export class Moves{
             if (dc != null && ac != null){
                 ui.popup.label = "Number of Troops to attack " + dc + " from " + ac;
                 ui.popup.max = Math.min((board.troops(ac) - 1), 3);
+                ui.popup.default = ui.popup.max
                 ui.popup.min = 1;
                 ui.popup.visible = true;
 
@@ -266,10 +277,16 @@ export class Moves{
             document.removeEventListener("AttackEnded", attackEnded);
             document.removeEventListener("CountryClickedOn", listenForAttack);
             document.removeEventListener("PopupSubmit", listenForAttackSubmit);
+            document.removeEventListener("PopupCancel", popupCanceled);
             ui.popup.visible = false;
             ui.clearColour()
         }
 
+        function popupCanceled(e : CustomEvent){
+            ui.popup.visible = false;
+        }
+
+        document.addEventListener("PopupCancel", popupCanceled);
         document.addEventListener("EndAttack", attackEnded);
         document.addEventListener("CountryClickedOn", listenForAttack);
         document.addEventListener("PopupSubmit", listenForAttackSubmit);
@@ -293,6 +310,7 @@ export class Moves{
         console.log((board.troops(dc)))
         ui.popup.label = "Number of Troops to defend " + dc + " from the " + attackers + " attackers from " + ac;
         ui.popup.max = Math.min((board.troops(dc)), 2);
+        ui.popup.default = ui.popup.max
         ui.popup.min = 1;
         ui.popup.visible = true;
 
@@ -329,6 +347,7 @@ export class Moves{
         ui.popup.label = "Number of Troops to invade " + dc + " from " + ac;
         ui.popup.max = (board.troops(ac) -1);
         ui.popup.min = remainingAttackers;
+        ui.popup.default = ui.popup.min;
         ui.popup.visible = true;
 
 
@@ -412,15 +431,20 @@ export class Moves{
             document.removeEventListener("SkipFortify", skipFortify);
             document.removeEventListener("CountryClickedOn", listenForFortify);
             document.removeEventListener("PopupSubmit", listenForFortifySubmit);
+            document.removeEventListener("PopupCancel", popupCanceled);
+
             ui.popup.visible = false;
             ui.clearColour()
         }
 
+        function popupCanceled(e : CustomEvent){
+            ui.popup.visible = false;
+        }
+
+        document.addEventListener("PopupCancel", popupCanceled);
         document.addEventListener("SkipFortify", skipFortify);
         document.addEventListener("CountryClickedOn", listenForFortify);
         document.addEventListener("PopupSubmit", listenForFortifySubmit);
 
     }
-
-
 }

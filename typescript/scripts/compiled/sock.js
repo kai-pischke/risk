@@ -77,6 +77,10 @@ define(["require", "exports", "./elements", "./board"], function (require, expor
                                     dc: msg.phase.defending_country,
                                     att: msg.phase.attackers } }));
                         }
+                        else if (msg.phase.kind === "TimeToTrade") {
+                            this.previousMessage = event;
+                            document.dispatchEvent(new CustomEvent("TimeToTrade", { detail: temp }));
+                        }
                     }
                 }
                 else if (msg.kind === "Won") {
