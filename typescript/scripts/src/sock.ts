@@ -87,6 +87,9 @@ export class Connection {
                                                         ac: msg.phase.attacking_country,
                                                         dc: msg.phase.defending_country,
                                                         att: msg.phase.attackers}}));
+                    } else if (msg.phase.kind === "TimeToTrade") {
+                        this.previousMessage = event;
+                        document.dispatchEvent(new CustomEvent("TimeToTrade", {detail: temp}));
                     }
                 }
             } else if (msg.kind === "Won") {

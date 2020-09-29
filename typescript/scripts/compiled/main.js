@@ -27,6 +27,7 @@ define(["require", "exports", "./draw", "./board", "./sock", "./moves", "./map"]
         document.getElementById("skipFortify").onclick = (() => { document.dispatchEvent(new CustomEvent("SkipFortify")); });
         document.getElementById("saveGame").onclick = (() => { document.dispatchEvent(new CustomEvent("SaveGame")); });
         document.getElementById("popupSubmit").onclick = (() => { document.dispatchEvent(new CustomEvent("PopupSubmit")); });
+        document.getElementById("popupCancel").onclick = (() => { document.dispatchEvent(new CustomEvent("PopupCancel")); });
         //document.getElementById("cancelNumberTroops").onclick = (() => {document.getElementById("popupNumberTroops").style.display = "none";});
         //-- That Pass Information In -----------
         document.addEventListener('Setup', function (e) { moves.setup(e.detail); });

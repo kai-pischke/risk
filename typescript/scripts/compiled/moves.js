@@ -61,11 +61,19 @@ define(["require", "exports", "./elements"], function (require, exports, element
             else
                 return [];
         }
+        setupNum(b) {
+            const init = 50 - 5 * b.players.length;
+            const owned = elements_1.ALL_COUNTRIES.filter((c) => { return b.owner(c) == this.me; });
+            const used = owned.map((c) => { return b.troops(c); }).reduce((a, b) => a + b, 0);
+            return init - used;
+        }
         async setup(board) {
             const me = this.me;
             const currentPlayer = board.players[0];
+            const toPlace = this.setupNum(board);
             this.ui.draw(board);
             this.ui.addPhase("Setup");
+            this.ui.addRecruit(toPlace);
             if (this.me != currentPlayer) {
                 return;
             }
@@ -223,6 +231,7 @@ define(["require", "exports", "./elements"], function (require, exports, element
                 if (dc != null && ac != null) {
                     ui.popup.label = "Number of Troops to attack " + dc + " from " + ac;
                     ui.popup.max = Math.min((board.troops(ac) - 1), 3);
+                    ui.popup.default = ui.popup.max;
                     ui.popup.min = 1;
                     ui.popup.visible = true;
                 }
@@ -243,9 +252,14 @@ define(["require", "exports", "./elements"], function (require, exports, element
                 document.removeEventListener("AttackEnded", attackEnded);
                 document.removeEventListener("CountryClickedOn", listenForAttack);
                 document.removeEventListener("PopupSubmit", listenForAttackSubmit);
+                document.removeEventListener("PopupCancel", popupCanceled);
                 ui.popup.visible = false;
                 ui.clearColour();
             }
+            function popupCanceled(e) {
+                ui.popup.visible = false;
+            }
+            document.addEventListener("PopupCancel", popupCanceled);
             document.addEventListener("EndAttack", attackEnded);
             document.addEventListener("CountryClickedOn", listenForAttack);
             document.addEventListener("PopupSubmit", listenForAttackSubmit);
@@ -266,6 +280,7 @@ define(["require", "exports", "./elements"], function (require, exports, element
             console.log((board.troops(dc)));
             ui.popup.label = "Number of Troops to defend " + dc + " from the " + attackers + " attackers from " + ac;
             ui.popup.max = Math.min((board.troops(dc)), 2);
+            ui.popup.default = ui.popup.max;
             ui.popup.min = 1;
             ui.popup.visible = true;
             function listenForNumberDefenders(e) {
@@ -294,6 +309,7 @@ define(["require", "exports", "./elements"], function (require, exports, element
             ui.popup.label = "Number of Troops to invade " + dc + " from " + ac;
             ui.popup.max = (board.troops(ac) - 1);
             ui.popup.min = remainingAttackers;
+            ui.popup.default = ui.popup.min;
             ui.popup.visible = true;
             function listenForNumberInvaders(e) {
                 document.dispatchEvent(new CustomEvent("Send", { detail: JSON.stringify({
@@ -365,9 +381,14 @@ define(["require", "exports", "./elements"], function (require, exports, element
                 document.removeEventListener("SkipFortify", skipFortify);
                 document.removeEventListener("CountryClickedOn", listenForFortify);
                 document.removeEventListener("PopupSubmit", listenForFortifySubmit);
+                document.removeEventListener("PopupCancel", popupCanceled);
                 ui.popup.visible = false;
                 ui.clearColour();
             }
+            function popupCanceled(e) {
+                ui.popup.visible = false;
+            }
+            document.addEventListener("PopupCancel", popupCanceled);
             document.addEventListener("SkipFortify", skipFortify);
             document.addEventListener("CountryClickedOn", listenForFortify);
             document.addEventListener("PopupSubmit", listenForFortifySubmit);

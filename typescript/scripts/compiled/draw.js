@@ -17,6 +17,7 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
                 this.changeTroops(-1);
             });
             this.submit = "Submit";
+            this.cancel = "Cancel";
         }
         changeTroops(d) {
             const n = parseInt(this._ntroops.innerHTML);
@@ -41,9 +42,21 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
         set submit(l) {
             document.getElementById("popupSubmit").innerHTML = l;
         }
+        set cancel(l) {
+            document.getElementById("popupCancel").innerHTML = l;
+        }
+        set default(newdef) {
+            this._ntroops.innerHTML = newdef.toString();
+        }
         set min(newmin) {
+            const n = parseInt(this._ntroops.innerHTML);
             this._min = newmin;
-            this._ntroops.innerHTML = newmin.toString();
+            if (n < newmin) {
+                this._ntroops.innerHTML = newmin.toString();
+            }
+        }
+        get min() {
+            return this._min;
         }
         set max(newmax) {
             const n = parseInt(this._ntroops.innerHTML);
@@ -51,6 +64,9 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
             if (n > newmax) {
                 this._ntroops.innerHTML = newmax.toString();
             }
+        }
+        get max() {
+            return this._max;
         }
     }
     class Draw {

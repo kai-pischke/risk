@@ -39,6 +39,7 @@ function countryClicked(e : MouseEvent, ui: Draw, canvas : HTMLElement){
     document.getElementById("saveGame").onclick   = (() => {document.dispatchEvent(new CustomEvent("SaveGame"))});
 
     document.getElementById("popupSubmit").onclick = (() => {document.dispatchEvent(new CustomEvent("PopupSubmit"))});
+    document.getElementById("popupCancel").onclick = (() => {document.dispatchEvent(new CustomEvent("PopupCancel"))});
     //document.getElementById("cancelNumberTroops").onclick = (() => {document.getElementById("popupNumberTroops").style.display = "none";});
 
     //-- That Pass Information In -----------
