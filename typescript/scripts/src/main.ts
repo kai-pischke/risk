@@ -49,6 +49,8 @@ function countryClicked(e : MouseEvent, ui: Draw, canvas : HTMLElement){
     document.addEventListener('Fortify', function (e : CustomEvent) {moves.fortify(e.detail)});
     document.addEventListener('MidBattle', function (e : CustomEvent) {moves.chooseDefenders(e.detail.board, e.detail.ac, e.detail.dc, e.detail.att)});
     document.addEventListener('BattleEnd', function (e : CustomEvent) {moves.invade(e.detail.board, e.detail.ac, e.detail.dc, e.detail.attrem)});
+    document.addEventListener('TimeToTrade', function (e : CustomEvent) {moves.getTrade(e.detail)});
+
 
 
 
