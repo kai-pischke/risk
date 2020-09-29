@@ -59,6 +59,7 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
             this.innerRadius = 25;
             this.borderSize = 3;
             this._countryColour = {};
+            this._cardColour = new Map();
             const canvas = document.getElementById("canvas");
             this.popup = new Popup();
             if (!(canvas instanceof HTMLCanvasElement)) {
@@ -143,8 +144,13 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
                     case "Cavalry":
                         imgstr = "Cavalry.jpg";
                 }
+                let styleStr = "";
+                if (this._cardColour.has("card" + i.toString()))
+                    styleStr = "\"border: 3px solid " + this._cardColour.get("card" + i.toString()) + "\"";
+                console.log(this._cardColour);
+                console.log("style: " + styleStr);
                 let str = "";
-                str = "<div class = \"card\" id = \"card" + i.toString() + "\" data-type = \"" + c + "\"><img src = \"" + imgstr + "\" width = 100%> <div class = \"container\"><h4><b>" + c + "</b></h4></div>";
+                str = "<div class = \"card\" id = \"card" + i.toString() + "\" data-type = \"" + c + "\" style = " + styleStr + "><img src = \"" + imgstr + "\" width = 100%> <div class = \"container\"><h4><b>" + c + "</b></h4></div>";
                 hand.innerHTML += str;
             }
             const numPlayers = state.players.length;
@@ -196,6 +202,19 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
                 this._ctx.font = "40px 'Helvetica'";
                 this._ctx.fillText(toRecruit.toString(), 1300, 150);
             }
+        }
+        setCardColour(id, colour) {
+            this._cardColour.set(id, colour);
+            document.getElementById(id).style.border = "3px solid " + colour;
+        }
+        removeCardColour(id) {
+            if (this._cardColour.has(id)) {
+                this._cardColour.delete(id);
+                document.getElementById(id).style.border = "none";
+            }
+        }
+        clearCardColours() {
+            this._cardColour = new Map();
         }
     }
     exports.Draw = Draw;

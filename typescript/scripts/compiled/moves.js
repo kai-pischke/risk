@@ -128,6 +128,7 @@ define(["require", "exports", "./elements"], function (require, exports, element
                         let elem = document.getElementById("card" + i.toString());
                         elem.removeEventListener("click", cardClickHandler);
                     }
+                    ui.clearCardColours();
                 }
             }
             function cardClickHandler(e) {
@@ -149,7 +150,7 @@ define(["require", "exports", "./elements"], function (require, exports, element
                 else {
                     if (tradeIn[whichSet].length < 3) {
                         cardsToTrade[whichSet].push(elemId);
-                        document.getElementById(elemId).style.border = "3px solid #7fbf7f";
+                        ui.setCardColour(elemId, "#7fbf7f");
                         let c = document.getElementById(elemId).getAttribute("data-type");
                         tradeIn[whichSet].push(c);
                         //Check the tradeIn is correct if it's complete
@@ -157,13 +158,16 @@ define(["require", "exports", "./elements"], function (require, exports, element
                             console.log("Invalid combo for cardset");
                             let i = 0;
                             for (i = 0; i < 3; i++) {
-                                document.getElementById(cardsToTrade[whichSet][i]).style.border = "none";
+                                ui.removeCardColour(cardsToTrade[whichSet][i]);
                             }
                             cardsToTrade[whichSet] = [];
                             tradeIn[whichSet] = [];
                         }
                         else if (tradeIn[whichSet].length == 3) {
                             toReinforce += self.cardSetBonus(tradeIn[whichSet]);
+                            ui.draw(board);
+                            ui.addPhase("Reinforce");
+                            ui.addRecruit(toReinforce);
                         }
                         console.log(JSON.stringify(tradeIn));
                     }

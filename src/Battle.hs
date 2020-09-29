@@ -8,9 +8,9 @@ This module deals with attacking and defending types and gives an interface to c
 module Battle 
     ( Defenders(..),
       Attackers(..),
-      doBattle
+      doBattle,
     ) where
-
+    
 import System.Random
 import Data.List
 data Defenders = OneDef | TwoDef deriving (Eq, Show, Ord)
@@ -39,12 +39,14 @@ roll 0 g = (g, [])
 roll n g = let (x, g') = uniformR (1, 6) g
            in (x:) <$> roll (n-1) g'
 
+antisort = reverse . sort
+
 -- | Takes a number of attackers ('Attackers') and a number of defenders ('Defenders') and calculates the attackers lost, the defeners lost and the new StdGen (returned in a tuple in that order).
 doBattle :: Attackers -> Defenders -> StdGen -> (Int, Int, StdGen)
 doBattle a d g = (attackerLosses, defenderLosses, g'')
   where
     (g', as)  = roll (fromEnum a) g
     (g'', ds) = roll (fromEnum d) g'
-    result = zip (sort as) (sort ds) 
-    attackerLosses = length $ filter (uncurry (<)) result
-    defenderLosses = length $ filter (uncurry (>=)) result
+    result = zip (antisort as) (antisort ds) 
+    attackerLosses = length $ filter (uncurry (<=)) result
+    defenderLosses = length $ filter (uncurry (>)) result
