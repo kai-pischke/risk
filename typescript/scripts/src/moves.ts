@@ -57,13 +57,13 @@ export class Moves{
       else return []
     }
 
-    private addTroops(initTroops : number, action : string, board : Board, ui : Draw){
+    private addTroops(initTroops : number, action : string, board : Board, ui : Draw, lowerCardLimit : number){
       var toAdd = initTroops
       var countryMap = {} as Record<Country, number>;
       var cardsToTrade = [new Array(), new Array()]
       var tradeIn = [new Array(), new Array()]
       var self = this;
-      var needToTrade = board.cards.length > 8
+      var needToTrade = board.cards.length > 4
       const me = this.me
 
       ui.addRecruit(toAdd)
@@ -148,9 +148,10 @@ export class Moves{
                 if (cardsToTrade[whichSet].includes(elem.id)) ui.setCardColour(elem.id, "#7fbf7f")
               }
 
-              if (board.cards.length - 3 <= 8 && needToTrade) {
+              if (board.cards.length - 3 <= lowerCardLimit && needToTrade) {
                 document.addEventListener("CountryClickedOn", listenForReinforce)
                 needToTrade = false
+                ui.hideTradeMessage()
               }
             }
             console.log(JSON.stringify(tradeIn))
@@ -159,6 +160,7 @@ export class Moves{
       }
 
       if (!needToTrade) document.addEventListener("CountryClickedOn", listenForReinforce);
+      else ui.showTradeMessage()
 
       let i = 0;
       for (i = 0; i < board.cards.length; i++){
@@ -218,7 +220,7 @@ export class Moves{
 
         var toReinforce = board.numberToReinforce(currentPlayer);
 
-        this.addTroops(toReinforce, "Reinforce", board, ui)
+        this.addTroops(toReinforce, "Reinforce", board, ui, board.cards.length)
 
     }
 
@@ -235,7 +237,7 @@ export class Moves{
         return;
       }
 
-      this.addTroops(0, "Trade", board, ui)
+      this.addTroops(0, "Trade", board, ui, 4)
     }
 
     async attack(board : Board){ //Doesn't check if they're neighbours

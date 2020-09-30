@@ -68,7 +68,6 @@
         border-color: #FFEBCD transparent transparent transparent;
       }
 
-
       .circle {
         width: 2em;
         height: 2em;
@@ -106,6 +105,32 @@
         margin-top: 2em;
         font-size: 1.1em;
       }
+
+      .tradeMessage {
+        position: absolute;
+        left: 50%;
+        top: 25%;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .tradeMessage .messageText{
+        visibility: hidden;
+        width: 240px;
+        background-color: #FFEBCD;
+        color: #2F4F4F;
+        text-align: center;
+        border-radius: 10px;
+        padding: 20px 0;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -120px;
+        cursor: default;
+        border: 3px solid #FF7F50;
+      }
+
       /* Add animation (fade in the popup) */
       @-webkit-keyframes fadeIn {
         from {opacity: 0;}
@@ -140,6 +165,11 @@
                     <h4><b>Infantry</b></Infantry>
                 </div>
             </div>-->
+        </div>
+        <div class = "tradeMessage">
+          <span class = "messageText" id = "tradeMessageBox">
+            <strong>Trade in some cards to continue.</strong>
+          </span>
         </div>
         <div class="popup">
             <span class="popuptext" id="popupBox">

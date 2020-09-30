@@ -283,4 +283,12 @@ export class Draw{
       this._cardColour = new Map()
     }
 
+    public showTradeMessage(){
+      document.getElementById("tradeMessageBox").style.visibility = "visible"
+    }
+
+    public hideTradeMessage(){
+      document.getElementById("tradeMessageBox").style.visibility = "hidden"
+    }
+
 }
