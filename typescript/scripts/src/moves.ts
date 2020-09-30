@@ -57,13 +57,13 @@ export class Moves{
       else return []
     }
 
-    private addTroops(initTroops : number, phaseName : string, board : Board, ui : Draw){
+    private addTroops(initTroops : number, action : string, board : Board, ui : Draw){
       var toAdd = initTroops
       var countryMap = {} as Record<Country, number>;
       var cardsToTrade = [new Array(), new Array()]
       var tradeIn = [new Array(), new Array()]
       var self = this;
-      var needToTrade = board.cards.length > 4
+      var needToTrade = board.cards.length > 8
       const me = this.me
 
       ui.addRecruit(toAdd)
@@ -74,7 +74,7 @@ export class Moves{
               toAdd -=1
               board.changeTroops(country, board.troops(country) + 1)
               ui.draw(board);
-              ui.addPhase(phaseName)
+              ui.addPhase(action)
               ui.addRecruit(toAdd)
               if (country in countryMap){
                   countryMap[country] = countryMap[country] +1
@@ -86,7 +86,7 @@ export class Moves{
           if (toAdd == 0){
               document.dispatchEvent(new CustomEvent("Send",
                   {detail: JSON.stringify({
-                      action: "Reinforce",
+                      action: action,
                       sender: me,
                       troops: countryMap,
                       trade_in: self.jsonifyTradeIn(tradeIn)
@@ -107,48 +107,56 @@ export class Moves{
         let elemId = this.id;
         let whichSet = 0
         if (cardsToTrade[0].length == 3) whichSet = 1
+        console.log("whichset: " + whichSet)
         if (whichSet == 1 && cardsToTrade[1].length == 3) return;
 
-        if (cardsToTrade[whichSet].includes(elemId) && toAdd > self.tradeInBonus(tradeIn)) {
+        if (cardsToTrade[whichSet].includes(elemId) && cardsToTrade[whichSet].length < 3) {
           toAdd -= self.tradeInBonus(tradeIn)
           let i = cardsToTrade[whichSet].indexOf(elemId);
           cardsToTrade[whichSet].splice(i,1);
           tradeIn[whichSet].splice(i,1)
           document.getElementById(elemId).style.border = "none";
           toAdd += self.tradeInBonus(tradeIn)
-          console.log(JSON.stringify(tradeIn))
-          }
-          else {
-            if (tradeIn[whichSet].length < 3){
-              cardsToTrade[whichSet].push(elemId);
-              ui.setCardColour(elemId, "#7fbf7f")
-              let c = document.getElementById(elemId).getAttribute("data-type");
-              tradeIn[whichSet].push(c)
+        }
+        else if (!cardsToTrade[0].includes(elemId) && !cardsToTrade[0].includes(elemId)){
+          if (tradeIn[whichSet].length < 3){
+            cardsToTrade[whichSet].push(elemId);
+            ui.setCardColour(elemId, "black")
+            let c = document.getElementById(elemId).getAttribute("data-type");
+            tradeIn[whichSet].push(c)
 
-              //Check the tradeIn is correct if it's complete
-              if (self.cardSetBonus(tradeIn[whichSet]) == 0 && tradeIn[whichSet].length == 3){
-                console.log("Invalid combo for cardset")
-                let i = 0
-                for (i = 0; i < 3; i++){
-                  ui.removeCardColour(cardsToTrade[whichSet][i])
-                }
-                cardsToTrade[whichSet] = []
-                tradeIn[whichSet] = []
+            //Check the tradeIn is correct if it's complete
+            if (self.cardSetBonus(tradeIn[whichSet]) == 0 && tradeIn[whichSet].length == 3){
+              console.log("Invalid combo for cardset")
+              let i = 0
+              for (i = 0; i < 3; i++){
+                ui.removeCardColour(cardsToTrade[whichSet][i])
               }
-              else if (tradeIn[whichSet].length == 3) {
-                toAdd += self.cardSetBonus(tradeIn[whichSet])
-                ui.draw(board);
-                ui.addPhase(phaseName)
-                ui.addRecruit(toAdd)
-                if (board.cards.length - 3 <= 4 && needToTrade) {
-                  document.addEventListener("CountryClickedOn", listenForReinforce)
-                  needToTrade = false
-                }
-              }
-              console.log(JSON.stringify(tradeIn))
+              cardsToTrade[whichSet] = []
+              tradeIn[whichSet] = []
             }
+            else if (tradeIn[whichSet].length == 3) {
+              toAdd += self.cardSetBonus(tradeIn[whichSet])
+              ui.draw(board);
+              ui.addPhase(action)
+              ui.addRecruit(toAdd)
+
+              let i = 0;
+              for (i = 0; i < board.cards.length; i++){
+                let elem = document.getElementById("card" + i.toString());
+                elem.addEventListener("click", cardClickHandler);
+                if (cardsToTrade[whichSet].includes(elem.id)) ui.setCardColour(elem.id, "#7fbf7f")
+              }
+
+              if (board.cards.length - 3 <= 8 && needToTrade) {
+                document.addEventListener("CountryClickedOn", listenForReinforce)
+                needToTrade = false
+              }
+            }
+            console.log(JSON.stringify(tradeIn))
           }
         }
+      }
 
       if (!needToTrade) document.addEventListener("CountryClickedOn", listenForReinforce);
 
@@ -221,13 +229,13 @@ export class Moves{
       const ui = this.ui
 
       ui.draw(board)
-      ui.addPhase("Trading")
+      ui.addPhase("Trade")
 
       if (this.me != currentPlayer) {
         return;
       }
 
-      this.addTroops(0, "Trading", board, ui)
+      this.addTroops(0, "Trade", board, ui)
     }
 
     async attack(board : Board){ //Doesn't check if they're neighbours

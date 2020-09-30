@@ -205,8 +205,6 @@ export class Draw{
 
             let styleStr = ""
             if (this._cardColour.has("card" + i.toString())) styleStr = "\"border: 3px solid " + this._cardColour.get("card" + i.toString()) + "\"";
-            console.log(this._cardColour)
-            console.log("style: " + styleStr)
 
             let str = ""
             str = "<div class = \"card\" id = \"card" + i.toString() + "\" data-type = \"" + c + "\" style = " + styleStr + "><img src = \"" + imgstr + "\" width = 100%> <div class = \"container\"><h4><b>" + c + "</b></h4></div>";
