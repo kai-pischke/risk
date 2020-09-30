@@ -39,6 +39,7 @@ roll 0 g = (g, [])
 roll n g = let (x, g') = uniformR (1, 6) g
            in (x:) <$> roll (n-1) g'
 
+antisort :: Ord a => [a] -> [a]
 antisort = reverse . sort
 
 -- | Takes a number of attackers ('Attackers') and a number of defenders ('Defenders') and calculates the attackers lost, the defeners lost and the new StdGen (returned in a tuple in that order).
