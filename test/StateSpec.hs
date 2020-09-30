@@ -198,6 +198,7 @@ spec = do
     let nextFromNormal = nextPhase changeToNormal
     let nextFromWonBattle = nextPhase changeToWonBattle
     let fortified = changeMiniPhase (WonBattle India Brazil OneAtt) nextFromNormal
+    let nextturn = nextTurn nextFromNormal
     context "New Game" $ do
       it "correctly does nothing when in Reinforce phase" $ do
         reinforceChange `shouldBe` game
@@ -206,9 +207,14 @@ spec = do
         (phase changeToWonBattle) `shouldBe` (Attack (WonBattle Peru Argentina TwoAtt))
       it "correctly changes to WonBattle for non-adjacent countries" $ do
         (phase changeToWonBattle2) `shouldBe` (Attack (WonBattle India Brazil TwoAtt))
+      it "correctly sets hasDrawn" $ do
+        changeToWonBattle `shouldSatisfy` hasDrawn
+        changeToWonBattle2 `shouldSatisfy` hasDrawn
     context "In WonBattle attack phase" $ do
       it "correctly changes to Normal phase" $ do
         phase changeToNormal `shouldBe` (Attack Normal)
+      it "correctly sets hasDrawn" $ do
+        changeToNormal `shouldSatisfy` hasDrawn
     context "calling nextPhase" $ do
       it "correctly goes to Fortify when in normal attack phase" $ do
         (phase nextFromNormal) `shouldBe` Fortify
@@ -219,6 +225,9 @@ spec = do
     context "In Fortify phase" $ do
       it "correctly no change when changeMiniPhase called" $ do
         fortified `shouldBe` nextFromNormal
+    context "Next turn" $ do
+      it "correctly resets hasDrawn" $ do
+        nextturn `shouldSatisfy` (not . hasDrawn)
 
   describe "drawCard" $ do
     let game = allRed
@@ -229,10 +238,6 @@ spec = do
       it "Correctly adds card into player's hand" $ do
         length (cards draw1 Red) `shouldBe` 1
         length (cards draw2 Red) `shouldBe` 2
-      it "Correctly sets hasDrawn" $ do
-        draw1 `shouldSatisfy` hasDrawn
-        draw2 `shouldSatisfy` hasDrawn
-        next `shouldSatisfy` (not.hasDrawn)
       it "Correctly doesn't change other players' hands" $ do
         cards draw1 Blue `shouldBe` []
         cards draw1 Green `shouldBe` []
