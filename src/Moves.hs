@@ -146,7 +146,7 @@ module Moves (
       f (Attack (WonBattle cAtt cDef attLeft))
         | not (cAtt `isNeighbour` cDef) || (owner gs cAtt == owner gs cDef) || (owner gs cAtt /= currPlayer gs) = error "Impossible MiniPhase"
         | (nTroops >= fromEnum attLeft) && (nTroops < troops gs cAtt) =
-          Just $ (forceDiscard . (tryKick (owner gs cAtt) (owner gs cDef)) . (tryDrawCard (currPlayer gs)) . (changeOwner cDef (currPlayer gs)). (changeTroops cAtt (-nTroops)) . (changeTroops cDef nTroops)) gs
+          Just $ (forceDiscard . (tryKick (owner gs cAtt) (owner gs cDef))  . (changeOwner cDef (currPlayer gs)). (changeTroops cAtt (-nTroops)) . (changeTroops cDef nTroops)) gs
         | otherwise = Nothing
         where forceDiscard gs' = if (length (cards gs' (currPlayer gs')) >= 6)
                                    then changeMiniPhase TimeToTrade gs'
@@ -156,12 +156,11 @@ module Moves (
       tryKick pAtt pDef gs' = if all ((/= pDef).owner gs') [toEnum 0 :: Country ..]
                           then kick pAtt pDef gs'
                           else gs'
-      tryDrawCard p gs' = if (hasDrawn gs') then gs' else drawCard p gs'
 
   -- |Only valid during the 'Attack' 'TimeToTrade' 'MiniPhase'. Takes a 'TradeIn' (owned by the current player) and caches it in for troops.
   trade :: TradeIn -> [(Country, Int)] -> GameState -> Maybe GameState
   trade tr movs gs | validTrade tr && phase gs == Attack TimeToTrade && validMovList movs =
-    Just $ nextPhase $ (useCards tr) $ foldr ((.).(uncurry changeTroops)) id movs gs
+    Just $ (changeMiniPhase Normal) $ (useCards tr) $ foldr ((.).(uncurry changeTroops)) id movs gs
                     | otherwise = Nothing
     where validMovList = valid (tradeInBonus tr)
           valid 0 []  = True
@@ -189,7 +188,7 @@ module Moves (
   -- |Moves troops from one country to another. Countries must be neighbours and owned by the current player. Must be during the correct phase. Troops are sent from the first country to the second one. Should update phase to 'Reinforce' and call nextTurn.
   fortify :: Country -> Country -> Int -> GameState -> Maybe GameState
   fortify cFrom cTo nTroops gs
-    | valid = (Just . nextTurn . (changeTroops cFrom (-nTroops)) . (changeTroops cTo nTroops)) gs
+    | valid = (Just . nextTurn . (tryDrawCard (currPlayer gs)) . (changeTroops cFrom (-nTroops)) . (changeTroops cTo nTroops)) gs
     | otherwise = Nothing
     where valid = (phase gs == Fortify) &&
                   (nTroops < troops gs cFrom) &&
@@ -197,10 +196,12 @@ module Moves (
                   (owner gs cFrom == currPlayer gs) &&
                   (owner gs cTo == currPlayer gs) &&
                   (cTo `isNeighbour` cFrom)
+          tryDrawCard p gs' = if (hasDrawn gs') then drawCard p gs' else gs'
 
   -- |Must be during the correct phase. Should update phase to Reinforce and call nextTurn.
   skipFortify :: GameState -> Maybe GameState
-  skipFortify gs | phase gs == Fortify = Just (nextTurn gs)
+  skipFortify gs | phase gs == Fortify = Just ((nextTurn . (tryDrawCard (currPlayer gs))) gs)
                  | otherwise = Nothing
+                 where tryDrawCard p gs' = if (hasDrawn gs') then drawCard p gs' else  gs'
 
 -------------------------------------------------------------------------------------------------------
