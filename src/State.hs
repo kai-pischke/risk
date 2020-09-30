@@ -85,6 +85,11 @@ updateMiniPhase :: MiniPhase -> Phase -> Phase
 updateMiniPhase m (Attack _) = Attack m
 updateMiniPhase _ y = y
 
+updateCardDrawing :: GameState -> GameState
+updateCardDrawing g = case statePhase g of
+  (Attack (WonBattle _ _ _)) -> changeGetCard (const True) g
+  _ -> g
+  
 -- general helper functions --
 fmaybe :: a -> Maybe a -> a
 fmaybe d = maybe d id
@@ -112,7 +117,7 @@ fischeryates (xs, ys, g) = fischeryates (xs', x:ys, g')
   (i, g') = uniformR (0, length xs - 1) g
   x = xs !! i
   xs' = take i xs ++ drop (i+1) xs
-    
+
 -- map functions for Internal State --
 changeTroopMap :: (Map Country Int -> Map Country Int) -> GameState -> GameState
 changeTroopMap f (InternalGameState t p g h l g' d d' h') = InternalGameState (f t) p g h l g' d d' h'
@@ -201,8 +206,9 @@ nextPhase = changePhase advancePhase
 
 -- | Does nothing if not in 'Attack' 'Phase', otherwise sets phase to 'Attack' 'MiniPhase'
 -- (inserting the provided 'MiniPhase').
+-- Note that calling this function on a 'WonBattle' will cause it to remember that the current player gets a card this turn.
 changeMiniPhase :: MiniPhase -> GameState -> GameState
-changeMiniPhase = changePhase . updateMiniPhase
+changeMiniPhase = (updateCardDrawing .) . changePhase . updateMiniPhase 
 
 -- | Returns the list of cards in the player's hand
 cards :: GameState -> Player -> [Card]
@@ -221,7 +227,7 @@ useCard p c = addToDiscard . removeCard
 -- | Adds the top card to the player's hand.
 -- Shuffles the discard pile if necessary using a provided shuffle function.
 drawCard :: Player -> GameState -> GameState
-drawCard p = changeGetCard (const True) . takeTop . fillDeck
+drawCard p = takeTop . fillDeck
    where
    fillDeck :: GameState -> GameState
    fillDeck g = if null (deck g)
@@ -248,7 +254,7 @@ kick p1 p2 = updateCards . removePlayer
          ++ show p1 ++ " since "
          ++ show p1 ++ " isn't in the game."
 
--- | @True@ if and only if the 'drawCard' has been called at least once this turn.
+-- | @True@ if and only if the current player has made at least one successful attack this turn.
 hasDrawn :: GameState -> Bool
 hasDrawn = getsCard
 
