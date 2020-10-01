@@ -157,7 +157,6 @@ play conn player state = do
                 (Request _ (LoadGame i)) -> do
                     putStrLn $ "SERVER REQUEST  >> " ++ reqInfo player (LoadGame i)
                     load state i
-                    broadcast state (BLU.pack "")
                 _ -> do
                     respond conn state req
             Right err -> do
