@@ -37,7 +37,8 @@ function countryClicked(e : MouseEvent, ui: Draw, canvas : HTMLElement){
     document.getElementById("endAttack").onclick = (() => {document.dispatchEvent(new CustomEvent("EndAttack"))});
     document.getElementById("skipFortify").onclick = (() => {document.dispatchEvent(new CustomEvent("SkipFortify"))});
     document.getElementById("saveGame").onclick   = (() => {document.dispatchEvent(new CustomEvent("SaveGame"))});
-
+    document.getElementById("loadGame").onclick   = (() => {document.dispatchEvent(new CustomEvent("LoadGame"))});
+    
     document.getElementById("popupSubmit").onclick = (() => {document.dispatchEvent(new CustomEvent("PopupSubmit"))});
     document.getElementById("popupCancel").onclick = (() => {document.dispatchEvent(new CustomEvent("PopupCancel"))});
     //document.getElementById("cancelNumberTroops").onclick = (() => {document.getElementById("popupNumberTroops").style.display = "none";});
@@ -95,6 +96,21 @@ function countryClicked(e : MouseEvent, ui: Draw, canvas : HTMLElement){
             action: "SaveGame",
             sender: colour
         }));
+    });
+    document.addEventListener('LoadGame', function (e : CustomEvent) {
+        const response = prompt("Enter a Game Id", "0");
+        if (response != null && response != "") {
+            const i = parseInt(response, 10);
+            if (i != null) {
+                conn.send(JSON.stringify({
+                    action: "LoadGame",
+                    game_id: i,
+                    sender: colour
+                }));
+            }
+        }
+
+        
     });
     //---------------------------------------
 

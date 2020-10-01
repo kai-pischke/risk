@@ -17,12 +17,13 @@ import System.Random (getStdGen)
 import Control.Exception (finally)
 import Control.Concurrent.MVar (MVar, modifyMVar, newMVar, readMVar, modifyMVar_)
 import Control.Monad (forM_, forever)
-import Data.ByteString.Lazy.UTF8 as BLU
+import Data.ByteString.Lazy (ByteString)
+import qualified Data.ByteString.Lazy.UTF8 as BLU
 import System.Directory
 import System.FilePath
 import Data.List
 import Text.Read
-import Data.Aeson (encode)
+import Data.Aeson (encode, decode)
 import qualified Data.ByteString.Lazy as B
 
 {- The State type holds all the current connections 
@@ -111,14 +112,30 @@ getGames = do
 save :: MVar State -> IO ()
 save s = do
     gamesFolder <- getAppUserDataDirectory gamesFolderName
-    print gamesFolder
+    createDirectoryIfMissing True gamesFolder
     gs <- getGames
     let gameId = case gs of 
                     [] -> 0
                     _  -> maximum gs + 1
-    State players game <- readMVar s
+    State _ game <- readMVar s
     let encoded = encode game
-    B.writeFile (gamesFolder </> addExtension ("saved_game" ++ show gameId) "json") encoded
+    let saveLocation = (gamesFolder </> addExtension ("saved_game" ++ show gameId) "json")
+    putStrLn $ "SAVED GAME      >> Location: " ++ saveLocation
+    B.writeFile saveLocation encoded
+
+load :: MVar State -> Int -> IO ()
+load s gameId = do
+    gamesFolder <- getAppUserDataDirectory gamesFolderName
+    createDirectoryIfMissing True gamesFolder
+    gs <- getGames
+    let gameName = (gamesFolder </> addExtension ("saved_game" ++ show gameId) "json")
+    if not (gameId `elem` gs) then return () else do
+        rawGame <- B.readFile gameName
+        let Just decodedGame = (decode rawGame) :: Maybe Game
+        modifyMVar_ s $ \(State ps _) -> do
+            return (State ps decodedGame)
+        putStrLn $ "LOADED GAME     >> Location: " ++ gameName
+
 
 -- deals with one cycle of receiving and then sending responses    
 play :: WS.Connection -> Player -> MVar State -> IO ()
@@ -137,7 +154,10 @@ play conn player state = do
                 (Request _ SaveGame) -> do
                     putStrLn $ "SERVER REQUEST  >> " ++ reqInfo player SaveGame
                     save state
-                (Request _ (LoadGame _)) -> undefined
+                (Request _ (LoadGame i)) -> do
+                    putStrLn $ "SERVER REQUEST  >> " ++ reqInfo player (LoadGame i)
+                    load state i
+                    broadcast state (BLU.pack "")
                 _ -> do
                     respond conn state req
             Right err -> do

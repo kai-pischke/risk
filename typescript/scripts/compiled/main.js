@@ -26,6 +26,7 @@ define(["require", "exports", "./draw", "./board", "./sock", "./moves", "./map"]
         document.getElementById("endAttack").onclick = (() => { document.dispatchEvent(new CustomEvent("EndAttack")); });
         document.getElementById("skipFortify").onclick = (() => { document.dispatchEvent(new CustomEvent("SkipFortify")); });
         document.getElementById("saveGame").onclick = (() => { document.dispatchEvent(new CustomEvent("SaveGame")); });
+        document.getElementById("loadGame").onclick = (() => { document.dispatchEvent(new CustomEvent("LoadGame")); });
         document.getElementById("popupSubmit").onclick = (() => { document.dispatchEvent(new CustomEvent("PopupSubmit")); });
         document.getElementById("popupCancel").onclick = (() => { document.dispatchEvent(new CustomEvent("PopupCancel")); });
         //document.getElementById("cancelNumberTroops").onclick = (() => {document.getElementById("popupNumberTroops").style.display = "none";});
@@ -36,6 +37,7 @@ define(["require", "exports", "./draw", "./board", "./sock", "./moves", "./map"]
         document.addEventListener('Fortify', function (e) { moves.fortify(e.detail); });
         document.addEventListener('MidBattle', function (e) { moves.chooseDefenders(e.detail.board, e.detail.ac, e.detail.dc, e.detail.att); });
         document.addEventListener('BattleEnd', function (e) { moves.invade(e.detail.board, e.detail.ac, e.detail.dc, e.detail.attrem); });
+        document.addEventListener('TimeToTrade', function (e) { moves.getTrade(e.detail); });
         // IDK why +1 but seems to make it recognise perfectly
         canvas.onmouseup = function (e) { countryClicked(e, ui, canvas); };
         canvas.onmousemove = function (e) {
@@ -76,6 +78,19 @@ define(["require", "exports", "./draw", "./board", "./sock", "./moves", "./map"]
                 action: "SaveGame",
                 sender: colour
             }));
+        });
+        document.addEventListener('LoadGame', function (e) {
+            const response = prompt("Enter a Game Id", "0");
+            if (response != null && response != "") {
+                const i = parseInt(response, 10);
+                if (i != null) {
+                    conn.send(JSON.stringify({
+                        action: "LoadGame",
+                        game_id: i,
+                        sender: colour
+                    }));
+                }
+            }
         });
         //---------------------------------------
         ui.draw(board);

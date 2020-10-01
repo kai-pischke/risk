@@ -79,6 +79,10 @@ instance FromJSON Request where
             then return (Request sender StartGame)
         else if (requestType == ("SaveGame" :: String))
             then return (Request sender SaveGame)
+        else if (requestType == ("LoadGame" :: String))
+            then do
+                i <- (v .: pack "game_id")
+                return (Request sender (LoadGame i))
         else if (requestType == "PlaceTroop")
             then do
                 c <- (v .: pack "country")

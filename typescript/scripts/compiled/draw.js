@@ -163,8 +163,6 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
                 let styleStr = "";
                 if (this._cardColour.has("card" + i.toString()))
                     styleStr = "\"border: 3px solid " + this._cardColour.get("card" + i.toString()) + "\"";
-                console.log(this._cardColour);
-                console.log("style: " + styleStr);
                 let str = "";
                 str = "<div class = \"card\" id = \"card" + i.toString() + "\" data-type = \"" + c + "\" style = " + styleStr + "><img src = \"" + imgstr + "\" width = 100%> <div class = \"container\"><h4><b>" + c + "</b></h4></div>";
                 hand.innerHTML += str;
@@ -231,6 +229,12 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
         }
         clearCardColours() {
             this._cardColour = new Map();
+        }
+        showTradeMessage() {
+            document.getElementById("tradeMessageBox").style.visibility = "visible";
+        }
+        hideTradeMessage() {
+            document.getElementById("tradeMessageBox").style.visibility = "hidden";
         }
     }
     exports.Draw = Draw;
