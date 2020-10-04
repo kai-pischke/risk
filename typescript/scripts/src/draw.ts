@@ -191,10 +191,10 @@ export class Draw{
 
             switch (c) {
                 case "Wild":
-                    imgstr = "Wild.png"
+                    imgstr = "Wild.jpg"
                     break;
                     case "Infantry":
-                        imgstr = "Infantry.png"
+                        imgstr = "Infantry.jpg"
                         break;
                     case "Artillery":
                         imgstr = "Artillery.jpg"

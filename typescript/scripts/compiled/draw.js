@@ -149,10 +149,10 @@ define(["require", "exports", "./elements", "./map", "./neighbours"], function (
                 let imgstr = "";
                 switch (c) {
                     case "Wild":
-                        imgstr = "Wild.png";
+                        imgstr = "Wild.jpg";
                         break;
                     case "Infantry":
-                        imgstr = "Infantry.png";
+                        imgstr = "Infantry.jpg";
                         break;
                     case "Artillery":
                         imgstr = "Artillery.jpg";

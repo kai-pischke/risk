@@ -145,7 +145,7 @@ define(["require", "exports", "./elements"], function (require, exports, element
                                 if (cardsToTrade[whichSet].includes(elem.id))
                                     ui.setCardColour(elem.id, "#7fbf7f");
                             }
-                            if (board.cards.length - 3 <= lowerCardLimit && needToTrade) {
+                            if (board.cards.length - tradeIn[0].length - tradeIn[1].length <= lowerCardLimit && needToTrade) {
                                 document.addEventListener("CountryClickedOn", listenForReinforce);
                                 needToTrade = false;
                                 ui.hideTradeMessage();
